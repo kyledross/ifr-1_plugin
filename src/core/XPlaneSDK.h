@@ -1,0 +1,30 @@
+#pragma once
+#include <string>
+#include <vector>
+#include <cstdint>
+
+/**
+ * @brief Interface for X-Plane SDK functions to allow mocking in unit tests.
+ */
+class IXPlaneSDK {
+public:
+    virtual ~IXPlaneSDK() = default;
+
+    // Data Access
+    virtual void* FindDataRef(const char* name) = 0;
+    virtual int GetDatai(void* dataRef) = 0;
+    virtual void SetDatai(void* dataRef, int value) = 0;
+    virtual float GetDataf(void* dataRef) = 0;
+    virtual void SetDataf(void* dataRef, float value) = 0;
+    virtual int GetDatab(void* dataRef, void* outData, int offset, int maxLength) = 0;
+
+    // Commands
+    virtual void* FindCommand(const char* name) = 0;
+    virtual void CommandOnce(void* commandRef) = 0;
+    virtual void CommandBegin(void* commandRef) = 0;
+    virtual void CommandEnd(void* commandRef) = 0;
+
+    // Utilities
+    virtual void DebugString(const char* string) = 0;
+    virtual float GetElapsedTime() = 0;
+};
