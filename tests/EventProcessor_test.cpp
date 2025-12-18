@@ -22,7 +22,6 @@ public:
 };
 
 using ::testing::Return;
-using ::testing::_;
 
 TEST(EventProcessorTest, ProcessEvent_CallsCommandOnce) {
     MockXPlaneSDK mockSdk;
@@ -41,7 +40,7 @@ TEST(EventProcessorTest, ProcessEvent_CallsCommandOnce) {
         }}
     };
 
-    void* dummyCmd = (void*)0x1234;
+    void* dummyCmd = reinterpret_cast<void*>(0x1234);
     EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("sim/radios/com1_standy_flip")))
         .WillOnce(Return(dummyCmd));
     EXPECT_CALL(mockSdk, CommandOnce(dummyCmd));
@@ -67,7 +66,7 @@ TEST(EventProcessorTest, ProcessEvent_CallsSetDataf) {
         }}
     };
 
-    void* dummyDr = (void*)0x5678;
+    void* dummyDr = reinterpret_cast<void*>(0x5678);
     EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833")))
         .WillOnce(Return(dummyDr));
     EXPECT_CALL(mockSdk, SetDataf(dummyDr, 121500.0f));
