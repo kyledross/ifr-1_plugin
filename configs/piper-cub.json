@@ -136,6 +136,30 @@
         }
       },
       "inner-knob-button": { "short-press": { "type": "command", "value": "sim/transponder/transponder_ident" } }
+    },
+    "xpdr-mode": {
+      "inner-knob-button": {
+        "short-press": {
+          "type": "command",
+          "value": "sim/transponder/transponder_ident"
+        }
+      },
+      "inner-knob": {
+        "rotate-clockwise": {
+          "type": "command",
+          "value": "sim/transponder/transponder_up"
+        },
+        "rotate-counterclockwise": {
+          "type": "command",
+          "value": "sim/transponder/transponder_dn"
+        }
+      },
+      "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
+      "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },
+      "nav": { "short-press": { "type": "command", "value": "sim/autopilot/NAV" } },
+      "apr": { "short-press": { "type": "command", "value": "sim/autopilot/approach" } },
+      "alt": { "short-press": { "type": "command", "value": "sim/autopilot/altitude_hold" } },
+      "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } }
     }
   },
   "output": {
