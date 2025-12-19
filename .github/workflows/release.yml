@@ -23,10 +23,7 @@ jobs:
       - name: Create Release Package
         run: |
           mkdir -p release-staging
-          cp docker-output/ifr1flex.xpl release-staging/
-          cp install.sh release-staging/
-          cp LICENSE release-staging/
-          cp -r configs release-staging/
+          cp -r docker-output/* release-staging/
           chmod +x release-staging/install.sh
           tar -czvf ifr1flex_Linux_Install.tar.gz -C release-staging .
 

@@ -74,6 +74,9 @@ docker run --rm \
         echo ""
         echo "Copying output to /output..."
         cp -v ifr1flex.xpl /output/ifr1flex.xpl
+        cp -v /source/install.sh /output/install.sh
+        cp -v /source/LICENSE /output/LICENSE
+        cp -rv /source/configs /output/configs
         echo ""
         echo "Build complete!"
         echo ""
@@ -86,9 +89,8 @@ echo "=========================================="
 echo "Build Complete!"
 echo "=========================================="
 echo ""
-echo "Output location: $SCRIPT_DIR/docker-output/ifr1flex.xpl"
+echo "Output location: $SCRIPT_DIR/docker-output/"
 echo ""
 echo "To install the plugin:"
-echo "  mkdir -p \"[Your X-Plane Installation]/Resources/plugins/ifr1flex/64\""
-echo "  cp \"$SCRIPT_DIR/docker-output/ifr1flex.xpl\" \"[Your X-Plane Installation]/Resources/plugins/ifr1flex/64/lin.xpl\""
+echo "  cd \"$SCRIPT_DIR/docker-output\" && ./install.sh"
 echo ""

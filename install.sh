@@ -189,7 +189,7 @@ fi
 success "Plugin binary verified."
 
 # Install the plugin
-PLUGIN_BASE_DIR="$XPLANE_ROOT/Resources/plugins/IFR1_Flex"
+PLUGIN_BASE_DIR="$XPLANE_ROOT/Resources/plugins/ifr1flex"
 PLUGIN_DIR="$PLUGIN_BASE_DIR/64"
 CONFIGS_TARGET_DIR="$PLUGIN_BASE_DIR/configs"
 TARGET_PLUGIN="$PLUGIN_DIR/lin.xpl"
