@@ -16,7 +16,7 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
             return;
         }
         m_sdk.DebugString("IFR-1 Flex: Device connected.\n");
-        m_shifted = false; // Reset state on reconnect
+        ClearLEDs(); // Reset state and clear LEDs on connect
     }
 
     uint8_t buffer[IFR1::HID_REPORT_SIZE + 1];
@@ -66,6 +66,15 @@ void DeviceHandler::UpdateLEDs(const nlohmann::json& config, float currentTime) 
         uint8_t report[2] = { IFR1::HID_LED_REPORT_ID, ledBits };
         m_hw.Write(report, 2);
         m_lastLedBits = ledBits;
+    }
+}
+
+void DeviceHandler::ClearLEDs() {
+    m_shifted = false;
+    m_lastLedBits = 0;
+    if (m_hw.IsConnected()) {
+        uint8_t report[2] = { IFR1::HID_LED_REPORT_ID, 0 };
+        m_hw.Write(report, 2);
     }
 }
 

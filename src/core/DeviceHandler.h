@@ -26,6 +26,11 @@ public:
      */
     void UpdateLEDs(const nlohmann::json& config, float currentTime);
 
+    /**
+     * @brief Turns off all LEDs and clears the flash bit.
+     */
+    void ClearLEDs();
+
 private:
     void ProcessReport(const uint8_t* data, const nlohmann::json& config, float currentTime);
     void HandleKnobs(const IFR1::HardwareEvent& event, const nlohmann::json& config);

@@ -42,10 +42,18 @@ TEST(DeviceHandlerTest, Update_ConnectsWhenDisconnected) {
     OutputProcessor outputProc(mockSdk);
     DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
     
-    EXPECT_CALL(mockHw, IsConnected()).WillOnce(Return(false));
+    EXPECT_CALL(mockHw, IsConnected())
+        .WillOnce(Return(false))
+        .WillRepeatedly(Return(true));
     EXPECT_CALL(mockHw, Connect(IFR1::VENDOR_ID, IFR1::PRODUCT_ID)).WillOnce(Return(true));
-    EXPECT_CALL(mockSdk, DebugString(_));
+    EXPECT_CALL(mockSdk, DebugString(_)).WillRepeatedly(Return());
     
+    // ClearLEDs will be called on connect
+    EXPECT_CALL(mockHw, Write(_, 2)).WillOnce(Return(2));
+    
+    // Read will be called in the loop
+    EXPECT_CALL(mockHw, Read(_, _, _)).WillRepeatedly(Return(0));
+
     nlohmann::json config;
     handler.Update(config, 0.0f);
 }
@@ -213,4 +221,24 @@ TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
     EXPECT_CALL(mockSdk, CommandOnce(com2Cmd));
     
     handler.Update(config, 0.9f);
+}
+
+TEST(DeviceHandlerTest, ClearLEDs_SendsZeroReportAndResetsState) {
+    MockHardwareManager mockHw;
+    MockXPlaneSDK mockSdk;
+    EventProcessor eventProc(mockSdk);
+    OutputProcessor outputProc(mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
+    
+    EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
+    
+    // Expect a write with HID_LED_REPORT_ID and 0
+    EXPECT_CALL(mockHw, Write(_, 2))
+        .WillOnce(::testing::Invoke([](const uint8_t* data, size_t len) {
+            EXPECT_EQ(data[0], IFR1::HID_LED_REPORT_ID);
+            EXPECT_EQ(data[1], 0);
+            return 2;
+        }));
+    
+    handler.ClearLEDs();
 }

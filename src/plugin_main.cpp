@@ -47,6 +47,7 @@ float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceL
         if (currentPath != gCurrentAircraftPath) {
             XPLMDebugString(("IFR-1 Flex: Aircraft changed to " + currentPath + "\n").c_str());
             gCurrentAircraftPath = currentPath;
+            gDeviceHandler->ClearLEDs();
             gCurrentConfig = gConfigManager->GetConfigForAircraft(currentPath);
             if (gCurrentConfig.empty()) {
                 XPLMDebugString("IFR-1 Flex: No configuration found for this aircraft.\n");
@@ -136,6 +137,9 @@ PLUGIN_API void XPluginStop(void) {
 }
 
 PLUGIN_API void XPluginDisable(void) {
+    if (gDeviceHandler) {
+        gDeviceHandler->ClearLEDs();
+    }
     if (gFlightLoop) {
         XPLMDestroyFlightLoop(gFlightLoop);
         gFlightLoop = nullptr;
@@ -148,6 +152,10 @@ PLUGIN_API void XPluginDisable(void) {
 PLUGIN_API int XPluginEnable(void) {
     gAcfPathRef = XPLMFindDataRef("sim/aircraft/view/acf_relative_path");
     gCurrentAircraftPath.clear();
+    
+    if (gDeviceHandler) {
+        gDeviceHandler->ClearLEDs();
+    }
 
     XPLMCreateFlightLoop_t params;
     params.structSize = sizeof(XPLMCreateFlightLoop_t);
