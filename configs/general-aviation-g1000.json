@@ -194,7 +194,7 @@
       "inner-knob-button": {
         "short-press": {
           "type": "command",
-          "value": "sim/instruments/heading_sync"
+          "value": "sim/GPS/g1000n1_hdg_sync"
         }
       },
       "outer-knob": {
