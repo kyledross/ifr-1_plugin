@@ -2,7 +2,6 @@
 #include "XPlaneSDK.h"
 #include <nlohmann/json.hpp>
 #include <string>
-#include <memory>
 
 class EventProcessor {
 public:
@@ -18,7 +17,7 @@ public:
     void ProcessEvent(const nlohmann::json& config, 
                       const std::string& mode, 
                       const std::string& control, 
-                      const std::string& action);
+                      const std::string& action) const;
 
 private:
     IXPlaneSDK& m_sdk;

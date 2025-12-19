@@ -2,7 +2,6 @@
 #include <string>
 #include <vector>
 #include <nlohmann/json.hpp>
-#include <filesystem>
 
 class ConfigManager {
 public:
@@ -20,7 +19,7 @@ public:
      * @param aircraftFilename The filename of the .acf file.
      * @return The matching JSON configuration, or empty json if not found.
      */
-    nlohmann::json GetConfigForAircraft(const std::string& aircraftFilename) const;
+    [[nodiscard]] nlohmann::json GetConfigForAircraft(const std::string& aircraftFilename) const;
 
 private:
     std::vector<nlohmann::json> m_configs;

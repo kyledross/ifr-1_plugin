@@ -2,7 +2,8 @@
 #include "IFR1Protocol.h"
 #include <cmath>
 
-uint8_t OutputProcessor::EvaluateLEDs(const nlohmann::json& config, float currentTime) {
+uint8_t OutputProcessor::EvaluateLEDs(const nlohmann::json& config, float currentTime) const
+{
     if (config.empty() || !config.contains("output")) {
         return IFR1::LEDMask::OFF;
     }
@@ -43,7 +44,8 @@ uint8_t OutputProcessor::EvaluateLEDs(const nlohmann::json& config, float curren
     return ledBits;
 }
 
-bool OutputProcessor::EvaluateTest(const nlohmann::json& test) {
+bool OutputProcessor::EvaluateTest(const nlohmann::json& test) const
+{
     if (!test.contains("dataref")) return false;
 
     std::string drName = test["dataref"];

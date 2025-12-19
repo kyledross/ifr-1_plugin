@@ -33,6 +33,7 @@ static void* gAcfPathRef = nullptr;
 
 static XPLMFlightLoopID gFlightLoop = nullptr;
 
+// ReSharper disable once CppDFAConstantFunctionResult
 float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void* inRefcon) {
     if (!gSDK || !gDeviceHandler) return -1.0f;
 
@@ -72,9 +73,9 @@ float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceL
 }
 
 PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
-    std::strcpy(outName, "IFR-1 Flex");
-    std::strcpy(outSig, "com.kyle.ifr1flex");
-    std::strcpy(outDesc, "Flexible Octavi IFR-1 interface.");
+    std::strcpy(outName, "IFR-1 Plugin");
+    std::strcpy(outSig, "com.kyleross.ifr1flex");
+    std::strcpy(outDesc, "Flexible IFR-1 interface.");
 
     gSDK = CreateXPlaneSDK();
     gConfigManager = std::make_unique<ConfigManager>();

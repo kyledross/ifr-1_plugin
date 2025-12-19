@@ -5,7 +5,7 @@ HIDManager::HIDManager() : m_device(nullptr) {
 }
 
 HIDManager::~HIDManager() {
-    Disconnect();
+    HIDManager::Disconnect();
     hid_exit();
 }
 

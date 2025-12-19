@@ -4,7 +4,8 @@
 void EventProcessor::ProcessEvent(const nlohmann::json& config, 
                                   const std::string& mode, 
                                   const std::string& control, 
-                                  const std::string& action) {
+                                  const std::string& action) const
+{
     if (config.empty()) return;
 
     if (config.contains("modes") && 
@@ -17,8 +18,7 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
         std::string value = actionConfig.value("value", "");
 
         if (type == "command") {
-            void* cmdRef = m_sdk.FindCommand(value.c_str());
-            if (cmdRef) {
+            if (void* cmdRef = m_sdk.FindCommand(value.c_str())) {
                 m_sdk.DebugString(("IFR-1 Flex: Executing command: " + value + "\n").c_str());
                 m_sdk.CommandOnce(cmdRef);
             } else {
@@ -26,8 +26,7 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
                 m_sdk.DebugString(msg.c_str());
             }
         } else if (type == "dataref-set") {
-            void* drRef = m_sdk.FindDataRef(value.c_str());
-            if (drRef) {
+            if (void* drRef = m_sdk.FindDataRef(value.c_str())) {
                 if (actionConfig.contains("adjustment")) {
                     float adj = actionConfig["adjustment"].get<float>();
                     int types = m_sdk.GetDataRefTypes(drRef);
@@ -42,8 +41,7 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
                 m_sdk.DebugString(msg.c_str());
             }
         } else if (type == "dataref-adjust") {
-            void* drRef = m_sdk.FindDataRef(value.c_str());
-            if (drRef) {
+            if (void* drRef = m_sdk.FindDataRef(value.c_str())) {
                 int types = m_sdk.GetDataRefTypes(drRef);
                 float current = 0.0f;
                 bool isInt = (types & static_cast<int>(DataRefType::Int));

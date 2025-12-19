@@ -41,7 +41,7 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
             if (currentTime - m_buttonStates[i].pressStartTime >= 0.5f) {
                 m_buttonStates[i].longPressDetected = true;
                 
-                IFR1::Button btn = static_cast<IFR1::Button>(i);
+                auto btn = static_cast<IFR1::Button>(i);
                 if (btn == IFR1::Button::INNER_KNOB) {
                     m_shifted = !m_shifted;
                 } else {
@@ -110,7 +110,12 @@ void DeviceHandler::ProcessReport(const uint8_t* data, const nlohmann::json& con
     event.buttonStates[static_cast<int>(IFR1::Button::ALT)] = checkBit(data[3], IFR1::BitPosition::ALT);
     event.buttonStates[static_cast<int>(IFR1::Button::VS)] = checkBit(data[3], IFR1::BitPosition::VS);
 
-    // Handle knobs
+    HandleKnobs(event, config);
+    HandleButtons(event, config, currentTime);
+}
+
+void DeviceHandler::HandleKnobs(const IFR1::HardwareEvent& event, const nlohmann::json& config) const
+{
     if (event.outerKnobRotation != 0) {
         std::string action = (event.outerKnobRotation > 0) ? "rotate-clockwise" : "rotate-counterclockwise";
         m_sdk.DebugString(("IFR-1 Flex: Outer knob " + action + "\n").c_str());
@@ -125,12 +130,13 @@ void DeviceHandler::ProcessReport(const uint8_t* data, const nlohmann::json& con
             m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), "inner-knob", action);
         }
     }
+}
 
-    // Handle button transitions
+void DeviceHandler::HandleButtons(const IFR1::HardwareEvent& event, const nlohmann::json& config, float currentTime) {
     for (int i = 0; i < 12; ++i) {
         bool current = event.buttonStates[i];
         bool last = m_buttonStates[i].currentlyHeld;
-        
+
         if (current && !last) {
             // Pressed
             m_sdk.DebugString(("IFR-1 Flex: Button " + GetControlString(static_cast<IFR1::Button>(i)) + " pressed\n").c_str());
@@ -150,7 +156,7 @@ void DeviceHandler::ProcessReport(const uint8_t* data, const nlohmann::json& con
     }
 }
 
-std::string DeviceHandler::GetModeString(IFR1::Mode mode, bool shifted) const {
+std::string DeviceHandler::GetModeString(IFR1::Mode mode, bool shifted) {
     if (!shifted) {
         switch (mode) {
             case IFR1::Mode::COM1: return "com1";
@@ -177,7 +183,7 @@ std::string DeviceHandler::GetModeString(IFR1::Mode mode, bool shifted) const {
     return "";
 }
 
-std::string DeviceHandler::GetControlString(IFR1::Button button) const {
+std::string DeviceHandler::GetControlString(IFR1::Button button) {
     switch (button) {
         case IFR1::Button::DIRECT: return "direct-to";
         case IFR1::Button::MENU: return "menu";

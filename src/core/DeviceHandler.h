@@ -4,8 +4,6 @@
 #include "EventProcessor.h"
 #include "OutputProcessor.h"
 #include "XPlaneSDK.h"
-#include <memory>
-#include <map>
 #include <array>
 
 class DeviceHandler {
@@ -33,11 +31,11 @@ public:
 
 private:
     void ProcessReport(const uint8_t* data, const nlohmann::json& config, float currentTime);
-    void HandleKnobs(const IFR1::HardwareEvent& event, const nlohmann::json& config);
-    void HandleButtons(const IFR1::HardwareEvent& event, const nlohmann::json& config);
+    static std::string GetModeString(IFR1::Mode mode, bool shifted);
+    static std::string GetControlString(IFR1::Button button);
+    void HandleKnobs(const IFR1::HardwareEvent& event, const nlohmann::json& config) const;
+    void HandleButtons(const IFR1::HardwareEvent& event, const nlohmann::json& config, float currentTime);
     
-    std::string GetModeString(IFR1::Mode mode, bool shifted) const;
-    std::string GetControlString(IFR1::Button button) const;
 
     IHardwareManager& m_hw;
     EventProcessor& m_eventProc;

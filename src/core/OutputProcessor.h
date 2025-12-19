@@ -1,8 +1,6 @@
 #pragma once
 #include "XPlaneSDK.h"
 #include <nlohmann/json.hpp>
-#include <string>
-#include <vector>
 
 class OutputProcessor {
 public:
@@ -14,10 +12,10 @@ public:
      * @param currentTime Current time in seconds (for blinking).
      * @return 8-bit mask of LEDs to be lit.
      */
-    uint8_t EvaluateLEDs(const nlohmann::json& config, float currentTime);
+    [[nodiscard]] uint8_t EvaluateLEDs(const nlohmann::json& config, float currentTime) const;
 
 private:
     IXPlaneSDK& m_sdk;
 
-    bool EvaluateTest(const nlohmann::json& test);
+    [[nodiscard]] bool EvaluateTest(const nlohmann::json& test) const;
 };
