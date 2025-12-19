@@ -8,7 +8,7 @@ A config file can be designated as the fallback configuration by adding a `"fall
 ```json
 {
   "fallback": true,
-  "modes": { ... }
+  "modes": { }
 }
 ```
 

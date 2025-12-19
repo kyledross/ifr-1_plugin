@@ -5,6 +5,7 @@ project(ifr1flex)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 # 2. External Libraries (Google Test & JSON)
 include(FetchContent)
@@ -20,7 +21,20 @@ FetchContent_Declare(
   URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
 )
 
-FetchContent_MakeAvailable(googletest json)
+FetchContent_Declare(
+  hidapi
+  URL https://github.com/libusb/hidapi/archive/refs/tags/hidapi-0.14.0.tar.gz
+)
+
+# 2.1 hidapi configuration
+set(HIDAPI_BUILD_HIDTEST OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+if(UNIX AND NOT APPLE)
+    set(HIDAPI_WITH_LIBUSB OFF CACHE BOOL "" FORCE)
+    set(HIDAPI_WITH_HIDRAW ON CACHE BOOL "" FORCE)
+endif()
+
+FetchContent_MakeAvailable(googletest json hidapi)
 
 enable_testing()
 
@@ -48,7 +62,10 @@ target_include_directories(ifr1flex_core PUBLIC
     ${XPLANE_SDK_PATH}/CHeaders/XPLM
     ${XPLANE_SDK_PATH}/CHeaders/Widgets
 )
-target_link_libraries(ifr1flex_core PUBLIC nlohmann_json::nlohmann_json)
+target_link_libraries(ifr1flex_core PUBLIC 
+    nlohmann_json::nlohmann_json
+    hidapi::hidapi
+)
 
 # 7. Create Library (Plugin Target)
 add_library(ifr1flex SHARED src/plugin_main.cpp)
