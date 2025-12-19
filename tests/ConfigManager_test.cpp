@@ -90,3 +90,17 @@ TEST_F(ConfigManagerTest, GetConfigForAircraft_ReturnsFallbackIfNoMatch) {
     auto config2 = manager.GetConfigForAircraft("SomeOtherAircraft.acf");
     EXPECT_EQ(config2["id"], "fallback");
 }
+
+TEST_F(ConfigManagerTest, LoadConfigs_PopulatesNameFromFilenameIfMissing) {
+    CreateTestConfig("my-cool-config.json", {{"aircraft", {"CoolPlane"}}});
+    CreateTestConfig("with-name.json", {{"name", "Explicit Name"}, {"aircraft", {"OtherPlane"}}});
+
+    ConfigManager manager;
+    manager.LoadConfigs(testConfigDir.string());
+
+    auto config1 = manager.GetConfigForAircraft("CoolPlane");
+    EXPECT_EQ(config1["name"], "my-cool-config");
+
+    auto config2 = manager.GetConfigForAircraft("OtherPlane");
+    EXPECT_EQ(config2["name"], "Explicit Name");
+}

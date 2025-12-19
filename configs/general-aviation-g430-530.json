@@ -1,8 +1,10 @@
 {
+  "name": "General Aviation (G430/530)",
   "aircraft": [
     "Cessna_172SP",
     "Cessna_172SP_seaplane"
   ],
+  "debug": true,
   "modes": {
     "com1": {
       "outer-knob": {
@@ -203,12 +205,18 @@
     },
     "ap": {
       "outer-knob": {
-        "rotate-clockwise": { "type": "dataref-adjust", "value": "sim/cockpit/autopilot/altitude", "adjustment": 100.0, "min": 0.0, "max": 40000.0, "limit-type": "stop" },
-        "rotate-counterclockwise": { "type": "dataref-adjust", "value": "sim/cockpit/autopilot/altitude", "adjustment": -100.0, "min": 0.0, "max": 40000.0, "limit-type": "stop" }
+        "rotate-clockwise": {
+          "type": "command",
+          "value": "sim/autopilot/altitude_up"
+        },
+        "rotate-counterclockwise": {
+          "type": "command",
+          "value": "sim/autopilot/altitude_down"
+        }
       },
       "inner-knob": {
-        "rotate-clockwise": { "type": "dataref-adjust", "value": "sim/cockpit/autopilot/vertical_velocity", "adjustment": 100.0, "min": -5000.0, "max": 5000.0, "limit-type": "stop" },
-        "rotate-counterclockwise": { "type": "dataref-adjust", "value": "sim/cockpit/autopilot/vertical_velocity", "adjustment": -100.0, "min": -5000.0, "max": 5000.0, "limit-type": "stop" }
+        "rotate-clockwise": { "type": "command", "value": "sim/autopilot/vertical_speed_up"},
+        "rotate-counterclockwise": { "type": "command", "value": "sim/autopilot/vertical_speed_down"}
       },
       "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
       "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },

@@ -1,4 +1,5 @@
 {
+  "name": "Generic Fallback",
   "fallback": true,
   "modes": {
     "com1": {

@@ -18,6 +18,9 @@ size_t ConfigManager::LoadConfigs(const std::string& directoryPath) {
                 if (file.is_open()) {
                     nlohmann::json config;
                     file >> config;
+                    if (!config.contains("name")) {
+                        config["name"] = entry.path().stem().string();
+                    }
                     if (config.value("fallback", false)) {
                         m_fallbackConfig = config;
                     } else {
