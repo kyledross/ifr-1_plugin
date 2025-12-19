@@ -3,13 +3,14 @@
 #include "IFR1Protocol.h"
 #include "EventProcessor.h"
 #include "OutputProcessor.h"
+#include "XPlaneSDK.h"
 #include <memory>
 #include <map>
 #include <array>
 
 class DeviceHandler {
 public:
-    DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc);
+    DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk);
 
     /**
      * @brief Polls the device and processes any new data.
@@ -36,6 +37,7 @@ private:
     IHardwareManager& m_hw;
     EventProcessor& m_eventProc;
     OutputProcessor& m_outputProc;
+    IXPlaneSDK& m_sdk;
 
     // State
     IFR1::Mode m_currentMode = IFR1::Mode::COM1;

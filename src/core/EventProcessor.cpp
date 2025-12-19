@@ -18,6 +18,7 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
         if (type == "command") {
             void* cmdRef = m_sdk.FindCommand(value.c_str());
             if (cmdRef) {
+                m_sdk.DebugString(("IFR-1 Flex: Executing command: " + value + "\n").c_str());
                 m_sdk.CommandOnce(cmdRef);
             } else {
                 std::string msg = "IFR-1 Flex: Command not found: " + value + "\n";

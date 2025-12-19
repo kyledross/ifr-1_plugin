@@ -1,8 +1,8 @@
 #include "DeviceHandler.h"
 #include <iostream>
 
-DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc)
-    : m_hw(hw), m_eventProc(eventProc), m_outputProc(outputProc) {
+DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk)
+    : m_hw(hw), m_eventProc(eventProc), m_outputProc(outputProc), m_sdk(sdk) {
     for (auto& state : m_buttonStates) {
         state.currentlyHeld = false;
         state.pressStartTime = 0.0f;
@@ -15,15 +15,23 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
         if (!m_hw.Connect(IFR1::VENDOR_ID, IFR1::PRODUCT_ID)) {
             return;
         }
+        m_sdk.DebugString("IFR-1 Flex: Device connected.\n");
         m_shifted = false; // Reset state on reconnect
     }
 
     uint8_t buffer[IFR1::HID_REPORT_SIZE + 1];
-    int bytesRead = m_hw.Read(buffer, IFR1::HID_REPORT_SIZE, 0); // Non-blocking read
+    int bytesRead;
+    int reportsProcessed = 0;
 
-    if (bytesRead > 0) {
+    // Read all available reports
+    while ((bytesRead = m_hw.Read(buffer, IFR1::HID_REPORT_SIZE, 0)) > 0) {
         ProcessReport(buffer, config, currentTime);
-    } else if (bytesRead < 0) {
+        reportsProcessed++;
+        if (reportsProcessed > 10) break; // Safety break
+    }
+
+    if (bytesRead < 0) {
+        m_sdk.DebugString("IFR-1 Flex: Device disconnected (read error).\n");
         m_hw.Disconnect();
     }
 
@@ -93,12 +101,14 @@ void DeviceHandler::ProcessReport(const uint8_t* data, const nlohmann::json& con
     // Handle knobs
     if (event.outerKnobRotation != 0) {
         std::string action = (event.outerKnobRotation > 0) ? "rotate-clockwise" : "rotate-counterclockwise";
+        m_sdk.DebugString(("IFR-1 Flex: Outer knob " + action + "\n").c_str());
         for (int i = 0; i < std::abs(event.outerKnobRotation); ++i) {
             m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), "outer-knob", action);
         }
     }
     if (event.innerKnobRotation != 0) {
         std::string action = (event.innerKnobRotation > 0) ? "rotate-clockwise" : "rotate-counterclockwise";
+        m_sdk.DebugString(("IFR-1 Flex: Inner knob " + action + "\n").c_str());
         for (int i = 0; i < std::abs(event.innerKnobRotation); ++i) {
             m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), "inner-knob", action);
         }
@@ -111,11 +121,13 @@ void DeviceHandler::ProcessReport(const uint8_t* data, const nlohmann::json& con
         
         if (current && !last) {
             // Pressed
+            m_sdk.DebugString(("IFR-1 Flex: Button " + GetControlString(static_cast<IFR1::Button>(i)) + " pressed\n").c_str());
             m_buttonStates[i].currentlyHeld = true;
             m_buttonStates[i].pressStartTime = currentTime;
             m_buttonStates[i].longPressDetected = false;
         } else if (!current && last) {
             // Released
+            m_sdk.DebugString(("IFR-1 Flex: Button " + GetControlString(static_cast<IFR1::Button>(i)) + " released\n").c_str());
             if (!m_buttonStates[i].longPressDetected) {
                 // Short press
                 m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), GetControlString(static_cast<IFR1::Button>(i)), "short-press");

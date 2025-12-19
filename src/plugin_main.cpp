@@ -75,18 +75,29 @@ PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
     gEventProcessor = std::make_unique<EventProcessor>(*gSDK);
     gOutputProcessor = std::make_unique<OutputProcessor>(*gSDK);
     gHIDManager = std::make_unique<HIDManager>();
-    gDeviceHandler = std::make_unique<DeviceHandler>(*gHIDManager, *gEventProcessor, *gOutputProcessor);
+    gDeviceHandler = std::make_unique<DeviceHandler>(*gHIDManager, *gEventProcessor, *gOutputProcessor, *gSDK);
 
     char pluginPath[512];
     XPLMGetPluginInfo(XPLMGetMyID(), nullptr, pluginPath, nullptr, nullptr);
-    // pluginPath is like ".../Resources/plugins/ifr1flex/lin_x64/ifr1flex.xpl"
     fs::path p(pluginPath);
+    
+    // Config directory discovery:
+    // 1. Check parent folder of the plugin binary (e.g. plugins/ifr1flex/lin_x64/ -> plugins/ifr1flex/configs)
+    // 2. Check the plugin binary folder itself (e.g. plugins/ifr1flex/ -> plugins/ifr1flex/configs)
+    
     fs::path configDir = p.parent_path().parent_path() / "configs";
+    if (!fs::exists(configDir)) {
+        configDir = p.parent_path() / "configs";
+    }
     
     size_t loaded = gConfigManager->LoadConfigs(configDir.string());
     
-    char msg[256];
-    std::snprintf(msg, sizeof(msg), "IFR-1 Flex: Loaded %zu configurations from %s\n", loaded, configDir.string().c_str());
+    char msg[512];
+    if (loaded == 0) {
+        std::snprintf(msg, sizeof(msg), "IFR-1 Flex: WARNING: No configurations found in %s\n", configDir.string().c_str());
+    } else {
+        std::snprintf(msg, sizeof(msg), "IFR-1 Flex: Loaded %zu configurations from %s\n", loaded, configDir.string().c_str());
+    }
     XPLMDebugString(msg);
 
     return 1;

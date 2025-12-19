@@ -40,10 +40,11 @@ TEST(DeviceHandlerTest, Update_ConnectsWhenDisconnected) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
     
     EXPECT_CALL(mockHw, IsConnected()).WillOnce(Return(false));
     EXPECT_CALL(mockHw, Connect(IFR1::VENDOR_ID, IFR1::PRODUCT_ID)).WillOnce(Return(true));
+    EXPECT_CALL(mockSdk, DebugString(_));
     
     nlohmann::json config;
     handler.Update(config, 0.0f);
@@ -54,7 +55,7 @@ TEST(DeviceHandlerTest, Update_ProcessesKnobRotation) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
     
     nlohmann::json config = {
         {"modes", {
@@ -67,17 +68,18 @@ TEST(DeviceHandlerTest, Update_ProcessesKnobRotation) {
     };
     
     EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
+    EXPECT_CALL(mockSdk, DebugString(_)).WillRepeatedly(Return());
     
     // Simulate HID report with outer knob rotation = 1
     // data[5] is outer knob, data[7] is mode
     uint8_t report[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 1, 0, 0, 0}; 
     
-    auto fillBuffer = [&](uint8_t* buf, size_t len, int timeout) {
-        std::memcpy(buf, report, IFR1::HID_REPORT_SIZE);
-        return IFR1::HID_REPORT_SIZE;
-    };
-    
-    EXPECT_CALL(mockHw, Read(_, _, _)).WillOnce(::testing::Invoke(fillBuffer));
+    EXPECT_CALL(mockHw, Read(_, _, _))
+        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int timeout) {
+            std::memcpy(buf, report, IFR1::HID_REPORT_SIZE);
+            return IFR1::HID_REPORT_SIZE;
+        }))
+        .WillOnce(Return(0)); // Second call returns 0 to stop loop
     
     void* dummyCmd = reinterpret_cast<void*>(0x1234);
     EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("test_cmd"))).WillOnce(Return(dummyCmd));
@@ -91,7 +93,7 @@ TEST(DeviceHandlerTest, Update_ProcessesShortPress) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
     
     nlohmann::json config = {
         {"modes", {
@@ -104,24 +106,29 @@ TEST(DeviceHandlerTest, Update_ProcessesShortPress) {
     };
     
     EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
+    EXPECT_CALL(mockSdk, DebugString(_)).WillRepeatedly(Return());
     
     // Frame 1: Button pressed
     uint8_t reportPressed[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
     reportPressed[2] |= (1 << (IFR1::BitPosition::SWAP - 1));
     
-    EXPECT_CALL(mockHw, Read(_, _, _)).WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
-        std::memcpy(buf, reportPressed, IFR1::HID_REPORT_SIZE);
-        return IFR1::HID_REPORT_SIZE;
-    }));
+    EXPECT_CALL(mockHw, Read(_, _, _))
+        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
+            std::memcpy(buf, reportPressed, IFR1::HID_REPORT_SIZE);
+            return IFR1::HID_REPORT_SIZE;
+        }))
+        .WillOnce(Return(0));
     
     handler.Update(config, 0.0f);
     
     // Frame 2: Button released
     uint8_t reportReleased[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-    EXPECT_CALL(mockHw, Read(_, _, _)).WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
-        std::memcpy(buf, reportReleased, IFR1::HID_REPORT_SIZE);
-        return IFR1::HID_REPORT_SIZE;
-    }));
+    EXPECT_CALL(mockHw, Read(_, _, _))
+        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
+            std::memcpy(buf, reportReleased, IFR1::HID_REPORT_SIZE);
+            return IFR1::HID_REPORT_SIZE;
+        }))
+        .WillOnce(Return(0));
     
     void* dummyCmd = reinterpret_cast<void*>(0x1234);
     EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("swap_cmd"))).WillOnce(Return(dummyCmd));
