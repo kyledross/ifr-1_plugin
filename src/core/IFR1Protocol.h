@@ -7,6 +7,7 @@ constexpr uint16_t VENDOR_ID = 0x04D8;
 constexpr uint16_t PRODUCT_ID = 0xE6D6;
 constexpr uint8_t HID_REPORT_SIZE = 9;
 constexpr uint8_t HID_LED_REPORT_ID = 11;
+constexpr float DEFAULT_BLINK_RATE_HZ = 1.0f;
 
 enum class Button : uint8_t {
     DIRECT = 0,

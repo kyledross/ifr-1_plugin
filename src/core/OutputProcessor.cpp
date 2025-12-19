@@ -19,9 +19,10 @@ uint8_t OutputProcessor::EvaluateLEDs(const nlohmann::json& config, float curren
                     if (mode == "solid") {
                         ledBits |= mask;
                     } else if (mode == "blink") {
-                        float blinkRate = test.value("blink-rate", 0.5f);
+                        float blinkRate = test.value("blink-rate", IFR1::DEFAULT_BLINK_RATE_HZ);
                         if (blinkRate > 0) {
-                            float period = 1.0f / blinkRate;
+                            float x = 1.0f;
+                            float period = x / blinkRate;
                             float phase = std::fmod(currentTime, period);
                             if (phase < period / 2.0f) {
                                 ledBits |= mask;
