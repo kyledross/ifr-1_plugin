@@ -77,7 +77,10 @@ void DeviceHandler::ProcessReport(const uint8_t* data, const nlohmann::json& con
     event.innerKnobRotation = static_cast<int8_t>(data[6]);
     event.mode = static_cast<IFR1::Mode>(data[7]);
     
-    m_currentMode = event.mode;
+    if (event.mode != m_currentMode) {
+        m_shifted = false;
+        m_currentMode = event.mode;
+    }
 
     auto checkBit = [](uint8_t val, uint8_t bit) {
         return (val & (1 << (bit - 1))) != 0;

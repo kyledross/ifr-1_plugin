@@ -136,3 +136,81 @@ TEST(DeviceHandlerTest, Update_ProcessesShortPress) {
     
     handler.Update(config, 0.1f);
 }
+
+TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
+    MockHardwareManager mockHw;
+    MockXPlaneSDK mockSdk;
+    EventProcessor eventProc(mockSdk);
+    OutputProcessor outputProc(mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
+    
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                {"outer-knob", {{"rotate-clockwise", {{"type", "command"}, {"value", "com1_cmd"}}}}}
+            }},
+            {"hdg", {
+                {"outer-knob", {{"rotate-clockwise", {{"type", "command"}, {"value", "hdg_cmd"}}}}}
+            }},
+            {"com2", {
+                {"outer-knob", {{"rotate-clockwise", {{"type", "command"}, {"value", "com2_cmd"}}}}}
+            }}
+        }}
+    };
+    
+    EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
+    EXPECT_CALL(mockSdk, DebugString(_)).WillRepeatedly(Return());
+    
+    // 1. Set mode to COM1 and long press INNER_KNOB to shift
+    uint8_t reportShiftPressed[IFR1::HID_REPORT_SIZE] = {0, 0, 0x02, 0, 0, 0, 0, 0, 0}; 
+    EXPECT_CALL(mockHw, Read(_, _, _))
+        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
+            std::memcpy(buf, reportShiftPressed, IFR1::HID_REPORT_SIZE);
+            return IFR1::HID_REPORT_SIZE;
+        }))
+        .WillOnce(Return(0));
+    handler.Update(config, 0.0f);
+    
+    // Trigger long press (0.5s)
+    EXPECT_CALL(mockHw, Read(_, _, _)).WillRepeatedly(Return(0));
+    handler.Update(config, 0.6f); 
+    
+    // Now shifted should be true. Verify by rotating outer knob (should trigger hdg_cmd)
+    uint8_t reportRotate[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 1, 0, 0, 0}; 
+    EXPECT_CALL(mockHw, Read(_, _, _))
+        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
+            std::memcpy(buf, reportRotate, IFR1::HID_REPORT_SIZE);
+            return IFR1::HID_REPORT_SIZE;
+        }))
+        .WillOnce(Return(0));
+    
+    void* hdgCmd = reinterpret_cast<void*>(0x1);
+    EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("hdg_cmd"))).WillOnce(Return(hdgCmd));
+    EXPECT_CALL(mockSdk, CommandOnce(hdgCmd));
+    handler.Update(config, 0.7f);
+
+    // 2. Change mode to COM2
+    uint8_t reportModeChange[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 0, 0, static_cast<uint8_t>(IFR1::Mode::COM2), 0};
+    EXPECT_CALL(mockHw, Read(_, _, _))
+        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
+            std::memcpy(buf, reportModeChange, IFR1::HID_REPORT_SIZE);
+            return IFR1::HID_REPORT_SIZE;
+        }))
+        .WillOnce(Return(0));
+    handler.Update(config, 0.8f);
+
+    // 3. Rotate outer knob again. It should trigger com2_cmd, NOT its shifted version (which would be baro)
+    uint8_t reportRotate2[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 1, 0, static_cast<uint8_t>(IFR1::Mode::COM2), 0}; 
+    EXPECT_CALL(mockHw, Read(_, _, _))
+        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
+            std::memcpy(buf, reportRotate2, IFR1::HID_REPORT_SIZE);
+            return IFR1::HID_REPORT_SIZE;
+        }))
+        .WillOnce(Return(0));
+
+    void* com2Cmd = reinterpret_cast<void*>(0x2);
+    EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("com2_cmd"))).WillOnce(Return(com2Cmd));
+    EXPECT_CALL(mockSdk, CommandOnce(com2Cmd));
+    
+    handler.Update(config, 0.9f);
+}
