@@ -16,6 +16,11 @@ public:
 
 class MockXPlaneSDK : public IXPlaneSDK {
 public:
+    MockXPlaneSDK() {
+        ON_CALL(*this, Log(::testing::_, ::testing::_)).WillByDefault(::testing::Return());
+        ON_CALL(*this, GetLogLevel()).WillByDefault(::testing::Return(LogLevel::Info));
+    }
+
     MOCK_METHOD(void*, FindDataRef, (const char* name), (override));
     MOCK_METHOD(int, GetDataRefTypes, (void* dataRef), (override));
     MOCK_METHOD(int, GetDatai, (void* dataRef), (override));
@@ -27,7 +32,9 @@ public:
     MOCK_METHOD(void, CommandOnce, (void* commandRef), (override));
     MOCK_METHOD(void, CommandBegin, (void* commandRef), (override));
     MOCK_METHOD(void, CommandEnd, (void* commandRef), (override));
-    MOCK_METHOD(void, DebugString, (const char* string), (override));
+    MOCK_METHOD(void, Log, (LogLevel level, const char* string), (override));
+    MOCK_METHOD(void, SetLogLevel, (LogLevel level), (override));
+    MOCK_METHOD(LogLevel, GetLogLevel, (), (const, override));
     MOCK_METHOD(float, GetElapsedTime, (), (override));
 };
 
@@ -47,7 +54,6 @@ TEST(DeviceHandlerTest, Update_ConnectsWhenDisconnected) {
         .WillOnce(Return(false))
         .WillRepeatedly(Return(true));
     EXPECT_CALL(mockHw, Connect(IFR1::VENDOR_ID, IFR1::PRODUCT_ID)).WillOnce(Return(true));
-    EXPECT_CALL(mockSdk, DebugString(_)).WillRepeatedly(Return());
     
     // ClearLEDs will be called on connect
     EXPECT_CALL(mockHw, Write(_, 2)).WillOnce(Return(2));
@@ -77,7 +83,6 @@ TEST(DeviceHandlerTest, Update_ProcessesKnobRotation) {
     };
     
     EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
-    EXPECT_CALL(mockSdk, DebugString(_)).WillRepeatedly(Return());
     
     // Simulate HID report with outer knob rotation = 1
     // data[5] is outer knob, data[7] is mode
@@ -115,7 +120,6 @@ TEST(DeviceHandlerTest, Update_ProcessesShortPress) {
     };
     
     EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
-    EXPECT_CALL(mockSdk, DebugString(_)).WillRepeatedly(Return());
     
     // Frame 1: Button pressed
     uint8_t reportPressed[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -168,7 +172,6 @@ TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
     };
     
     EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
-    EXPECT_CALL(mockSdk, DebugString(_)).WillRepeatedly(Return());
     
     // 1. Set mode to COM1 and long press INNER_KNOB to shift
     uint8_t reportShiftPressed[IFR1::HID_REPORT_SIZE] = {0, 0, 0x02, 0, 0, 0, 0, 0, 0}; 

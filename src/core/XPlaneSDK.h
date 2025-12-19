@@ -11,6 +11,12 @@ enum class DataRefType {
     Data = 32
 };
 
+enum class LogLevel {
+    Error = 0,
+    Info = 1,
+    Verbose = 2
+};
+
 /**
  * @brief Interface for X-Plane SDK functions to allow mocking in unit tests.
  */
@@ -34,7 +40,9 @@ public:
     virtual void CommandEnd(void* commandRef) = 0;
 
     // Utilities
-    virtual void DebugString(const char* string) = 0;
+    virtual void Log(LogLevel level, const char* string) = 0;
+    virtual void SetLogLevel(LogLevel level) = 0;
+    virtual LogLevel GetLogLevel() const = 0;
     virtual float GetElapsedTime() = 0;
 };
 

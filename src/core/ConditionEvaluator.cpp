@@ -7,9 +7,7 @@ bool ConditionEvaluator::EvaluateCondition(const nlohmann::json& condition, bool
     std::string drName = condition["dataref"];
     void* drRef = m_sdk.FindDataRef(drName.c_str());
     if (!drRef) {
-        if (verbose) {
-            m_sdk.DebugString(("IFR-1 Flex: Condition failed - DataRef not found: " + drName + "\n").c_str());
-        }
+        m_sdk.Log(LogLevel::Verbose, ("Condition failed - DataRef not found: " + drName).c_str());
         return false;
     }
 
@@ -40,8 +38,8 @@ bool ConditionEvaluator::EvaluateCondition(const nlohmann::json& condition, bool
     }
 
     if (verbose) {
-        std::string msg = "IFR-1 Flex: Testing " + drName + " (value: " + std::to_string(val) + ") against " + testDesc + " -> " + (result ? "TRUE" : "FALSE") + "\n";
-        m_sdk.DebugString(msg.c_str());
+        std::string msg = "Testing " + drName + " (value: " + std::to_string(val) + ") against " + testDesc + " -> " + (result ? "TRUE" : "FALSE");
+        m_sdk.Log(LogLevel::Verbose, msg.c_str());
     }
 
     return result;
@@ -50,9 +48,7 @@ bool ConditionEvaluator::EvaluateCondition(const nlohmann::json& condition, bool
 bool ConditionEvaluator::EvaluateConditions(const nlohmann::json& actionConfig, bool verbose) const {
     // If there is no "conditions" or "condition" key, it's always true (default action)
     if (!actionConfig.contains("conditions") && !actionConfig.contains("condition")) {
-        if (verbose) {
-            m_sdk.DebugString("IFR-1 Flex: No conditions for this action, assuming TRUE\n");
-        }
+        m_sdk.Log(LogLevel::Verbose, "No conditions for this action, assuming TRUE");
         return true;
     }
 

@@ -15,7 +15,7 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
         if (!m_hw.Connect(IFR1::VENDOR_ID, IFR1::PRODUCT_ID)) {
             return;
         }
-        m_sdk.DebugString("IFR-1 Flex: Device connected.\n");
+        m_sdk.Log(LogLevel::Info, "Device connected.");
         ClearLEDs(); // Reset state and clear LEDs on connect
     }
 
@@ -31,7 +31,7 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
     }
 
     if (bytesRead < 0) {
-        m_sdk.DebugString("IFR-1 Flex: Device disconnected (read error).\n");
+        m_sdk.Log(LogLevel::Error, "Device disconnected (read error).");
         m_hw.Disconnect();
     }
 
@@ -42,6 +42,7 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
                 m_buttonStates[i].longPressDetected = true;
                 
                 auto btn = static_cast<IFR1::Button>(i);
+                m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(btn) + " long-press").c_str());
                 if (btn == IFR1::Button::INNER_KNOB) {
                     m_shifted = !m_shifted;
                 } else {
@@ -63,6 +64,7 @@ void DeviceHandler::UpdateLEDs(const nlohmann::json& config, float currentTime) 
     }
 
     if (ledBits != m_lastLedBits) {
+        m_sdk.Log(LogLevel::Verbose, ("LEDs being updated.  Bits: " + std::to_string(ledBits)).c_str());
         uint8_t report[2] = { IFR1::HID_LED_REPORT_ID, ledBits };
         m_hw.Write(report, 2);
         m_lastLedBits = ledBits;
@@ -118,14 +120,14 @@ void DeviceHandler::HandleKnobs(const IFR1::HardwareEvent& event, const nlohmann
 {
     if (event.outerKnobRotation != 0) {
         std::string action = (event.outerKnobRotation > 0) ? "rotate-clockwise" : "rotate-counterclockwise";
-        m_sdk.DebugString(("IFR-1 Flex: Outer knob " + action + "\n").c_str());
+        m_sdk.Log(LogLevel::Verbose, ("Outer knob " + action).c_str());
         for (int i = 0; i < std::abs(event.outerKnobRotation); ++i) {
             m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), "outer-knob", action);
         }
     }
     if (event.innerKnobRotation != 0) {
         std::string action = (event.innerKnobRotation > 0) ? "rotate-clockwise" : "rotate-counterclockwise";
-        m_sdk.DebugString(("IFR-1 Flex: Inner knob " + action + "\n").c_str());
+        m_sdk.Log(LogLevel::Verbose, ("Inner knob " + action).c_str());
         for (int i = 0; i < std::abs(event.innerKnobRotation); ++i) {
             m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), "inner-knob", action);
         }
@@ -139,13 +141,13 @@ void DeviceHandler::HandleButtons(const IFR1::HardwareEvent& event, const nlohma
 
         if (current && !last) {
             // Pressed
-            m_sdk.DebugString(("IFR-1 Flex: Button " + GetControlString(static_cast<IFR1::Button>(i)) + " pressed\n").c_str());
+            m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(static_cast<IFR1::Button>(i)) + " pressed").c_str());
             m_buttonStates[i].currentlyHeld = true;
             m_buttonStates[i].pressStartTime = currentTime;
             m_buttonStates[i].longPressDetected = false;
         } else if (!current && last) {
             // Released
-            m_sdk.DebugString(("IFR-1 Flex: Button " + GetControlString(static_cast<IFR1::Button>(i)) + " released\n").c_str());
+            m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(static_cast<IFR1::Button>(i)) + " released").c_str());
             if (!m_buttonStates[i].longPressDetected) {
                 // Short press
                 m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), GetControlString(static_cast<IFR1::Button>(i)), "short-press");

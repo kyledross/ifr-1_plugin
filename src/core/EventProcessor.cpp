@@ -13,49 +13,41 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
         config["modes"][mode].contains(control) && 
         config["modes"][mode][control].contains(action)) {
         
-        bool verbose = config.value("debug", false);
-        if (verbose) {
-            m_sdk.DebugString(("IFR-1 Flex: Event - mode: " + mode + ", control: " + control + ", action: " + action + "\n").c_str());
-        }
+        m_sdk.Log(LogLevel::Verbose, ("Event - mode: " + mode + ", control: " + control + ", action: " + action).c_str());
 
         const auto& actionData = config["modes"][mode][control][action];
         if (actionData.is_array()) {
             for (const auto& actionConfig : actionData) {
-                if (m_evaluator.EvaluateConditions(actionConfig, verbose)) {
-                    ExecuteAction(actionConfig, verbose);
+                if (m_evaluator.EvaluateConditions(actionConfig, m_sdk.GetLogLevel() >= LogLevel::Verbose)) {
+                    ExecuteAction(actionConfig);
                     break; // First one that matches wins
                 }
             }
         } else {
-            if (m_evaluator.EvaluateConditions(actionData, verbose)) {
-                ExecuteAction(actionData, verbose);
+            if (m_evaluator.EvaluateConditions(actionData, m_sdk.GetLogLevel() >= LogLevel::Verbose)) {
+                ExecuteAction(actionData);
             }
         }
     }
 }
 
-void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig, bool verbose) const
+void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig) const
 {
     std::string type = actionConfig.value("type", "");
     std::string value = actionConfig.value("value", "");
 
     if (type == "command") {
         if (void* cmdRef = m_sdk.FindCommand(value.c_str())) {
-            if (verbose) {
-                m_sdk.DebugString(("IFR-1 Flex: Executing command: " + value + "\n").c_str());
-            }
+            m_sdk.Log(LogLevel::Verbose, ("Executing command: " + value).c_str());
             m_sdk.CommandOnce(cmdRef);
         } else {
-            std::string msg = "IFR-1 Flex: Command not found: " + value + "\n";
-            m_sdk.DebugString(msg.c_str());
+            m_sdk.Log(LogLevel::Error, ("Command not found: " + value).c_str());
         }
     } else if (type == "dataref-set") {
         if (void* drRef = m_sdk.FindDataRef(value.c_str())) {
             if (actionConfig.contains("adjustment")) {
                 float adj = actionConfig["adjustment"].get<float>();
-                if (verbose) {
-                    m_sdk.DebugString(("IFR-1 Flex: Setting dataref: " + value + " to " + std::to_string(adj) + "\n").c_str());
-                }
+                m_sdk.Log(LogLevel::Verbose, ("Setting dataref: " + value + " to " + std::to_string(adj)).c_str());
                 int types = m_sdk.GetDataRefTypes(drRef);
                 if (types & static_cast<int>(DataRefType::Int)) {
                     m_sdk.SetDatai(drRef, static_cast<int>(adj));
@@ -64,8 +56,7 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig, bool verb
                 }
             }
         } else {
-            std::string msg = "IFR-1 Flex: DataRef not found: " + value + "\n";
-            m_sdk.DebugString(msg.c_str());
+            m_sdk.Log(LogLevel::Error, ("DataRef not found: " + value).c_str());
         }
     } else if (type == "dataref-adjust") {
         if (void* drRef = m_sdk.FindDataRef(value.c_str())) {
@@ -97,9 +88,7 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig, bool verb
                 }
             }
             
-            if (verbose) {
-                m_sdk.DebugString(("IFR-1 Flex: Adjusting dataref: " + value + " (current: " + std::to_string(current) + ", adj: " + std::to_string(adj) + ") -> " + std::to_string(next) + "\n").c_str());
-            }
+            m_sdk.Log(LogLevel::Verbose, ("Adjusting dataref: " + value + " (current: " + std::to_string(current) + ", adj: " + std::to_string(adj) + ") -> " + std::to_string(next)).c_str());
 
             if (isInt) {
                 m_sdk.SetDatai(drRef, static_cast<int>(std::round(next)));
@@ -107,8 +96,7 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig, bool verb
                 m_sdk.SetDataf(drRef, next);
             }
         } else {
-            std::string msg = "IFR-1 Flex: DataRef not found: " + value + "\n";
-            m_sdk.DebugString(msg.c_str());
+            m_sdk.Log(LogLevel::Error, ("DataRef not found: " + value).c_str());
         }
     }
 }

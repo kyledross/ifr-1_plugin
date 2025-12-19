@@ -46,18 +46,26 @@ float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceL
         path[bytes] = '\0';
         std::string currentPath(path);
         if (currentPath != gCurrentAircraftPath) {
-            XPLMDebugString(("IFR-1 Flex: Aircraft changed to " + currentPath + "\n").c_str());
+            gSDK->Log(LogLevel::Info, ("Aircraft changed to " + currentPath).c_str());
             gCurrentAircraftPath = currentPath;
             gDeviceHandler->ClearLEDs();
             gCurrentConfig = gConfigManager->GetConfigForAircraft(currentPath);
+
+            // Update log level based on config
+            if (gCurrentConfig.value("debug", false)) {
+                gSDK->SetLogLevel(LogLevel::Verbose);
+            } else {
+                gSDK->SetLogLevel(LogLevel::Info);
+            }
+
             if (gCurrentConfig.empty()) {
-                XPLMDebugString("IFR-1 Flex: No configuration found for this aircraft.\n");
+                gSDK->Log(LogLevel::Info, "No configuration found for this aircraft.");
             } else {
                 std::string configName = gCurrentConfig.value("name", "Unknown");
                 if (gCurrentConfig.value("fallback", false)) {
-                    XPLMDebugString(("IFR-1 Flex: Using fallback configuration: " + configName + "\n").c_str());
+                    gSDK->Log(LogLevel::Info, ("Using fallback configuration: " + configName).c_str());
                 } else {
-                    XPLMDebugString(("IFR-1 Flex: Configuration loaded: " + configName + "\n").c_str());
+                    gSDK->Log(LogLevel::Info, ("Configuration loaded: " + configName).c_str());
                 }
             }
         }
@@ -110,15 +118,17 @@ PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
     char msg[1024];
     if (loaded == 0) {
         if (configDir.empty()) {
-            std::snprintf(msg, sizeof(msg), "IFR-1 Flex: ERROR: Could not find 'configs' directory. Tried:\n  1. %s\n  2. %s\n", 
+            std::snprintf(msg, sizeof(msg), "ERROR: Could not find 'configs' directory. Tried:\n  1. %s\n  2. %s\n", 
                          p1.string().c_str(), p2.string().c_str());
+            gSDK->Log(LogLevel::Error, msg);
         } else {
-            std::snprintf(msg, sizeof(msg), "IFR-1 Flex: WARNING: No configuration files found in %s\n", configDir.string().c_str());
+            std::snprintf(msg, sizeof(msg), "WARNING: No configuration files found in %s\n", configDir.string().c_str());
+            gSDK->Log(LogLevel::Info, msg);
         }
     } else {
-        std::snprintf(msg, sizeof(msg), "IFR-1 Flex: Loaded %zu configurations from %s\n", loaded, configDir.string().c_str());
+        std::snprintf(msg, sizeof(msg), "Loaded %zu configurations from %s\n", loaded, configDir.string().c_str());
+        gSDK->Log(LogLevel::Info, msg);
     }
-    XPLMDebugString(msg);
 
     return 1;
 }

@@ -7,6 +7,11 @@
 
 class MockXPlaneSDK : public IXPlaneSDK {
 public:
+    MockXPlaneSDK() {
+        ON_CALL(*this, Log(::testing::_, ::testing::_)).WillByDefault(::testing::Return());
+        ON_CALL(*this, GetLogLevel()).WillByDefault(::testing::Return(LogLevel::Info));
+    }
+
     MOCK_METHOD(void*, FindDataRef, (const char* name), (override));
     MOCK_METHOD(int, GetDataRefTypes, (void* dataRef), (override));
     MOCK_METHOD(int, GetDatai, (void* dataRef), (override));
@@ -18,11 +23,14 @@ public:
     MOCK_METHOD(void, CommandOnce, (void* commandRef), (override));
     MOCK_METHOD(void, CommandBegin, (void* commandRef), (override));
     MOCK_METHOD(void, CommandEnd, (void* commandRef), (override));
-    MOCK_METHOD(void, DebugString, (const char* string), (override));
+    MOCK_METHOD(void, Log, (LogLevel level, const char* string), (override));
+    MOCK_METHOD(void, SetLogLevel, (LogLevel level), (override));
+    MOCK_METHOD(LogLevel, GetLogLevel, (), (const, override));
     MOCK_METHOD(float, GetElapsedTime, (), (override));
 };
 
 using ::testing::Return;
+using ::testing::NiceMock;
 
 TEST(EventProcessorTest, ProcessEvent_CallsCommandOnce) {
     MockXPlaneSDK mockSdk;
@@ -168,12 +176,11 @@ TEST(EventProcessorTest, ProcessEvent_AdjustsIntDataref) {
     processor.ProcessEvent(config, "xpdr", "inner-knob", "rotate-clockwise");
 }
 
-TEST(EventProcessorTest, ProcessEvent_RespectsDebugFlag) {
-    MockXPlaneSDK mockSdk;
+TEST(EventProcessorTest, ProcessEvent_LogsAtVerboseLevel) {
+    NiceMock<MockXPlaneSDK> mockSdk;
     EventProcessor processor(mockSdk);
 
     nlohmann::json config = {
-        {"debug", false},
         {"modes", {
             {"com1", {
                 {"swap", {
@@ -191,20 +198,13 @@ TEST(EventProcessorTest, ProcessEvent_RespectsDebugFlag) {
         .WillOnce(Return(dummyCmd));
     EXPECT_CALL(mockSdk, CommandOnce(dummyCmd));
     
-    // DebugString should NOT be called if debug is false (except for errors, but here it's success)
-    EXPECT_CALL(mockSdk, DebugString(::testing::_)).Times(0);
+    // GetLogLevel should be called to check if verbose logging is enabled for conditions
+    EXPECT_CALL(mockSdk, GetLogLevel()).WillRepeatedly(Return(LogLevel::Info));
 
-    processor.ProcessEvent(config, "com1", "swap", "short-press");
-
-    // Now enable debug
-    config["debug"] = true;
-    
-    EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("sim/radios/com1_standy_flip")))
-        .WillOnce(Return(dummyCmd));
-    EXPECT_CALL(mockSdk, CommandOnce(dummyCmd));
-    
-    // DebugString SHOULD be called multiple times
-    EXPECT_CALL(mockSdk, DebugString(::testing::_)).Times(::testing::AtLeast(1));
+    // Log should be called with Verbose level for the event and action
+    EXPECT_CALL(mockSdk, Log(LogLevel::Verbose, ::testing::_)).WillRepeatedly(Return());
+    EXPECT_CALL(mockSdk, Log(LogLevel::Verbose, ::testing::HasSubstr("Event - mode: com1"))).Times(1);
+    EXPECT_CALL(mockSdk, Log(LogLevel::Verbose, ::testing::HasSubstr("Executing command"))).Times(1);
 
     processor.ProcessEvent(config, "com1", "swap", "short-press");
 }

@@ -24,5 +24,5 @@ private:
     IXPlaneSDK& m_sdk;
     ConditionEvaluator m_evaluator;
 
-    void ExecuteAction(const nlohmann::json& actionConfig, bool verbose) const;
+    void ExecuteAction(const nlohmann::json& actionConfig) const;
 };

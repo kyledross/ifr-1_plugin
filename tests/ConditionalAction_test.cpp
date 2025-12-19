@@ -6,6 +6,11 @@
 
 class MockXPlaneSDK : public IXPlaneSDK {
 public:
+    MockXPlaneSDK() {
+        ON_CALL(*this, Log(::testing::_, ::testing::_)).WillByDefault(::testing::Return());
+        ON_CALL(*this, GetLogLevel()).WillByDefault(::testing::Return(LogLevel::Info));
+    }
+
     MOCK_METHOD(void*, FindDataRef, (const char* name), (override));
     MOCK_METHOD(int, GetDataRefTypes, (void* dataRef), (override));
     MOCK_METHOD(int, GetDatai, (void* dataRef), (override));
@@ -17,7 +22,9 @@ public:
     MOCK_METHOD(void, CommandOnce, (void* commandRef), (override));
     MOCK_METHOD(void, CommandBegin, (void* commandRef), (override));
     MOCK_METHOD(void, CommandEnd, (void* commandRef), (override));
-    MOCK_METHOD(void, DebugString, (const char* string), (override));
+    MOCK_METHOD(void, Log, (LogLevel level, const char* string), (override));
+    MOCK_METHOD(void, SetLogLevel, (LogLevel level), (override));
+    MOCK_METHOD(LogLevel, GetLogLevel, (), (const, override));
     MOCK_METHOD(float, GetElapsedTime, (), (override));
 };
 
