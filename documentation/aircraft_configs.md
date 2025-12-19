@@ -113,11 +113,14 @@ vs
 All LEDs will default to off unless they are explicitly turned on by a test.
 
 Each LED will have one or more tests.
-A test is a dataref that will be checked for a specific value.
+A test is a dataref that will be checked for a specific value or bit.
 An LED may have more than one test.
 The first test that is met will take precedence over later tests.
 
-Each test will have a minimum and maximum value.  If the dataref value is outside of these values, the LED will be turned off.
+Each test will have a minimum and maximum value, or a bit. 
+If a bit is provided, the dataref value will be checked if that bit is set (using bitwise AND).
+If minimum and maximum values are provided, and the dataref value is outside of these values, the LED will be turned off.
+If both are provided, the bit check takes precedence (this depends on implementation, but usually you'd use one or the other).
 
 Each test will have a LED mode.
 The LED mode will determine how the LED will be lit when the test is met.
