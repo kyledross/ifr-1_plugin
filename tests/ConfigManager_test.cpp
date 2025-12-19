@@ -36,6 +36,16 @@ TEST_F(ConfigManagerTest, LoadConfigs_LoadsMultipleFiles) {
     EXPECT_EQ(loaded, 2);
 }
 
+TEST_F(ConfigManagerTest, LoadConfigs_IncludesFallbackInCount) {
+    CreateTestConfig("fallback.json", {{"fallback", true}});
+    CreateTestConfig("specific.json", {{"aircraft", {"Specific"}}});
+
+    ConfigManager manager;
+    size_t loaded = manager.LoadConfigs(testConfigDir.string());
+
+    EXPECT_EQ(loaded, 2);
+}
+
 TEST_F(ConfigManagerTest, GetConfigForAircraft_FindsCorrectAircraft) {
     CreateTestConfig("ga.json", {
         {"aircraft", {"Cessna_172", "RV-10"}},

@@ -51,7 +51,12 @@ float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceL
             if (gCurrentConfig.empty()) {
                 XPLMDebugString("IFR-1 Flex: No configuration found for this aircraft.\n");
             } else {
-                XPLMDebugString("IFR-1 Flex: Configuration loaded.\n");
+                std::string configName = gCurrentConfig.value("name", "Unknown");
+                if (gCurrentConfig.value("fallback", false)) {
+                    XPLMDebugString(("IFR-1 Flex: Using fallback configuration: " + configName + "\n").c_str());
+                } else {
+                    XPLMDebugString(("IFR-1 Flex: Configuration loaded: " + configName + "\n").c_str());
+                }
             }
         }
     }
@@ -82,19 +87,32 @@ PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
     fs::path p(pluginPath);
     
     // Config directory discovery:
-    // 1. Check parent folder of the plugin binary (e.g. plugins/ifr1flex/lin_x64/ -> plugins/ifr1flex/configs)
-    // 2. Check the plugin binary folder itself (e.g. plugins/ifr1flex/ -> plugins/ifr1flex/configs)
+    // 1. Check parent folder of the plugin binary (e.g. plugins/ifr1flex/64/lin.xpl -> plugins/ifr1flex/configs)
+    // 2. Check the plugin binary folder itself (e.g. plugins/ifr1flex/lin.xpl -> plugins/ifr1flex/configs)
     
-    fs::path configDir = p.parent_path().parent_path() / "configs";
-    if (!fs::exists(configDir)) {
-        configDir = p.parent_path() / "configs";
+    fs::path configDir;
+    fs::path p1 = p.parent_path().parent_path() / "configs";
+    fs::path p2 = p.parent_path() / "configs";
+
+    if (fs::exists(p1) && fs::is_directory(p1)) {
+        configDir = p1;
+    } else if (fs::exists(p2) && fs::is_directory(p2)) {
+        configDir = p2;
     }
     
-    size_t loaded = gConfigManager->LoadConfigs(configDir.string());
+    size_t loaded = 0;
+    if (!configDir.empty()) {
+        loaded = gConfigManager->LoadConfigs(configDir.string());
+    }
     
-    char msg[512];
+    char msg[1024];
     if (loaded == 0) {
-        std::snprintf(msg, sizeof(msg), "IFR-1 Flex: WARNING: No configurations found in %s\n", configDir.string().c_str());
+        if (configDir.empty()) {
+            std::snprintf(msg, sizeof(msg), "IFR-1 Flex: ERROR: Could not find 'configs' directory. Tried:\n  1. %s\n  2. %s\n", 
+                         p1.string().c_str(), p2.string().c_str());
+        } else {
+            std::snprintf(msg, sizeof(msg), "IFR-1 Flex: WARNING: No configuration files found in %s\n", configDir.string().c_str());
+        }
     } else {
         std::snprintf(msg, sizeof(msg), "IFR-1 Flex: Loaded %zu configurations from %s\n", loaded, configDir.string().c_str());
     }

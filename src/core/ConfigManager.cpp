@@ -30,7 +30,7 @@ size_t ConfigManager::LoadConfigs(const std::string& directoryPath) {
             }
         }
     }
-    return m_configs.size();
+    return m_configs.size() + (m_fallbackConfig.empty() ? 0 : 1);
 }
 
 nlohmann::json ConfigManager::GetConfigForAircraft(const std::string& aircraftFilename) const {

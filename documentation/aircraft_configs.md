@@ -2,6 +2,29 @@ Aircraft config files are a JSON file that describes how an aircraft will interf
 
 The JSON file is structured as follows:
 
+### Installation
+Configuration files should be placed in a directory named `configs` located in the plugin's root folder.
+
+Standard directory structure:
+```
+Resources/plugins/IFR1_Flex/
+├── 64/
+│   └── lin.xpl (the plugin binary)
+└── configs/
+    ├── generic.json
+    ├── cessna_172.json
+    └── ...
+```
+
+If the plugin is installed as a single file (flat layout), the `configs` directory should be next to it:
+```
+Resources/plugins/
+├── ifr1flex.xpl
+└── configs/
+    ├── generic.json
+    └── ...
+```
+
 ### Fallback
 A config file can be designated as the fallback configuration by adding a `"fallback": true` node at the top level. This configuration will be used if no other config file matches the loaded aircraft. Only one fallback file should be present.
 
