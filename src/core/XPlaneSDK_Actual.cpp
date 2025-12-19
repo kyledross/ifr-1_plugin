@@ -2,6 +2,7 @@
 #include "XPLMDataAccess.h"
 #include "XPLMUtilities.h"
 #include "XPLMProcessing.h"
+#include <memory>
 
 class XPlaneSDK : public IXPlaneSDK {
 public:
@@ -53,3 +54,7 @@ public:
         return XPLMGetElapsedTime();
     }
 };
+
+std::unique_ptr<IXPlaneSDK> CreateXPlaneSDK() {
+    return std::make_unique<XPlaneSDK>();
+}

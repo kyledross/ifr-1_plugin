@@ -19,6 +19,9 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
             void* cmdRef = m_sdk.FindCommand(value.c_str());
             if (cmdRef) {
                 m_sdk.CommandOnce(cmdRef);
+            } else {
+                std::string msg = "IFR-1 Flex: Command not found: " + value + "\n";
+                m_sdk.DebugString(msg.c_str());
             }
         } else if (type == "dataref-set") {
             void* drRef = m_sdk.FindDataRef(value.c_str());
@@ -27,6 +30,9 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
                     float adj = actionConfig["adjustment"].get<float>();
                     m_sdk.SetDataf(drRef, adj);
                 }
+            } else {
+                std::string msg = "IFR-1 Flex: DataRef not found: " + value + "\n";
+                m_sdk.DebugString(msg.c_str());
             }
         } else if (type == "dataref-adjust") {
             void* drRef = m_sdk.FindDataRef(value.c_str());
@@ -50,6 +56,9 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
                     }
                 }
                 m_sdk.SetDataf(drRef, next);
+            } else {
+                std::string msg = "IFR-1 Flex: DataRef not found: " + value + "\n";
+                m_sdk.DebugString(msg.c_str());
             }
         }
     }

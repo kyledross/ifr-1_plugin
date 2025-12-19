@@ -28,3 +28,6 @@ public:
     virtual void DebugString(const char* string) = 0;
     virtual float GetElapsedTime() = 0;
 };
+
+#include <memory>
+std::unique_ptr<IXPlaneSDK> CreateXPlaneSDK();

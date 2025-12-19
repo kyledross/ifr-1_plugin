@@ -1,49 +1,136 @@
 #include <cstring>
+#include <memory>
+#include <string>
+#include <vector>
+#include <filesystem>
+
 #include "XPLMPlugin.h"
 #include "XPLMDisplay.h"
 #include "XPLMUtilities.h"
+#include "XPLMProcessing.h"
+#include "XPLMDataAccess.h"
+
 #include "ConfigManager.h"
-#include <string>
-#include <print>
+#include "EventProcessor.h"
+#include "OutputProcessor.h"
+#include "HIDManager.h"
+#include "DeviceHandler.h"
+#include "XPlaneSDK.h"
 
-// Global variables
-ConfigManager gConfigManager;
+namespace fs = std::filesystem;
 
-PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc)
-{
+// Global state
+static std::unique_ptr<IXPlaneSDK> gSDK;
+static std::unique_ptr<ConfigManager> gConfigManager;
+static std::unique_ptr<EventProcessor> gEventProcessor;
+static std::unique_ptr<OutputProcessor> gOutputProcessor;
+static std::unique_ptr<HIDManager> gHIDManager;
+static std::unique_ptr<DeviceHandler> gDeviceHandler;
+
+static nlohmann::json gCurrentConfig;
+static std::string gCurrentAircraftPath;
+static void* gAcfPathRef = nullptr;
+
+static XPLMFlightLoopID gFlightLoop = nullptr;
+
+float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void* inRefcon) {
+    if (!gSDK || !gDeviceHandler) return -1.0f;
+
+    float now = gSDK->GetElapsedTime();
+
+    // 1. Aircraft detection
+    char path[512];
+    int bytes = XPLMGetDatab(static_cast<XPLMDataRef>(gAcfPathRef), path, 0, sizeof(path) - 1);
+    if (bytes > 0) {
+        path[bytes] = '\0';
+        std::string currentPath(path);
+        if (currentPath != gCurrentAircraftPath) {
+            XPLMDebugString(("IFR-1 Flex: Aircraft changed to " + currentPath + "\n").c_str());
+            gCurrentAircraftPath = currentPath;
+            gCurrentConfig = gConfigManager->GetConfigForAircraft(currentPath);
+            if (gCurrentConfig.empty()) {
+                XPLMDebugString("IFR-1 Flex: No configuration found for this aircraft.\n");
+            } else {
+                XPLMDebugString("IFR-1 Flex: Configuration loaded.\n");
+            }
+        }
+    }
+
+    // 2. Update hardware input
+    gDeviceHandler->Update(gCurrentConfig, now);
+
+    // 3. Update LEDs
+    gDeviceHandler->UpdateLEDs(gCurrentConfig, now);
+
+    return -1.0f; // Run every frame
+}
+
+PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
     std::strcpy(outName, "IFR-1 Flex");
     std::strcpy(outSig, "com.kyle.ifr1flex");
     std::strcpy(outDesc, "Flexible Octavi IFR-1 interface.");
 
-    XPLMDebugString("IFR-1 Flex: Plugin starting...\n");
+    gSDK = CreateXPlaneSDK();
+    gConfigManager = std::make_unique<ConfigManager>();
+    gEventProcessor = std::make_unique<EventProcessor>(*gSDK);
+    gOutputProcessor = std::make_unique<OutputProcessor>(*gSDK);
+    gHIDManager = std::make_unique<HIDManager>();
+    gDeviceHandler = std::make_unique<DeviceHandler>(*gHIDManager, *gEventProcessor, *gOutputProcessor);
 
-    // In a real scenario, we'd get the plugin directory and load configs from there
-    size_t loaded = gConfigManager.LoadConfigs("Resources/plugins/ifr1flex/configs");
-
-    char msg[128];
-    std::snprintf(msg, sizeof(msg), "IFR-1 Flex: Loaded %zu configurations.\n", loaded);
+    char pluginPath[512];
+    XPLMGetPluginInfo(XPLMGetMyID(), nullptr, pluginPath, nullptr, nullptr);
+    // pluginPath is like ".../Resources/plugins/ifr1flex/lin_x64/ifr1flex.xpl"
+    fs::path p(pluginPath);
+    fs::path configDir = p.parent_path().parent_path() / "configs";
+    
+    size_t loaded = gConfigManager->LoadConfigs(configDir.string());
+    
+    char msg[256];
+    std::snprintf(msg, sizeof(msg), "IFR-1 Flex: Loaded %zu configurations from %s\n", loaded, configDir.string().c_str());
     XPLMDebugString(msg);
 
     return 1;
 }
 
-PLUGIN_API void	XPluginStop(void)
-{
-    XPLMDebugString("IFR-1 Flex: Stop.\n");
+PLUGIN_API void XPluginStop(void) {
+    if (gFlightLoop) {
+        XPLMDestroyFlightLoop(gFlightLoop);
+        gFlightLoop = nullptr;
+    }
+    
+    gDeviceHandler.reset();
+    gHIDManager.reset();
+    gOutputProcessor.reset();
+    gEventProcessor.reset();
+    gConfigManager.reset();
+    gSDK.reset();
 }
 
-PLUGIN_API void XPluginDisable(void)
-{
-    // Triggered when user disables plugin in menu
+PLUGIN_API void XPluginDisable(void) {
+    if (gFlightLoop) {
+        XPLMDestroyFlightLoop(gFlightLoop);
+        gFlightLoop = nullptr;
+    }
+    if (gHIDManager) {
+        gHIDManager->Disconnect();
+    }
 }
 
-PLUGIN_API int XPluginEnable(void)
-{
-    // Triggered when user enables plugin in menu
+PLUGIN_API int XPluginEnable(void) {
+    gAcfPathRef = XPLMFindDataRef("sim/aircraft/view/acf_relative_path");
+    gCurrentAircraftPath.clear();
+
+    XPLMCreateFlightLoop_t params;
+    params.structSize = sizeof(XPLMCreateFlightLoop_t);
+    params.phase = xplm_FlightLoop_Phase_BeforeFlightModel;
+    params.callbackFunc = FlightLoopCallback;
+    params.refcon = nullptr;
+
+    gFlightLoop = XPLMCreateFlightLoop(&params);
+    XPLMScheduleFlightLoop(gFlightLoop, -1.0f, 1);
+
     return 1;
 }
 
-PLUGIN_API void XPluginReceiveMessage(XPLMPluginID inFromWho, int inMessage, void *inParam)
-{
-    // Handle messages from other plugins or X-Plane
+PLUGIN_API void XPluginReceiveMessage(XPLMPluginID inFromWho, int inMessage, void *inParam) {
 }
