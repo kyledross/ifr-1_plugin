@@ -17,6 +17,7 @@ public:
 class MockXPlaneSDK : public IXPlaneSDK {
 public:
     MOCK_METHOD(void*, FindDataRef, (const char* name), (override));
+    MOCK_METHOD(int, GetDataRefTypes, (void* dataRef), (override));
     MOCK_METHOD(int, GetDatai, (void* dataRef), (override));
     MOCK_METHOD(void, SetDatai, (void* dataRef, int value), (override));
     MOCK_METHOD(float, GetDataf, (void* dataRef), (override));

@@ -10,6 +10,10 @@ public:
         return XPLMFindDataRef(name);
     }
 
+    int GetDataRefTypes(void* dataRef) override {
+        return XPLMGetDataRefTypes(static_cast<XPLMDataRef>(dataRef));
+    }
+
     int GetDatai(void* dataRef) override {
         return XPLMGetDatai(static_cast<XPLMDataRef>(dataRef));
     }

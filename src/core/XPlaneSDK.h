@@ -3,6 +3,17 @@
 #include <vector>
 #include <cstdint>
 
+// Dataref types from XPLMDataAccess.h
+enum class DataRefType {
+    Unknown = 0,
+    Int = 1,
+    Float = 2,
+    Double = 4,
+    FloatArray = 8,
+    IntArray = 16,
+    Data = 32
+};
+
 /**
  * @brief Interface for X-Plane SDK functions to allow mocking in unit tests.
  */
@@ -12,6 +23,7 @@ public:
 
     // Data Access
     virtual void* FindDataRef(const char* name) = 0;
+    virtual int GetDataRefTypes(void* dataRef) = 0;
     virtual int GetDatai(void* dataRef) = 0;
     virtual void SetDatai(void* dataRef, int value) = 0;
     virtual float GetDataf(void* dataRef) = 0;

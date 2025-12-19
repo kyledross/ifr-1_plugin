@@ -7,6 +7,7 @@
 class MockXPlaneSDK : public IXPlaneSDK {
 public:
     MOCK_METHOD(void*, FindDataRef, (const char* name), (override));
+    MOCK_METHOD(int, GetDataRefTypes, (void* dataRef), (override));
     MOCK_METHOD(int, GetDatai, (void* dataRef), (override));
     MOCK_METHOD(void, SetDatai, (void* dataRef, int value), (override));
     MOCK_METHOD(float, GetDataf, (void* dataRef), (override));
@@ -48,6 +49,7 @@ TEST(OutputProcessorTest, EvaluateLEDs_SetsSolidBit) {
     void* dummyDr = reinterpret_cast<void*>(0x1234);
     EXPECT_CALL(mockSdk, FindDataRef(StrEq("sim/cockpit/autopilot/autopilot_mode")))
         .WillOnce(Return(dummyDr));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr)).WillOnce(Return(2)); // xplmType_Float = 2
     EXPECT_CALL(mockSdk, GetDataf(dummyDr)).WillOnce(Return(2.0f));
     
     uint8_t bits = processor.EvaluateLEDs(config, 0.0f);
@@ -72,6 +74,9 @@ TEST(OutputProcessorTest, EvaluateLEDs_Blinks) {
     EXPECT_CALL(mockSdk, FindDataRef(StrEq("sim/cockpit2/autopilot/altitude_mode")))
         .Times(2)
         .WillRepeatedly(Return(dummyDr));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr))
+        .Times(2)
+        .WillRepeatedly(Return(2)); // xplmType_Float = 2
     EXPECT_CALL(mockSdk, GetDataf(dummyDr))
         .Times(2)
         .WillRepeatedly(Return(5.0f));
@@ -98,9 +103,36 @@ TEST(OutputProcessorTest, EvaluateLEDs_BitTest) {
     void* dummyDr = reinterpret_cast<void*>(0x1234);
     EXPECT_CALL(mockSdk, FindDataRef(StrEq("sim/cockpit/autopilot/autopilot_state")))
         .WillOnce(Return(dummyDr));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr)).WillOnce(Return(1)); // xplmType_Int = 1
     // Bit 1 means (1 << 1) = 2
     EXPECT_CALL(mockSdk, GetDatai(dummyDr)).WillOnce(Return(2));
     
     uint8_t bits = processor.EvaluateLEDs(config, 0.0f);
     EXPECT_EQ(bits, IFR1::LEDMask::HDG);
+}
+
+TEST(OutputProcessorTest, EvaluateLEDs_IntDatarefWithMinMax) {
+    MockXPlaneSDK mockSdk;
+    OutputProcessor processor(mockSdk);
+    
+    nlohmann::json config = {
+        {"output", {
+            {"ap", {
+                {"tests", {
+                    {{"dataref", "sim/cockpit/autopilot/autopilot_mode"}, {"min", 2.0}, {"max", 2.0}, {"mode", "solid"}}
+                }}
+            }}
+        }}
+    };
+    
+    void* dummyDr = reinterpret_cast<void*>(0x1234);
+    EXPECT_CALL(mockSdk, FindDataRef(StrEq("sim/cockpit/autopilot/autopilot_mode")))
+        .WillOnce(Return(dummyDr));
+    
+    // Simulate it being an INT dataref
+    EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr)).WillOnce(Return(1)); // xplmType_Int = 1
+    EXPECT_CALL(mockSdk, GetDatai(dummyDr)).WillOnce(Return(2));
+    
+    uint8_t bits = processor.EvaluateLEDs(config, 0.0f);
+    EXPECT_EQ(bits, IFR1::LEDMask::AP);
 }

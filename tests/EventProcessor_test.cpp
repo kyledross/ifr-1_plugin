@@ -8,6 +8,7 @@
 class MockXPlaneSDK : public IXPlaneSDK {
 public:
     MOCK_METHOD(void*, FindDataRef, (const char* name), (override));
+    MOCK_METHOD(int, GetDataRefTypes, (void* dataRef), (override));
     MOCK_METHOD(int, GetDatai, (void* dataRef), (override));
     MOCK_METHOD(void, SetDatai, (void* dataRef, int value), (override));
     MOCK_METHOD(float, GetDataf, (void* dataRef), (override));
@@ -69,6 +70,7 @@ TEST(EventProcessorTest, ProcessEvent_CallsSetDataf) {
     void* dummyDr = reinterpret_cast<void*>(0x5678);
     EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833")))
         .WillOnce(Return(dummyDr));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr)).WillOnce(Return(2)); // xplmType_Float = 2
     EXPECT_CALL(mockSdk, SetDataf(dummyDr, 121500.0f));
 
     processor.ProcessEvent(config, "com1", "swap", "long-press");
@@ -98,6 +100,7 @@ TEST(EventProcessorTest, ProcessEvent_CallsDatarefAdjustWrap) {
     void* dummyDr = reinterpret_cast<void*>(0x9ABC);
     EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/cockpit/autopilot/heading_mag")))
         .WillOnce(Return(dummyDr));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr)).WillOnce(Return(2)); // xplmType_Float = 2
     EXPECT_CALL(mockSdk, GetDataf(dummyDr)).WillOnce(Return(359.0f));
     EXPECT_CALL(mockSdk, SetDataf(dummyDr, 0.0f));
 
@@ -128,8 +131,39 @@ TEST(EventProcessorTest, ProcessEvent_CallsDatarefAdjustStop) {
     void* dummyDr = reinterpret_cast<void*>(0xDEF0);
     EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/cockpit/autopilot/altitude")))
         .WillOnce(Return(dummyDr));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr)).WillOnce(Return(2)); // xplmType_Float = 2
     EXPECT_CALL(mockSdk, GetDataf(dummyDr)).WillOnce(Return(50.0f));
     EXPECT_CALL(mockSdk, SetDataf(dummyDr, 0.0f));
 
     processor.ProcessEvent(config, "ap", "outer-knob", "rotate-counterclockwise");
+}
+
+TEST(EventProcessorTest, ProcessEvent_AdjustsIntDataref) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+    
+    nlohmann::json config = {
+        {"modes", {
+            {"xpdr", {
+                {"inner-knob", {
+                    {"rotate-clockwise", {
+                        {"type", "dataref-adjust"},
+                        {"value", "sim/transponder/transponder_code"},
+                        {"adjustment", 1.0},
+                        {"min", 0.0},
+                        {"max", 7777.0}
+                    }}
+                }}
+            }}
+        }}
+    };
+    
+    void* dummyDr = reinterpret_cast<void*>(0x1234);
+    EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/transponder/transponder_code")))
+        .WillOnce(Return(dummyDr));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr)).WillOnce(Return(1)); // xplmType_Int = 1
+    EXPECT_CALL(mockSdk, GetDatai(dummyDr)).WillOnce(Return(1200));
+    EXPECT_CALL(mockSdk, SetDatai(dummyDr, 1201));
+    
+    processor.ProcessEvent(config, "xpdr", "inner-knob", "rotate-clockwise");
 }
