@@ -12,14 +12,14 @@ uint8_t OutputProcessor::EvaluateLEDs(const nlohmann::json& config, float curren
     const auto& output = config["output"];
 
     auto processLED = [&](const std::string& name, uint8_t mask) {
-        if (output.contains(name) && output[name].contains("tests")) {
-            for (const auto& test : output[name]["tests"]) {
-                if (EvaluateTest(test)) {
-                    std::string mode = test.value("mode", "solid");
+        if (output.contains(name) && output[name].contains("conditions")) {
+            for (const auto& condition : output[name]["conditions"]) {
+                if (EvaluateCondition(condition)) {
+                    std::string mode = condition.value("mode", "solid");
                     if (mode == "solid") {
                         ledBits |= mask;
                     } else if (mode == "blink") {
-                        float blinkRate = test.value("blink-rate", IFR1::DEFAULT_BLINK_RATE_HZ);
+                        float blinkRate = condition.value("blink-rate", IFR1::DEFAULT_BLINK_RATE_HZ);
                         if (blinkRate > 0) {
                             float x = 1.0f;
                             float period = x / blinkRate;
@@ -29,7 +29,7 @@ uint8_t OutputProcessor::EvaluateLEDs(const nlohmann::json& config, float curren
                             }
                         }
                     }
-                    return; // Precedence: first test met wins
+                    return; // Precedence: first condition met wins
                 }
             }
         }
@@ -45,11 +45,11 @@ uint8_t OutputProcessor::EvaluateLEDs(const nlohmann::json& config, float curren
     return ledBits;
 }
 
-bool OutputProcessor::EvaluateTest(const nlohmann::json& test) const
+bool OutputProcessor::EvaluateCondition(const nlohmann::json& condition) const
 {
-    if (!test.contains("dataref")) return false;
+    if (!condition.contains("dataref")) return false;
 
-    std::string drName = test["dataref"];
+    std::string drName = condition["dataref"];
     void* drRef = m_sdk.FindDataRef(drName.c_str());
     if (!drRef) return false;
 
@@ -63,12 +63,12 @@ bool OutputProcessor::EvaluateTest(const nlohmann::json& test) const
         val = static_cast<double>(m_sdk.GetDataf(drRef));
     }
 
-    if (test.contains("bit")) {
-        int bit = test["bit"].get<int>();
+    if (condition.contains("bit")) {
+        int bit = condition["bit"].get<int>();
         return (static_cast<int>(val) & (1 << bit)) != 0;
-    } else if (test.contains("min") && test.contains("max")) {
-        double minVal = test["min"].get<double>();
-        double maxVal = test["max"].get<double>();
+    } else if (condition.contains("min") && condition.contains("max")) {
+        double minVal = condition["min"].get<double>();
+        double maxVal = condition["max"].get<double>();
         return (val >= minVal && val <= maxVal);
     }
 

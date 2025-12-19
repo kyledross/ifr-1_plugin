@@ -39,7 +39,7 @@ TEST(OutputProcessorTest, EvaluateLEDs_SetsSolidBit) {
     nlohmann::json config = {
         {"output", {
             {"ap", {
-                {"tests", {
+                {"conditions", {
                     {{"dataref", "sim/cockpit/autopilot/autopilot_mode"}, {"min", 2.0}, {"max", 2.0}, {"mode", "solid"}}
                 }}
             }}
@@ -63,7 +63,7 @@ TEST(OutputProcessorTest, EvaluateLEDs_Blinks) {
     nlohmann::json config = {
         {"output", {
             {"alt", {
-                {"tests", {
+                {"conditions", {
                     {{"dataref", "sim/cockpit2/autopilot/altitude_mode"}, {"min", 5.0}, {"max", 5.0}, {"mode", "blink"}, {"blink-rate", 1.0}}
                 }}
             }}
@@ -93,7 +93,7 @@ TEST(OutputProcessorTest, EvaluateLEDs_BitTest) {
     nlohmann::json config = {
         {"output", {
             {"hdg", {
-                {"tests", {
+                {"conditions", {
                     {{"dataref", "sim/cockpit/autopilot/autopilot_state"}, {"bit", 1}, {"mode", "solid"}}
                 }}
             }}
@@ -118,7 +118,7 @@ TEST(OutputProcessorTest, EvaluateLEDs_IntDatarefWithMinMax) {
     nlohmann::json config = {
         {"output", {
             {"ap", {
-                {"tests", {
+                {"conditions", {
                     {{"dataref", "sim/cockpit/autopilot/autopilot_mode"}, {"min", 2.0}, {"max", 2.0}, {"mode", "solid"}}
                 }}
             }}

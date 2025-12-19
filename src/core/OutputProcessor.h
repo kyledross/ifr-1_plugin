@@ -17,5 +17,5 @@ public:
 private:
     IXPlaneSDK& m_sdk;
 
-    [[nodiscard]] bool EvaluateTest(const nlohmann::json& test) const;
+    [[nodiscard]] bool EvaluateCondition(const nlohmann::json& condition) const;
 };

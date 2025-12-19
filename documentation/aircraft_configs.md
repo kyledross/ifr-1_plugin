@@ -133,22 +133,22 @@ apr
 alt
 vs
 
-All LEDs will default to off unless they are explicitly turned on by a test.
+All LEDs will default to off unless they are explicitly turned on by a condition.
 
-Each LED will have one or more tests.
-A test is a dataref that will be checked for a specific value or bit.
-An LED may have more than one test.
-The first test that is met will take precedence over later tests.
+Each LED will have one or more conditions.
+A condition is a dataref that will be checked for a specific value or bit.
+An LED may have more than one condition.
+The first condition that is met will take precedence over later conditions.
 
-Each test will have a minimum and maximum value, or a bit. 
+Each condition will have a minimum and maximum value, or a bit. 
 If a bit is provided, the dataref value will be checked if that bit is set (using bitwise AND).
 If minimum and maximum values are provided, and the dataref value is outside of these values, the LED will be turned off.
 If both are provided, the bit check takes precedence (this depends on implementation, but usually you'd use one or the other).
 
-Each test will have a LED mode.
-The LED mode will determine how the LED will be lit when the test is met.
-solid = the LED is on solidly when the test is met
-blink = the LED blinks when the test is met
+Each condition will have a LED mode.
+The LED mode will determine how the LED will be lit when the condition is met.
+solid = the LED is on solidly when the condition is met
+blink = the LED blinks when the condition is met
 
 Each LED mode may have a blink rate.
 The blink rate will determine how often the LED will blink per second.
