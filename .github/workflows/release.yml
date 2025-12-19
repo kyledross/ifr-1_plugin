@@ -1,0 +1,39 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Make script executable
+        run: chmod +x docker-build.sh
+
+      - name: Build Plugin
+        run: ./docker-build.sh
+
+      - name: Create Release Package
+        run: |
+          mkdir -p release-staging
+          cp docker-output/ifr1flex.xpl release-staging/
+          cp install.sh release-staging/
+          cp LICENSE release-staging/
+          cp -r configs release-staging/
+          chmod +x release-staging/install.sh
+          tar -czvf ifr1flex_Linux_Install.tar.gz -C release-staging .
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ifr1flex_Linux_Install.tar.gz
+          generate_release_notes: true
+          draft: false
+          prerelease: false

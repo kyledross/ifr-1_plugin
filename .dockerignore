@@ -1,0 +1,10 @@
+.git
+.github
+.idea
+cmake-build-*
+docker-build
+docker-output
+*.xpl
+*.a
+*.o
+*.so

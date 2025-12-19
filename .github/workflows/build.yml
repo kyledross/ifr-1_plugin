@@ -1,0 +1,28 @@
+name: Build X-Plane Plugin
+
+on:
+  push:
+    branches: [ "main", "master", "development" ]
+  pull_request:
+    branches: [ "main", "master", "development" ]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Make script executable
+        run: chmod +x docker-build.sh
+
+      - name: Run Docker Build Script
+        run: ./docker-build.sh
+
+      - name: Upload Plugin Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ifr1flex_Linux_x64
+          path: docker-output/lin.xpl
+          if-no-files-found: error
