@@ -228,6 +228,22 @@
       },
       "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } }
     },
+    "ap-alt": {
+      "outer-knob": {
+        "rotate-clockwise": {
+          "type": "command",
+          "value": "sim/instruments/panel_bright_up"
+        },
+        "rotate-counterclockwise": {
+          "type": "command",
+          "value": "sim/instruments/panel_bright_down"
+        }
+      },
+      "inner-knob": {
+        "rotate-clockwise": { "type": "command", "value": "sim/instruments/instrument_bright_up" },
+        "rotate-counterclockwise": { "type": "command", "value": "sim/instruments/instrument_bright_down" }
+      }
+    },
     "xpdr": {
       "outer-knob": {
         "rotate-clockwise": {

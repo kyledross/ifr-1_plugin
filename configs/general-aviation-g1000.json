@@ -488,30 +488,19 @@
       }
     },
     "ap-alt": {
-      "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
-      "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },
-      "nav": { "short-press": { "type": "command", "value": "sim/autopilot/NAV" } },
-      "apr": { "short-press": { "type": "command", "value": "sim/autopilot/approach" } },
-      "alt": {
-        "short-press": { "type": "command", "value": "sim/autopilot/altitude_hold" },
-        "long-press": { "type": "command", "value": "sim/GPS/g1000n1_flc" }
-      },
-      "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/altitude",
-          "adjustment": 100
+          "type": "command",
+          "value": "sim/instruments/panel_bright_up"
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/altitude",
-          "adjustment": -100
+          "type": "command",
+          "value": "sim/instruments/panel_bright_down"
         }
       },
       "inner-knob": {
-        "rotate-clockwise": { "type": "command", "value": "sim/autopilot/nose_down" },
-        "rotate-counterclockwise": { "type": "command", "value": "sim/autopilot/nose_up" }
+        "rotate-clockwise": { "type": "command", "value": "sim/instruments/instrument_bright_up" },
+        "rotate-counterclockwise": { "type": "command", "value": "sim/instruments/instrument_bright_down" }
       }
     },
     "xpdr": {
