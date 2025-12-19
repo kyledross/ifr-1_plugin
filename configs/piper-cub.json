@@ -116,12 +116,24 @@
     },
     "xpdr": {
       "outer-knob": {
-        "rotate-clockwise": { "type": "dataref-adjust", "value": "sim/cockpit/radios/transponder_code", "adjustment": 64, "min": 0, "max": 4095, "limit-type": "wrap" },
-        "rotate-counterclockwise": { "type": "dataref-adjust", "value": "sim/cockpit/radios/transponder_code", "adjustment": -64, "min": 0, "max": 4095, "limit-type": "wrap" }
+        "rotate-clockwise": {
+          "type": "command",
+          "value": "sim/transponder/transponder_12_up"
+        },
+        "rotate-counterclockwise": {
+          "type": "command",
+          "value": "sim/transponder/transponder_12_down"
+        }
       },
       "inner-knob": {
-        "rotate-clockwise": { "type": "dataref-adjust", "value": "sim/cockpit/radios/transponder_code", "adjustment": 1, "min": 0, "max": 4095, "limit-type": "wrap" },
-        "rotate-counterclockwise": { "type": "dataref-adjust", "value": "sim/cockpit/radios/transponder_code", "adjustment": -1, "min": 0, "max": 4095, "limit-type": "wrap" }
+        "rotate-clockwise": {
+          "type": "command",
+          "value": "sim/transponder/transponder_34_up"
+        },
+        "rotate-counterclockwise": {
+          "type": "command",
+          "value": "sim/transponder/transponder_34_down"
+        }
       },
       "inner-knob-button": { "short-press": { "type": "command", "value": "sim/transponder/transponder_ident" } }
     }

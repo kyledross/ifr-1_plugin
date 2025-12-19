@@ -506,26 +506,22 @@
       "inner-knob-button": { "short-press": { "type": "command", "value": "sim/transponder/transponder_ident" } },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/radios/transponder_code",
-          "adjustment": 100
+          "type": "command",
+          "value": "sim/transponder/transponder_12_up"
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/radios/transponder_code",
-          "adjustment": -100
+          "type": "command",
+          "value": "sim/transponder/transponder_12_down"
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/radios/transponder_code",
-          "adjustment": 1
+          "type": "command",
+          "value": "sim/transponder/transponder_34_up"
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/radios/transponder_code",
-          "adjustment": -1
+          "type": "command",
+          "value": "sim/transponder/transponder_34_down"
         }
       },
       "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
