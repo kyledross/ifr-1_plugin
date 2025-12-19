@@ -206,7 +206,7 @@
           "adjustment": 10,
           "min": 0,
           "max": 359,
-          "limit": "wrap"
+          "limit-type": "wrap"
         },
         "rotate-counterclockwise": {
           "type": "dataref-adjust",
@@ -214,7 +214,7 @@
           "adjustment": -10,
           "min": 0,
           "max": 359,
-          "limit": "wrap"
+          "limit-type": "wrap"
         }
       },
       "inner-knob": {
@@ -224,7 +224,7 @@
           "adjustment": 1,
           "min": 0,
           "max": 359,
-          "limit": "wrap"
+          "limit-type": "wrap"
         },
         "rotate-counterclockwise": {
           "type": "dataref-adjust",
@@ -232,7 +232,7 @@
           "adjustment": -1,
           "min": 0,
           "max": 359,
-          "limit": "wrap"
+          "limit-type": "wrap"
         }
       },
       "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
@@ -294,7 +294,7 @@
           "adjustment": -10,
           "min": 0,
           "max": 359,
-          "limit": "wrap"
+          "limit-type": "wrap"
         },
         "rotate-counterclockwise": {
           "type": "dataref-adjust",
@@ -302,7 +302,7 @@
           "adjustment": 10,
           "min": 0,
           "max": 359,
-          "limit": "wrap"
+          "limit-type": "wrap"
         }
       },
       "inner-knob": {
@@ -312,7 +312,7 @@
           "adjustment": -1,
           "min": 0,
           "max": 359,
-          "limit": "wrap"
+          "limit-type": "wrap"
         },
         "rotate-counterclockwise": {
           "type": "dataref-adjust",
@@ -320,7 +320,7 @@
           "adjustment": 1,
           "min": 0,
           "max": 359,
-          "limit": "wrap"
+          "limit-type": "wrap"
         }
       },
       "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
@@ -341,7 +341,7 @@
           "adjustment": -10,
           "min": 0,
           "max": 359,
-          "limit": "wrap"
+          "limit-type": "wrap"
         },
         "rotate-counterclockwise": {
           "type": "dataref-adjust",
@@ -349,7 +349,7 @@
           "adjustment": 10,
           "min": 0,
           "max": 359,
-          "limit": "wrap"
+          "limit-type": "wrap"
         }
       },
       "inner-knob": {
@@ -359,7 +359,7 @@
           "adjustment": -1,
           "min": 0,
           "max": 359,
-          "limit": "wrap"
+          "limit-type": "wrap"
         },
         "rotate-counterclockwise": {
           "type": "dataref-adjust",
@@ -367,7 +367,7 @@
           "adjustment": 1,
           "min": 0,
           "max": 359,
-          "limit": "wrap"
+          "limit-type": "wrap"
         }
       },
       "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },

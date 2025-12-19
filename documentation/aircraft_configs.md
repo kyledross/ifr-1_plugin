@@ -1,11 +1,12 @@
-Aircraft config files are a JSON file that describes how an aircraft will interface with the IFR-1 controller.
+# Aircraft Configuration Guide
 
-The JSON file is structured as follows:
+The Octavi IFR-1 Flex plugin uses JSON configuration files to map hardware events to X-Plane commands and datarefs. This guide explains the structure and available options for creating your own aircraft configurations.
 
-### Installation
-Configuration files should be placed in a directory named `configs` located in the plugin's root folder.
+## File Location and Loading
 
-Standard directory structure:
+Configuration files must be placed in a directory named `configs` located in the plugin's root folder.
+
+### Directory Structure
 ```
 Resources/plugins/IFR1_Flex/
 ├── 64/
@@ -16,153 +17,171 @@ Resources/plugins/IFR1_Flex/
     └── ...
 ```
 
-If the plugin is installed as a single file (flat layout), the `configs` directory should be next to it:
-```
-Resources/plugins/
-├── ifr1flex.xpl
-└── configs/
-    ├── generic.json
-    └── ...
-```
-
-### Fallback
-A config file can be designated as the fallback configuration by adding a `"fallback": true` node at the top level. This configuration will be used if no other config file matches the loaded aircraft. Only one fallback file should be present.
-
-### Debug
-To enable verbose logging for a specific aircraft, add `"debug": true` at the top level of the JSON configuration. This will log event processing, condition evaluation, and action execution details to the X-Plane `Log.txt` file.
+### Aircraft Matching
+Each configuration file (except the fallback) must contain an `aircraft` array. The plugin matches these strings against the aircraft's `.acf` filename. If any string in the array matches (partial match), the configuration is loaded.
 
 ```json
 {
-  "aircraft": ["Cessna_172SP_G1000"],
-  "debug": true,
-  "modes": { }
+  "aircraft": ["Cessna_172SP_G1000", "N844X"],
+  "modes": { ... }
 }
 ```
 
-### Aircraft
-Each config file (except a fallback one) must have an `aircraft` node which is a list of strings. These strings are partial matches for the aircraft filename (the `.acf` file) in X-Plane.
+### Fallback Configuration
+A configuration can be designated as the fallback by adding `"fallback": true` at the top level. This configuration will be used if no other file matches the loaded aircraft.
+
+### Debugging
+To enable verbose logging for a specific aircraft, add `"debug": true` at the top level. Details about event processing and condition evaluation will be logged to X-Plane's `Log.txt`.
+
+---
+
+## Modes and the Shifted State
+
+The IFR-1 controller has 8 primary modes, selected by the physical mode knob. Each mode also has a "shifted" state, toggled by a **long-press (0.5 seconds) on the inner knob**.
+
+The plugin uses different identifiers for these states in the JSON:
+
+| Selector Position | Primary Mode Identifier | Shifted Mode Identifier |
+| :--- | :--- | :--- |
+| **COM 1** | `com1` | `hdg` |
+| **COM 2** | `com2` | `baro` |
+| **NAV 1** | `nav1` | `crs1` |
+| **NAV 2** | `nav2` | `crs2` |
+| **FMS 1** | `fms1` | `fms1-alt` |
+| **FMS 2** | `fms2` | `fms2-alt` |
+| **AP** | `ap` | `ap-alt` |
+| **XPDR** | `xpdr` | `xpdr-mode` |
+
+---
+
+## Defining Actions
+
+Within each mode, you map **Controls** to **Actions** based on **Event Types**.
+
+### Hardware Controls
+- **Knobs**: `outer-knob`, `inner-knob`
+- **Knob Button**: `inner-knob-button`
+- **Right Buttons**: `direct-to`, `menu`, `clr`, `ent`
+- **Center Buttons**: `swap`
+- **Bottom Buttons**: `ap`, `hdg`, `nav`, `apr`, `alt`, `vs`
+
+### Event Types
+- **For Knobs**: `rotate-clockwise`, `rotate-counterclockwise`
+- **For Buttons**: `short-press`, `long-press`
+
+### Action Types
+There are three types of actions you can trigger:
+
+#### 1. `command`
+Executes a standard X-Plane command.
+- `value`: The command path (e.g., `sim/radios/com1_standy_flip`).
+
+#### 2. `dataref-set`
+Sets a dataref to a specific value.
+- `value`: The dataref name.
+- `adjustment`: The value to set (e.g., `1` for ON, `0` for OFF).
+
+#### 3. `dataref-adjust`
+Increments or decrements a dataref.
+- `value`: The dataref name.
+- `adjustment`: The amount to add (use negative for subtraction).
+- `min`: (Optional) Minimum allowed value.
+- `max`: (Optional) Maximum allowed value.
+- `limit-type`: (Optional) `"stop"` (clamped) or `"wrap"`. Defaults to `"stop"`.
+
+---
+
+## Conditional Actions
+
+If you want an event to do different things depending on the aircraft's state, you can use an array of actions with `conditions`. The plugin will execute the **first** action whose conditions are all met.
+
+### Condition Syntax
+A condition checks a dataref value:
+- `dataref`: The name of the dataref to check.
+- `min` and `max`: (Required for range) Inclusive range the value must fall into.
+- `bit`: (Alternative to range) A 0-indexed bit that must be set in the integer value.
 
 ```json
-{
-  "aircraft": [
-    "Cirrus SR22",
-    "CirrusSF50"
-  ],
-  "modes": {
-    "com1": {
-      "swap": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/radios/com1_standy_flip"
-        }
-      }
+"alt": {
+  "short-press": [
+    {
+      "condition": { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 5, "max": 5 },
+      "type": "command",
+      "value": "sim/autopilot/airspeed_up"
+    },
+    {
+      "type": "command",
+      "value": "sim/autopilot/altitude_hold"
     }
+  ]
+}
+```
+
+---
+
+## LED Outputs
+
+The `output` node controls the LEDs for the bottom buttons (`ap`, `hdg`, `nav`, `apr`, `alt`, `vs`).
+
+### LED Configuration
+Each LED can have multiple conditions. The first matching condition wins.
+- `mode`: `"solid"` or `"blink"`.
+- `blink-rate`: (Optional) Frequency in Hz. Defaults to `1.0`.
+
+```json
+"output": {
+  "alt": {
+    "conditions": [
+      { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 6, "max": 6, "mode": "solid" },
+      { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 5, "max": 5, "mode": "blink", "blink-rate": 2.0 }
+    ]
   }
 }
 ```
 
-### Modes
-Each aircraft will have a list of modes.  Some may be missing, which means they are not implemented.
+---
 
-com1  
-com2  
-nav1  
-nav2  
-fms1  
-fms2  
-ap  
-xpdr  
-hdg (this is a shifted com1)
-baro (this is a shifted com2)
-crs1 (this is a shifted nav1)
-crs2 (this is a shifted nav2)
-fms1-alt (this is a shifted fms1)
-fms2-alt (this is a shifted fms2)
-ap-alt (this is a shifted ap)
-xpdr-mode (this is a shifted xpdr)
+## Example Configuration
 
-Each mode has a list of one or more actions.  There must be at least one action for each implemented mode.
-direct-to
-menu
-clr
-ent
-ap
-hdg
-nav
-apr
-alt
-vs
-swap
-inner-knob
-outer-knob
-inner-knob-button
+Here is a concise example showing a basic Com 1 setup with Heading sync.
 
-Each action has an action type. Each action must have a type.
-
-### Conditional Actions
-An action type (short-press, long-press, rotate-clockwise, rotate-counterclockwise) can be a single object or an array of objects. Each object can have an optional `conditions` or `condition` node. If multiple objects are provided in an array, the first one whose conditions are all met will be executed, and subsequent objects will be skipped.
-
-If a single object is provided with conditions that are not met, the action will not be executed.
-
-Conditions for actions use the same syntax as output conditions (referencing a dataref and either a bit or a min/max range).
-
-### Action Types
-short-press
-long-press
-rotate-clockwise
-rotate-counterclockwise
-
-Each action type has a response type.  There must be one of these for each action type.
-command (which will send a command to the simulator)
-dataref-set (which will set a dataref to a specific value)
-dataref-adjust (which will adjust a dataref by a specific value)
-
-Each response type will have a response value.  The value will depend on the response type.
-For a command, the response value will be the command to send to the simulator.
-For a dataref-set or dataref-adjust, the response value will be the dataref to set or change.
-
-Each response type may have an adjustment value.  This is used for response types of dataref-set and dataref-change.
-When the response type is a dataref-set, the value is a single value to set the dataref to.
-When the response type is a dataref-adjust, the value is the amount to change the dataref by.
-
-Each response type may have a minimum value.  This is used for response types of dataref-adjust. If there is a minimum value, there must also be a maximum value.
-
-Each response type may have a maximum value.  This is used for response types of dataref-adjust. If there is a maximum value, there must also be a minimum value.
-
-If there is a minimum and maximum value, there will be a limit type.
-Limit types are either stop or wrap.
-If the limit type is stop, the value will be clamped to the minimum and maximum values.
-If the limit type is wrap, the value will be wrapped around the minimum and maximum values.
-
-### Output
-Each aircraft may have an output node.  This node defines how each controller LED will be controlled.
-The output may have a list of LEDs.  Not every LED will be implemented, and there may be no LEDs implemented at all, in which case the output node will be omitted.
-
-LEDs:
-ap
-hdg
-nav
-apr
-alt
-vs
-
-All LEDs will default to off unless they are explicitly turned on by a condition.
-
-Each LED will have one or more conditions.
-A condition is a dataref that will be checked for a specific value or bit.
-An LED may have more than one condition.
-The first condition that is met will take precedence over later conditions.
-
-Each condition will have a minimum and maximum value, or a bit. 
-If a bit is provided, the dataref value will be checked if that bit is set (using bitwise AND).
-If minimum and maximum values are provided, and the dataref value is outside of these values, the LED will be turned off.
-If both are provided, the bit check takes precedence (this depends on implementation, but usually you'd use one or the other).
-
-Each condition will have a LED mode.
-The LED mode will determine how the LED will be lit when the condition is met.
-solid = the LED is on solidly when the condition is met
-blink = the LED blinks when the condition is met
-
-Each LED mode may have a blink rate.
-The blink rate will determine how often the LED will blink per second.
-The default blink rate is .5 Hz.
+```json
+{
+  "name": "Example Config",
+  "aircraft": ["Cessna_172"],
+  "modes": {
+    "com1": {
+      "swap": {
+        "short-press": { "type": "command", "value": "sim/radios/com1_standy_flip" }
+      },
+      "outer-knob": {
+        "rotate-clockwise": { "type": "command", "value": "sim/radios/stby_com1_coarse_up" },
+        "rotate-counterclockwise": { "type": "command", "value": "sim/radios/stby_com1_coarse_down" }
+      },
+      "inner-knob": {
+        "rotate-clockwise": { "type": "command", "value": "sim/radios/stby_com1_fine_up" },
+        "rotate-counterclockwise": { "type": "command", "value": "sim/radios/stby_com1_fine_down" }
+      }
+    },
+    "hdg": {
+      "inner-knob-button": {
+        "short-press": { "type": "command", "value": "sim/autopilot/heading_sync" }
+      },
+      "outer-knob": {
+        "rotate-clockwise": {
+          "type": "dataref-adjust",
+          "value": "sim/cockpit/autopilot/heading_mag",
+          "adjustment": 10, "min": 0, "max": 359, "limit-type": "wrap"
+        }
+      }
+    }
+  },
+  "output": {
+    "ap": {
+      "conditions": [
+        { "dataref": "sim/cockpit/autopilot/autopilot_mode", "min": 2, "max": 2, "mode": "solid" }
+      ]
+    }
+  }
+}
+```
