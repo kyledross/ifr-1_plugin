@@ -73,3 +73,63 @@ TEST(EventProcessorTest, ProcessEvent_CallsSetDataf) {
 
     processor.ProcessEvent(config, "com1", "swap", "long-press");
 }
+
+TEST(EventProcessorTest, ProcessEvent_CallsDatarefAdjustWrap) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"hdg", {
+                {"inner-knob", {
+                    {"rotate-clockwise", {
+                        {"type", "dataref-adjust"},
+                        {"value", "sim/cockpit/autopilot/heading_mag"},
+                        {"adjustment", 1.0},
+                        {"min", 0.0},
+                        {"max", 359.0},
+                        {"limit-type", "wrap"}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* dummyDr = reinterpret_cast<void*>(0x9ABC);
+    EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/cockpit/autopilot/heading_mag")))
+        .WillOnce(Return(dummyDr));
+    EXPECT_CALL(mockSdk, GetDataf(dummyDr)).WillOnce(Return(359.0f));
+    EXPECT_CALL(mockSdk, SetDataf(dummyDr, 0.0f));
+
+    processor.ProcessEvent(config, "hdg", "inner-knob", "rotate-clockwise");
+}
+
+TEST(EventProcessorTest, ProcessEvent_CallsDatarefAdjustStop) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"ap", {
+                {"outer-knob", {
+                    {"rotate-counterclockwise", {
+                        {"type", "dataref-adjust"},
+                        {"value", "sim/cockpit/autopilot/altitude"},
+                        {"adjustment", -100.0},
+                        {"min", 0.0},
+                        {"max", 40000.0},
+                        {"limit-type", "stop"}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* dummyDr = reinterpret_cast<void*>(0xDEF0);
+    EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/cockpit/autopilot/altitude")))
+        .WillOnce(Return(dummyDr));
+    EXPECT_CALL(mockSdk, GetDataf(dummyDr)).WillOnce(Return(50.0f));
+    EXPECT_CALL(mockSdk, SetDataf(dummyDr, 0.0f));
+
+    processor.ProcessEvent(config, "ap", "outer-knob", "rotate-counterclockwise");
+}

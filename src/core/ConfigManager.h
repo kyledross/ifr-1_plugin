@@ -24,4 +24,5 @@ public:
 
 private:
     std::vector<nlohmann::json> m_configs;
+    nlohmann::json m_fallbackConfig;
 };

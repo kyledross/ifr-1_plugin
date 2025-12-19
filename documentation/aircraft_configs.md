@@ -2,8 +2,18 @@ Aircraft config files are a JSON file that describes how an aircraft will interf
 
 The JSON file is structured as follows:
 
+### Fallback
+A config file can be designated as the fallback configuration by adding a `"fallback": true` node at the top level. This configuration will be used if no other config file matches the loaded aircraft. Only one fallback file should be present.
+
+```json
+{
+  "fallback": true,
+  "modes": { ... }
+}
+```
+
 ### Aircraft
-Each config file must have an `aircraft` node which is a list of strings. These strings are partial matches for the aircraft filename (the `.acf` file) in X-Plane.
+Each config file (except a fallback one) must have an `aircraft` node which is a list of strings. These strings are partial matches for the aircraft filename (the `.acf` file) in X-Plane.
 
 ```json
 {

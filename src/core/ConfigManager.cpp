@@ -6,6 +6,7 @@ namespace fs = std::filesystem;
 
 size_t ConfigManager::LoadConfigs(const std::string& directoryPath) {
     m_configs.clear();
+    m_fallbackConfig.clear();
     if (!fs::exists(directoryPath) || !fs::is_directory(directoryPath)) {
         return 0;
     }
@@ -17,7 +18,11 @@ size_t ConfigManager::LoadConfigs(const std::string& directoryPath) {
                 if (file.is_open()) {
                     nlohmann::json config;
                     file >> config;
-                    m_configs.push_back(config);
+                    if (config.value("fallback", false)) {
+                        m_fallbackConfig = config;
+                    } else {
+                        m_configs.push_back(config);
+                    }
                 }
             } catch (const std::exception& e) {
                 // In a real plugin, we'd use XPLMDebugString here
@@ -38,5 +43,5 @@ nlohmann::json ConfigManager::GetConfigForAircraft(const std::string& aircraftFi
             }
         }
     }
-    return nlohmann::json{};
+    return m_fallbackConfig;
 }

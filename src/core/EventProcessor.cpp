@@ -28,7 +28,29 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
                     m_sdk.SetDataf(drRef, adj);
                 }
             }
+        } else if (type == "dataref-adjust") {
+            void* drRef = m_sdk.FindDataRef(value.c_str());
+            if (drRef) {
+                float current = m_sdk.GetDataf(drRef);
+                float adj = actionConfig.value("adjustment", 0.0f);
+                float next = current + adj;
+
+                if (actionConfig.contains("min") && actionConfig.contains("max")) {
+                    float minVal = actionConfig["min"].get<float>();
+                    float maxVal = actionConfig["max"].get<float>();
+                    std::string limitType = actionConfig.value("limit-type", "stop");
+
+                    if (limitType == "wrap") {
+                        float range = maxVal - minVal + 1.0f;
+                        while (next < minVal) next += range;
+                        while (next > maxVal) next -= range;
+                    } else {
+                        if (next < minVal) next = minVal;
+                        if (next > maxVal) next = maxVal;
+                    }
+                }
+                m_sdk.SetDataf(drRef, next);
+            }
         }
-        // More types like dataref-adjust can be added here
     }
 }

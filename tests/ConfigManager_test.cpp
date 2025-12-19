@@ -60,3 +60,23 @@ TEST_F(ConfigManagerTest, GetConfigForAircraft_FindsCorrectAircraft) {
     auto config3 = manager.GetConfigForAircraft("Unknown Aircraft");
     EXPECT_TRUE(config3.empty());
 }
+
+TEST_F(ConfigManagerTest, GetConfigForAircraft_ReturnsFallbackIfNoMatch) {
+    CreateTestConfig("specific.json", {
+        {"aircraft", {"SpecificAircraft"}},
+        {"id", "specific"}
+    });
+    CreateTestConfig("fallback.json", {
+        {"fallback", true},
+        {"id", "fallback"}
+    });
+
+    ConfigManager manager;
+    manager.LoadConfigs(testConfigDir.string());
+
+    auto config1 = manager.GetConfigForAircraft("SpecificAircraft.acf");
+    EXPECT_EQ(config1["id"], "specific");
+
+    auto config2 = manager.GetConfigForAircraft("SomeOtherAircraft.acf");
+    EXPECT_EQ(config2["id"], "fallback");
+}
