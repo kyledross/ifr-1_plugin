@@ -453,14 +453,12 @@
       "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/altitude",
-          "adjustment": 100
+          "type": "command",
+          "value": "sim/autopilot/altitude_up"
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/altitude",
-          "adjustment": -100
+          "type": "command",
+          "value": "sim/autopilot/altitude_down"
         }
       },
       "inner-knob": {
@@ -471,9 +469,8 @@
             "value": "sim/autopilot/airspeed_up"
           },
           {
-            "type": "dataref-adjust",
-            "value": "sim/cockpit/autopilot/vertical_velocity",
-            "adjustment": 100
+            "type": "command",
+            "value": "sim/autopilot/vertical_speed_up"
           }
         ],
         "rotate-counterclockwise": [
@@ -483,9 +480,8 @@
             "value": "sim/autopilot/airspeed_down"
           },
           {
-            "type": "dataref-adjust",
-            "value": "sim/cockpit/autopilot/vertical_velocity",
-            "adjustment": -100
+            "type": "command",
+            "value": "sim/autopilot/vertical_speed_down"
           }
         ]
       }
