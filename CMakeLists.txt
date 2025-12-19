@@ -64,6 +64,7 @@ target_include_directories(ifr1flex_core PUBLIC
     src/core
     ${XPLANE_SDK_PATH}/CHeaders/XPLM
     ${XPLANE_SDK_PATH}/CHeaders/Widgets
+    ${hidapi_SOURCE_DIR}
 )
 target_link_libraries(ifr1flex_core PUBLIC 
     nlohmann_json::nlohmann_json
