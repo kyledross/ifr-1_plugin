@@ -156,11 +156,37 @@
     }
   },
   "output": {
-    "ap": { "conditions": [ { "dataref": "sim/cockpit/autopilot/autopilot_mode", "min": 2, "max": 2, "mode": "solid" } ] },
-    "hdg": { "conditions": [ { "dataref": "sim/cockpit/autopilot/autopilot_state", "bit": 1, "mode": "solid" } ] },
-    "nav": { "conditions": [ { "dataref": "sim/cockpit/autopilot/autopilot_state", "bit": 9, "mode": "solid" } ] },
-    "apr": { "conditions": [ { "dataref": "sim/cockpit2/autopilot/approach_status", "min": 1, "max": 100, "mode": "solid" } ] },
-    "alt": { "conditions": [ { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 6, "max": 6, "mode": "solid" }, { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 5, "max": 5, "mode": "blink" } ] },
-    "vs": { "conditions": [ { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 4, "max": 4, "mode": "solid" } ] }
+    "ap": {
+      "conditions": [
+        { "dataref": "sim/cockpit/autopilot/autopilot_mode", "min": 2, "max": 2, "mode": "solid" }
+      ]
+    },
+    "hdg": {
+      "conditions": [
+        { "dataref": "sim/cockpit/autopilot/autopilot_state", "bit":  1, "mode": "solid" }
+      ]
+    },
+    "nav": {
+      "conditions": [
+        { "dataref": "sim/cockpit/autopilot/autopilot_state", "bit":  9, "mode": "solid" }
+      ]
+    },
+    "apr": {
+      "conditions": [
+        { "dataref": "sim/cockpit2/autopilot/approach_status", "min": 1, "max": 1, "mode": "blink" },
+        { "dataref": "sim/cockpit2/autopilot/approach_status", "min": 2, "max": 2, "mode": "solid" }
+      ]
+    },
+    "alt": {
+      "conditions": [
+        { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 6, "max": 6, "mode": "solid" },
+        { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 5, "max": 5, "mode": "blink" }
+      ]
+    },
+    "vs": {
+      "conditions": [
+        { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 4, "max": 4, "mode": "solid" }
+      ]
+    }
   }
 }
