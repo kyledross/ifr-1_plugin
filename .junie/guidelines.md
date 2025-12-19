@@ -1,6 +1,7 @@
 # Project Guidelines
 
 - Keep this document up-to-date when there are any architectural or functional changes to the project.
+- If any temporary files are created as part of the agent's work, they should be removed at the end of a task unless they are essential for later tasks.
 
 ## Reference Project
 - The `IFR-1_Native` project (located at `../IFR-1_Native`) is the primary reference for this project.

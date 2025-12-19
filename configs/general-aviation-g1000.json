@@ -7,6 +7,7 @@
     "CirrusSF50",
     "SF50"
   ],
+  "debug": true,
   "modes": {
     "com1": {
       "inner-knob-button": {
@@ -463,16 +464,30 @@
         }
       },
       "inner-knob": {
-        "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/vertical_velocity",
-          "adjustment": 100
-        },
-        "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/vertical_velocity",
-          "adjustment": -100
-        }
+        "rotate-clockwise": [
+          {
+            "condition": { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 5, "max": 5 },
+            "type": "command",
+            "value": "sim/autopilot/airspeed_up"
+          },
+          {
+            "type": "dataref-adjust",
+            "value": "sim/cockpit/autopilot/vertical_velocity",
+            "adjustment": 100
+          }
+        ],
+        "rotate-counterclockwise": [
+          {
+            "condition": { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 5, "max": 5 },
+            "type": "command",
+            "value": "sim/autopilot/airspeed_down"
+          },
+          {
+            "type": "dataref-adjust",
+            "value": "sim/cockpit/autopilot/vertical_velocity",
+            "adjustment": -100
+          }
+        ]
       }
     },
     "ap-alt": {

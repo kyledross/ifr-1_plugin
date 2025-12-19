@@ -167,3 +167,44 @@ TEST(EventProcessorTest, ProcessEvent_AdjustsIntDataref) {
     
     processor.ProcessEvent(config, "xpdr", "inner-knob", "rotate-clockwise");
 }
+
+TEST(EventProcessorTest, ProcessEvent_RespectsDebugFlag) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"debug", false},
+        {"modes", {
+            {"com1", {
+                {"swap", {
+                    {"short-press", {
+                        {"type", "command"},
+                        {"value", "sim/radios/com1_standy_flip"}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* dummyCmd = reinterpret_cast<void*>(0x1234);
+    EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("sim/radios/com1_standy_flip")))
+        .WillOnce(Return(dummyCmd));
+    EXPECT_CALL(mockSdk, CommandOnce(dummyCmd));
+    
+    // DebugString should NOT be called if debug is false (except for errors, but here it's success)
+    EXPECT_CALL(mockSdk, DebugString(::testing::_)).Times(0);
+
+    processor.ProcessEvent(config, "com1", "swap", "short-press");
+
+    // Now enable debug
+    config["debug"] = true;
+    
+    EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("sim/radios/com1_standy_flip")))
+        .WillOnce(Return(dummyCmd));
+    EXPECT_CALL(mockSdk, CommandOnce(dummyCmd));
+    
+    // DebugString SHOULD be called multiple times
+    EXPECT_CALL(mockSdk, DebugString(::testing::_)).Times(::testing::AtLeast(1));
+
+    processor.ProcessEvent(config, "com1", "swap", "short-press");
+}

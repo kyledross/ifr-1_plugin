@@ -2,10 +2,11 @@
 #include "XPlaneSDK.h"
 #include <nlohmann/json.hpp>
 #include <string>
+#include "ConditionEvaluator.h"
 
 class EventProcessor {
 public:
-    explicit EventProcessor(IXPlaneSDK& sdk) : m_sdk(sdk) {}
+    explicit EventProcessor(IXPlaneSDK& sdk) : m_sdk(sdk), m_evaluator(sdk) {}
 
     /**
      * @brief Processes an input event based on the current configuration.
@@ -21,4 +22,7 @@ public:
 
 private:
     IXPlaneSDK& m_sdk;
+    ConditionEvaluator m_evaluator;
+
+    void ExecuteAction(const nlohmann::json& actionConfig, bool verbose) const;
 };

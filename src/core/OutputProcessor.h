@@ -1,10 +1,11 @@
 #pragma once
 #include "XPlaneSDK.h"
 #include <nlohmann/json.hpp>
+#include "ConditionEvaluator.h"
 
 class OutputProcessor {
 public:
-    explicit OutputProcessor(IXPlaneSDK& sdk) : m_sdk(sdk) {}
+    explicit OutputProcessor(IXPlaneSDK& sdk) : m_sdk(sdk), m_evaluator(sdk) {}
 
     /**
      * @brief Evaluates LED states based on the current configuration and X-Plane state.
@@ -16,6 +17,5 @@ public:
 
 private:
     IXPlaneSDK& m_sdk;
-
-    [[nodiscard]] bool EvaluateCondition(const nlohmann::json& condition) const;
+    ConditionEvaluator m_evaluator;
 };

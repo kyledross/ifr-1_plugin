@@ -59,6 +59,7 @@ add_library(ifr1flex_core STATIC
         src/core/HIDManager.cpp
         src/core/OutputProcessor.cpp
         src/core/DeviceHandler.cpp
+        src/core/ConditionEvaluator.cpp
 )
 target_include_directories(ifr1flex_core PUBLIC 
     src/core
@@ -89,6 +90,7 @@ add_executable(ifr1flex_tests
         tests/EventProcessor_test.cpp
         tests/OutputProcessor_test.cpp
         tests/DeviceHandler_test.cpp
+        tests/ConditionalAction_test.cpp
 )
 target_include_directories(ifr1flex_tests PRIVATE tests)
 target_link_libraries(ifr1flex_tests PRIVATE

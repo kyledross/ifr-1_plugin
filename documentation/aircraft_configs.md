@@ -28,9 +28,13 @@ Resources/plugins/
 ### Fallback
 A config file can be designated as the fallback configuration by adding a `"fallback": true` node at the top level. This configuration will be used if no other config file matches the loaded aircraft. Only one fallback file should be present.
 
+### Debug
+To enable verbose logging for a specific aircraft, add `"debug": true` at the top level of the JSON configuration. This will log event processing, condition evaluation, and action execution details to the X-Plane `Log.txt` file.
+
 ```json
 {
-  "fallback": true,
+  "aircraft": ["Cessna_172SP_G1000"],
+  "debug": true,
   "modes": { }
 }
 ```
@@ -93,7 +97,16 @@ inner-knob
 outer-knob
 inner-knob-button
 
-Each action has an action type.  Each action must have a type.  There can be multiple types of actions for a single action.
+Each action has an action type. Each action must have a type.
+
+### Conditional Actions
+An action type (short-press, long-press, rotate-clockwise, rotate-counterclockwise) can be a single object or an array of objects. Each object can have an optional `conditions` or `condition` node. If multiple objects are provided in an array, the first one whose conditions are all met will be executed, and subsequent objects will be skipped.
+
+If a single object is provided with conditions that are not met, the action will not be executed.
+
+Conditions for actions use the same syntax as output conditions (referencing a dataref and either a bit or a min/max range).
+
+### Action Types
 short-press
 long-press
 rotate-clockwise

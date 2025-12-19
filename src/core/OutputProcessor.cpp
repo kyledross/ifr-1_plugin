@@ -10,11 +10,12 @@ uint8_t OutputProcessor::EvaluateLEDs(const nlohmann::json& config, float curren
 
     uint8_t ledBits = IFR1::LEDMask::OFF;
     const auto& output = config["output"];
+    bool verbose = false; // config.value("debug", false); // Hard-coded to false to avoid log spam from high-frequency LED updates
 
     auto processLED = [&](const std::string& name, uint8_t mask) {
         if (output.contains(name) && output[name].contains("conditions")) {
             for (const auto& condition : output[name]["conditions"]) {
-                if (EvaluateCondition(condition)) {
+                if (m_evaluator.EvaluateCondition(condition, verbose)) {
                     std::string mode = condition.value("mode", "solid");
                     if (mode == "solid") {
                         ledBits |= mask;
@@ -43,34 +44,4 @@ uint8_t OutputProcessor::EvaluateLEDs(const nlohmann::json& config, float curren
     processLED("vs", IFR1::LEDMask::VS);
 
     return ledBits;
-}
-
-bool OutputProcessor::EvaluateCondition(const nlohmann::json& condition) const
-{
-    if (!condition.contains("dataref")) return false;
-
-    std::string drName = condition["dataref"];
-    void* drRef = m_sdk.FindDataRef(drName.c_str());
-    if (!drRef) return false;
-
-    // We'll read it based on its type
-    int types = m_sdk.GetDataRefTypes(drRef);
-    double val = 0.0;
-    if (types & static_cast<int>(DataRefType::Int)) {
-        val = static_cast<double>(m_sdk.GetDatai(drRef));
-    } else {
-        // Fallback to float for everything else
-        val = static_cast<double>(m_sdk.GetDataf(drRef));
-    }
-
-    if (condition.contains("bit")) {
-        int bit = condition["bit"].get<int>();
-        return (static_cast<int>(val) & (1 << bit)) != 0;
-    } else if (condition.contains("min") && condition.contains("max")) {
-        double minVal = condition["min"].get<double>();
-        double maxVal = condition["max"].get<double>();
-        return (val >= minVal && val <= maxVal);
-    }
-
-    return false;
 }
