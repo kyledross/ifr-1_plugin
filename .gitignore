@@ -1,3 +1,4 @@
 /docker-build/
 /docker-output/
 .output.txt
+/deploy.sh
