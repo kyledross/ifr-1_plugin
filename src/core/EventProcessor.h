@@ -2,6 +2,7 @@
 #include "XPlaneSDK.h"
 #include <nlohmann/json.hpp>
 #include <string>
+#include <queue>
 #include "ConditionEvaluator.h"
 
 class EventProcessor {
@@ -18,12 +19,19 @@ public:
     void ProcessEvent(const nlohmann::json& config, 
                       const std::string& mode, 
                       const std::string& control, 
-                      const std::string& action) const;
+                      const std::string& action);
+
+    /**
+     * @brief Processes one command from the FIFO queue.
+     * Should be called once per frame.
+     */
+    void ProcessQueue();
 
 private:
     IXPlaneSDK& m_sdk;
     ConditionEvaluator m_evaluator;
+    std::queue<void*> m_commandQueue;
 
-    void ExecuteAction(const nlohmann::json& actionConfig) const;
+    void ExecuteAction(const nlohmann::json& actionConfig);
     [[nodiscard]] bool ShouldEvaluateNext(const nlohmann::json& actionConfig) const;
 };

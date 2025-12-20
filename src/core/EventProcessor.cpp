@@ -21,7 +21,7 @@ namespace {
 void EventProcessor::ProcessEvent(const nlohmann::json& config, 
                                   const std::string& mode, 
                                   const std::string& control, 
-                                  const std::string& action) const
+                                  const std::string& action)
 {
     if (config.empty()) return;
 
@@ -50,15 +50,28 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
     }
 }
 
-void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig) const
+void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
 {
     std::string type = actionConfig.value("type", "");
     std::string value = actionConfig.value("value", "");
 
     if (type == "command") {
         if (void* cmdRef = m_sdk.FindCommand(value.c_str())) {
-            m_sdk.Log(LogLevel::Verbose, ("Executing command: " + value).c_str());
-            m_sdk.CommandOnce(cmdRef);
+            int times = actionConfig.value("send-x-times", 1);
+            if (times < 0) times = -times;
+            
+            if (times > 0) {
+                m_sdk.Log(LogLevel::Verbose, ("Queueing command: " + value + " (" + std::to_string(times) + " times)").c_str());
+                for (int i = 0; i < times; ++i) {
+                    if (m_commandQueue.size() < 10) {
+                        m_commandQueue.push(cmdRef);
+                    } else {
+                        m_sdk.Log(LogLevel::Verbose, "Command queue full, discarding command");
+                    }
+                }
+            } else {
+                m_sdk.Log(LogLevel::Verbose, ("Skipping command: " + value + " (send-x-times is 0)").c_str());
+            }
         } else {
             m_sdk.Log(LogLevel::Error, ("Command not found: " + value).c_str());
         }
@@ -171,4 +184,13 @@ bool EventProcessor::ShouldEvaluateNext(const nlohmann::json& actionConfig) cons
     }
 
     return false;
+}
+
+void EventProcessor::ProcessQueue()
+{
+    if (!m_commandQueue.empty()) {
+        void* cmdRef = m_commandQueue.front();
+        m_commandQueue.pop();
+        m_sdk.CommandOnce(cmdRef);
+    }
 }

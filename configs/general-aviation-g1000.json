@@ -968,11 +968,13 @@
       "inner-knob": {
         "rotate-clockwise": {
           "type": "command",
-          "value": "sim/instruments/instrument_bright_up"
+          "value": "sim/instruments/instrument_bright_up",
+          "send-x-times": 3
         },
         "rotate-counterclockwise": {
           "type": "command",
-          "value": "sim/instruments/instrument_bright_down"
+          "value": "sim/instruments/instrument_bright_down",
+          "send-x-times": 3
         }
       }
     },

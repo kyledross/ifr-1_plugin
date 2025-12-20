@@ -75,6 +75,7 @@ There are three types of actions you can trigger:
 #### 1. `command`
 Executes a standard X-Plane command.
 - `value`: The command path (e.g., `sim/radios/com1_standy_flip`).
+- `send-x-times`: (Optional) The number of times to send the command. Defaults to `1`. `0` means don't send. Negative values are treated as positive (e.g., `-2` sends the command `2` times). Commands are sent at a rate of one per frame to ensure X-Plane processes each one. The command queue has a maximum size of 10; any commands beyond this limit will be discarded.
 
 #### 2. `dataref-set`
 Sets a dataref to a specific value.

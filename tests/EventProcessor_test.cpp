@@ -64,6 +64,7 @@ TEST(EventProcessorTest, ProcessEvent_CallsCommandOnce) {
     EXPECT_CALL(mockSdk, CommandOnce(dummyCmd));
 
     processor.ProcessEvent(config, "com1", "swap", "short-press");
+    processor.ProcessQueue();
 }
 
 TEST(EventProcessorTest, ProcessEvent_CallsSetDataf) {
@@ -213,9 +214,10 @@ TEST(EventProcessorTest, ProcessEvent_LogsAtVerboseLevel) {
     // Log should be called with Verbose level for the event and action
     EXPECT_CALL(mockSdk, Log(LogLevel::Verbose, ::testing::_)).WillRepeatedly(Return());
     EXPECT_CALL(mockSdk, Log(LogLevel::Verbose, ::testing::HasSubstr("Event - mode: com1"))).Times(1);
-    EXPECT_CALL(mockSdk, Log(LogLevel::Verbose, ::testing::HasSubstr("Executing command"))).Times(1);
+    EXPECT_CALL(mockSdk, Log(LogLevel::Verbose, ::testing::HasSubstr("Queueing command"))).Times(1);
 
     processor.ProcessEvent(config, "com1", "swap", "short-press");
+    processor.ProcessQueue();
 }
 
 TEST(EventProcessorTest, ProcessEvent_ExecutesMultipleActionsWhenRequested) {
@@ -257,6 +259,8 @@ TEST(EventProcessorTest, ProcessEvent_ExecutesMultipleActionsWhenRequested) {
     EXPECT_CALL(mockSdk, CommandOnce(cmd2));
 
     processor.ProcessEvent(config, "com1", "swap", "short-press");
+    processor.ProcessQueue();
+    processor.ProcessQueue();
 }
 
 TEST(EventProcessorTest, ProcessEvent_StopsAtFirstMatchByDefaultForArray) {
@@ -297,6 +301,7 @@ TEST(EventProcessorTest, ProcessEvent_StopsAtFirstMatchByDefaultForArray) {
     EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("sim/test/cmd2"))).Times(0);
 
     processor.ProcessEvent(config, "com1", "swap", "short-press");
+    processor.ProcessQueue();
 }
 
 TEST(EventProcessorTest, DataRefAdjust_ArrayFloat) {
@@ -383,4 +388,148 @@ TEST(EventProcessorTest, DataRefSet_ArrayFloat) {
     };
 
     processor.ProcessEvent(config, "com1", "knob_inner", "button_press");
+}
+// New tests for command send-x-times
+TEST(EventProcessorTest, Command_SendXTimes_DefaultSendsOnce) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                {"button", {
+                    {"press", {
+                        {"type", "command"},
+                        {"value", "sim/operation/screenshot"}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* cmdRef = reinterpret_cast<void*>(0x123);
+    EXPECT_CALL(mockSdk, FindCommand(StrEq("sim/operation/screenshot"))).WillOnce(Return(cmdRef));
+    EXPECT_CALL(mockSdk, CommandOnce(cmdRef)).Times(1);
+
+    processor.ProcessEvent(config, "com1", "button", "press");
+    processor.ProcessQueue();
+}
+
+TEST(EventProcessorTest, Command_SendXTimes_Multiple) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                {"button", {
+                    {"press", {
+                        {"type", "command"},
+                        {"value", "sim/operation/screenshot"},
+                        {"send-x-times", 3}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* cmdRef = reinterpret_cast<void*>(0x123);
+    EXPECT_CALL(mockSdk, FindCommand(StrEq("sim/operation/screenshot"))).WillOnce(Return(cmdRef));
+    EXPECT_CALL(mockSdk, CommandOnce(cmdRef)).Times(3);
+
+    processor.ProcessEvent(config, "com1", "button", "press");
+    processor.ProcessQueue();
+    processor.ProcessQueue();
+    processor.ProcessQueue();
+}
+
+TEST(EventProcessorTest, Command_SendXTimes_Zero) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                {"button", {
+                    {"press", {
+                        {"type", "command"},
+                        {"value", "sim/operation/screenshot"},
+                        {"send-x-times", 0}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* cmdRef = reinterpret_cast<void*>(0x123);
+    EXPECT_CALL(mockSdk, FindCommand(StrEq("sim/operation/screenshot"))).WillOnce(Return(cmdRef));
+    EXPECT_CALL(mockSdk, CommandOnce(cmdRef)).Times(0);
+
+    processor.ProcessEvent(config, "com1", "button", "press");
+    processor.ProcessQueue();
+}
+
+TEST(EventProcessorTest, Command_SendXTimes_Negative) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                {"button", {
+                    {"press", {
+                        {"type", "command"},
+                        {"value", "sim/operation/screenshot"},
+                        {"send-x-times", -2}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* cmdRef = reinterpret_cast<void*>(0x123);
+    EXPECT_CALL(mockSdk, FindCommand(StrEq("sim/operation/screenshot"))).WillOnce(Return(cmdRef));
+    EXPECT_CALL(mockSdk, CommandOnce(cmdRef)).Times(2);
+
+    processor.ProcessEvent(config, "com1", "button", "press");
+    processor.ProcessQueue();
+    processor.ProcessQueue();
+}
+
+TEST(EventProcessorTest, CommandQueueLimit_EnforcedAtTen) {
+    NiceMock<MockXPlaneSDK> mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                {"button", {
+                    {"press", {
+                        {"type", "command"},
+                        {"value", "sim/test/cmd"},
+                        {"send-x-times", 15}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* cmdRef = reinterpret_cast<void*>(0x123);
+    EXPECT_CALL(mockSdk, FindCommand(StrEq("sim/test/cmd"))).WillOnce(Return(cmdRef));
+    
+    // Allow other log calls
+    EXPECT_CALL(mockSdk, Log(::testing::_, ::testing::_)).WillRepeatedly(::testing::Return());
+
+    // We expect exactly 10 commands to be processed, even though we requested 15
+    EXPECT_CALL(mockSdk, CommandOnce(cmdRef)).Times(10);
+    
+    // We also expect a log message about discarding commands
+    EXPECT_CALL(mockSdk, Log(LogLevel::Verbose, ::testing::HasSubstr("Command queue full, discarding command"))).Times(5);
+
+    processor.ProcessEvent(config, "com1", "button", "press");
+    
+    // Try to process 15 times, but only 10 should happen
+    for (int i = 0; i < 15; ++i) {
+        processor.ProcessQueue();
+    }
 }

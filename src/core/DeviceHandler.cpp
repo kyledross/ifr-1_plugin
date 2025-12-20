@@ -54,6 +54,8 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
             }
         }
     }
+
+    m_eventProc.ProcessQueue();
 }
 
 void DeviceHandler::UpdateLEDs(const nlohmann::json& config, float currentTime) {
