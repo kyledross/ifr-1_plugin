@@ -87,7 +87,7 @@ Increments or decrements a dataref.
 - `adjustment`: The amount to add (use negative for subtraction).
 - `min`: (Optional) Minimum allowed value.
 - `max`: (Optional) Maximum allowed value.
-- `limit-type`: (Optional) `"stop"` (clamped) or `"wrap"`. Defaults to `"stop"`.
+- `limit-type`: (Optional) `"clamp"` (default) or `"wrap"`.
 
 ### Array Datarefs
 Many X-Plane datarefs are arrays (e.g., `sim/cockpit2/switches/panel_brightness_ratio` which has 4 values). You can access a specific index by appending `[index]` to the dataref name.

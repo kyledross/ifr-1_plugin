@@ -115,7 +115,7 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig) const
             if (actionConfig.contains("min") && actionConfig.contains("max")) {
                 float minVal = actionConfig["min"].get<float>();
                 float maxVal = actionConfig["max"].get<float>();
-                std::string limitType = actionConfig.value("limit-type", "stop");
+                std::string limitType = actionConfig.value("limit-type", "clamp");
 
                 if (limitType == "wrap") {
                     float range = maxVal - minVal + 1.0f;

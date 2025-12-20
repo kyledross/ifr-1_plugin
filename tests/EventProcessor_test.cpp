@@ -122,7 +122,7 @@ TEST(EventProcessorTest, ProcessEvent_CallsDatarefAdjustWrap) {
     processor.ProcessEvent(config, "hdg", "inner-knob", "rotate-clockwise");
 }
 
-TEST(EventProcessorTest, ProcessEvent_CallsDatarefAdjustStop) {
+TEST(EventProcessorTest, ProcessEvent_CallsDatarefAdjustClamp) {
     MockXPlaneSDK mockSdk;
     EventProcessor processor(mockSdk);
 
@@ -136,7 +136,7 @@ TEST(EventProcessorTest, ProcessEvent_CallsDatarefAdjustStop) {
                         {"adjustment", -100.0},
                         {"min", 0.0},
                         {"max", 40000.0},
-                        {"limit-type", "stop"}
+                        {"limit-type", "clamp"}
                     }}
                 }}
             }}
