@@ -151,11 +151,11 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig) const
 bool EventProcessor::ShouldEvaluateNext(const nlohmann::json& actionConfig) const
 {
     // Check at action level
-    if (actionConfig.value("evaluate_next_condition", false)) return true;
+    if (actionConfig.value("evaluate-next-condition", false)) return true;
 
     // Check at single condition level
     if (actionConfig.contains("condition")) {
-        if (actionConfig["condition"].value("evaluate_next_condition", false)) return true;
+        if (actionConfig["condition"].value("evaluate-next-condition", false)) return true;
     }
 
     // Check at multiple conditions level
@@ -163,10 +163,10 @@ bool EventProcessor::ShouldEvaluateNext(const nlohmann::json& actionConfig) cons
         const auto& conditions = actionConfig["conditions"];
         if (conditions.is_array()) {
             for (const auto& cond : conditions) {
-                if (cond.is_object() && cond.value("evaluate_next_condition", false)) return true;
+                if (cond.is_object() && cond.value("evaluate-next-condition", false)) return true;
             }
         } else if (conditions.is_object()) {
-            if (conditions.value("evaluate_next_condition", false)) return true;
+            if (conditions.value("evaluate-next-condition", false)) return true;
         }
     }
 

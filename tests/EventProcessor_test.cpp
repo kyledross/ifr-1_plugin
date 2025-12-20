@@ -226,7 +226,7 @@ TEST(EventProcessorTest, ProcessEvent_ExecutesMultipleActionsWhenRequested) {
                 {"swap", {
                     {"short-press", {
                         {
-                            {"condition", {{"dataref", "sim/test/dr1"}, {"min", 1}, {"max", 1}, {"evaluate_next_condition", true}}},
+                            {"condition", {{"dataref", "sim/test/dr1"}, {"min", 1}, {"max", 1}, {"evaluate-next-condition", true}}},
                             {"type", "command"},
                             {"value", "sim/test/cmd1"}
                         },

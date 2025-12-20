@@ -106,14 +106,14 @@ If you want an event to do different things depending on the aircraft's state, o
 - For each action, it evaluates the `condition` (or `conditions`).
 - If the conditions are met, the action is executed.
 - By default, after executing an action, the plugin **stops** and does not evaluate any further actions in the array for that event.
-- If you want to continue to the next action even after a match, add `"evaluate_next_condition": true` to the condition object or the action itself.
+- If you want to continue to the next action even after a match, add `"evaluate-next-condition": true` to the condition object or the action itself.
 
 ### Condition Syntax
 A condition checks a dataref value:
 - `dataref`: The name of the dataref to check.
 - `min` and `max`: (Required for range) Inclusive range the value must fall into.
 - `bit`: (Alternative to range) A 0-indexed bit that must be set in the integer value.
-- `evaluate_next_condition`: (Optional) If `true`, the plugin will continue to evaluate subsequent actions in the array even if this action's conditions were met and it was executed.
+- `evaluate-next-condition`: (Optional) If `true`, the plugin will continue to evaluate subsequent actions in the array even if this action's conditions were met and it was executed.
 
 ```json
 "alt": {
@@ -122,7 +122,7 @@ A condition checks a dataref value:
       "condition": { 
         "dataref": "sim/cockpit2/autopilot/altitude_mode", 
         "min": 5, "max": 5, 
-        "evaluate_next_condition": true 
+        "evaluate-next-condition": true 
       },
       "type": "command",
       "value": "sim/autopilot/airspeed_up"

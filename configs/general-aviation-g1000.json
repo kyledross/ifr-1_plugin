@@ -942,7 +942,7 @@
             "min": 0,
             "max": 1,
             "limit-type": "clamp",
-            "evaluate_next_condition": true
+            "evaluate-next-condition": true
           },
           {
             "type": "command",
@@ -957,7 +957,7 @@
             "min": 0,
             "max": 1,
             "limit-type": "clamp",
-            "evaluate_next_condition": true
+            "evaluate-next-condition": true
           },
           {
             "type": "command",
