@@ -34,6 +34,8 @@ public:
     MOCK_METHOD(void, SetLogLevel, (LogLevel level), (override));
     MOCK_METHOD(LogLevel, GetLogLevel, (), (const, override));
     MOCK_METHOD(float, GetElapsedTime, (), (override));
+    MOCK_METHOD(std::string, GetSystemPath, (), (override));
+    MOCK_METHOD(void, PlaySound, (const std::string& path), (override));
 };
 
 using ::testing::Return;

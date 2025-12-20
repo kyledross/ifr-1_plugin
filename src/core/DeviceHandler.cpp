@@ -8,6 +8,7 @@ DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, Ou
         state.pressStartTime = 0.0f;
         state.longPressDetected = false;
     }
+    m_clickSoundPath = m_sdk.GetSystemPath() + "Resources/sounds/systems/click.wav";
 }
 
 void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
@@ -41,6 +42,8 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
             if (currentTime - m_buttonStates[i].pressStartTime >= 0.3f) {
                 m_buttonStates[i].longPressDetected = true;
                 
+                m_sdk.PlaySound(m_clickSoundPath);
+
                 auto btn = static_cast<IFR1::Button>(i);
                 m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(btn) + " long-press").c_str());
                 if (btn == IFR1::Button::INNER_KNOB) {

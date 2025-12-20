@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 // Dataref types from XPLMDataAccess.h
 enum class DataRefType {
@@ -48,7 +49,12 @@ public:
     virtual void SetLogLevel(LogLevel level) = 0;
     virtual LogLevel GetLogLevel() const = 0;
     virtual float GetElapsedTime() = 0;
+    virtual std::string GetSystemPath() = 0;
+
+    // Sound
+    virtual void PlaySound(const std::string& path) = 0;
 };
 
 #include <memory>
+#include <string>
 std::unique_ptr<IXPlaneSDK> CreateXPlaneSDK();

@@ -57,4 +57,6 @@ private:
     
     // Last raw report to detect changes
     std::array<uint8_t, IFR1::HID_REPORT_SIZE> m_lastReport{};
+
+    std::string m_clickSoundPath;
 };
