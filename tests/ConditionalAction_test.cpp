@@ -17,6 +17,10 @@ public:
     MOCK_METHOD(void, SetDatai, (void* dataRef, int value), (override));
     MOCK_METHOD(float, GetDataf, (void* dataRef), (override));
     MOCK_METHOD(void, SetDataf, (void* dataRef, float value), (override));
+    MOCK_METHOD(int, GetDataiArray, (void* dataRef, int index), (override));
+    MOCK_METHOD(void, SetDataiArray, (void* dataRef, int value, int index), (override));
+    MOCK_METHOD(float, GetDatafArray, (void* dataRef, int index), (override));
+    MOCK_METHOD(void, SetDatafArray, (void* dataRef, float value, int index), (override));
     MOCK_METHOD(int, GetDatab, (void* dataRef, void* outData, int offset, int maxLength), (override));
     MOCK_METHOD(void*, FindCommand, (const char* name), (override));
     MOCK_METHOD(void, CommandOnce, (void* commandRef), (override));
@@ -122,4 +126,24 @@ TEST(ConditionalActionTest, ProcessEvent_SingleActionWithCondition) {
     EXPECT_CALL(mockSdk, GetDatai(modeDr)).WillOnce(Return(4));
     // No other calls expected
     processor.ProcessEvent(config, "ap", "inner-knob", "rotate-clockwise");
+}
+
+TEST(ConditionalActionTest, Condition_ArrayDataRef) {
+    MockXPlaneSDK mockSdk;
+    ConditionEvaluator evaluator(mockSdk);
+
+    void* drRef = reinterpret_cast<void*>(0x1234);
+    std::string drName = "sim/cockpit2/switches/panel_brightness_ratio[3]";
+    
+    EXPECT_CALL(mockSdk, FindDataRef(StrEq("sim/cockpit2/switches/panel_brightness_ratio"))).WillOnce(Return(drRef));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(drRef)).WillOnce(Return(static_cast<int>(DataRefType::FloatArray)));
+    EXPECT_CALL(mockSdk, GetDatafArray(drRef, 3)).WillOnce(Return(0.75f));
+
+    nlohmann::json condition = {
+        {"dataref", drName},
+        {"min", 0.7},
+        {"max", 0.8}
+    };
+
+    EXPECT_TRUE(evaluator.EvaluateCondition(condition, false));
 }

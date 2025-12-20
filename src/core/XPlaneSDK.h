@@ -31,6 +31,10 @@ public:
     virtual void SetDatai(void* dataRef, int value) = 0;
     virtual float GetDataf(void* dataRef) = 0;
     virtual void SetDataf(void* dataRef, float value) = 0;
+    virtual int GetDataiArray(void* dataRef, int index) = 0;
+    virtual void SetDataiArray(void* dataRef, int value, int index) = 0;
+    virtual float GetDatafArray(void* dataRef, int index) = 0;
+    virtual void SetDatafArray(void* dataRef, float value, int index) = 0;
     virtual int GetDatab(void* dataRef, void* outData, int offset, int maxLength) = 0;
 
     // Commands

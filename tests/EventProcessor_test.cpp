@@ -5,6 +5,9 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
+using ::testing::Return;
+using ::testing::StrEq;
+
 class MockXPlaneSDK : public IXPlaneSDK {
 public:
     MockXPlaneSDK() {
@@ -18,6 +21,10 @@ public:
     MOCK_METHOD(void, SetDatai, (void* dataRef, int value), (override));
     MOCK_METHOD(float, GetDataf, (void* dataRef), (override));
     MOCK_METHOD(void, SetDataf, (void* dataRef, float value), (override));
+    MOCK_METHOD(int, GetDataiArray, (void* dataRef, int index), (override));
+    MOCK_METHOD(void, SetDataiArray, (void* dataRef, int value, int index), (override));
+    MOCK_METHOD(float, GetDatafArray, (void* dataRef, int index), (override));
+    MOCK_METHOD(void, SetDatafArray, (void* dataRef, float value, int index), (override));
     MOCK_METHOD(int, GetDatab, (void* dataRef, void* outData, int offset, int maxLength), (override));
     MOCK_METHOD(void*, FindCommand, (const char* name), (override));
     MOCK_METHOD(void, CommandOnce, (void* commandRef), (override));
@@ -288,4 +295,90 @@ TEST(EventProcessorTest, ProcessEvent_StopsAtFirstMatchByDefaultForArray) {
     EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("sim/test/cmd2"))).Times(0);
 
     processor.ProcessEvent(config, "com1", "swap", "short-press");
+}
+
+TEST(EventProcessorTest, DataRefAdjust_ArrayFloat) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    void* drRef = reinterpret_cast<void*>(0x1234);
+    std::string drName = "sim/cockpit2/switches/panel_brightness_ratio[1]";
+    
+    EXPECT_CALL(mockSdk, FindDataRef(StrEq("sim/cockpit2/switches/panel_brightness_ratio"))).WillOnce(Return(drRef));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(drRef)).WillOnce(Return(static_cast<int>(DataRefType::FloatArray)));
+    EXPECT_CALL(mockSdk, GetDatafArray(drRef, 1)).WillOnce(Return(0.5f));
+    EXPECT_CALL(mockSdk, SetDatafArray(drRef, 0.6f, 1)).Times(1);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                {"knob_inner", {
+                    {"rotate_cw", {
+                        {"type", "dataref-adjust"},
+                        {"value", drName},
+                        {"adjustment", 0.1}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    processor.ProcessEvent(config, "com1", "knob_inner", "rotate_cw");
+}
+
+TEST(EventProcessorTest, DataRefAdjust_ArrayInt) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    void* drRef = reinterpret_cast<void*>(0x1234);
+    std::string drName = "sim/custom/array_int[2]";
+    
+    EXPECT_CALL(mockSdk, FindDataRef(StrEq("sim/custom/array_int"))).WillOnce(Return(drRef));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(drRef)).WillOnce(Return(static_cast<int>(DataRefType::IntArray)));
+    EXPECT_CALL(mockSdk, GetDataiArray(drRef, 2)).WillOnce(Return(10));
+    EXPECT_CALL(mockSdk, SetDataiArray(drRef, 11, 2)).Times(1);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                {"knob_inner", {
+                    {"rotate_cw", {
+                        {"type", "dataref-adjust"},
+                        {"value", drName},
+                        {"adjustment", 1}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    processor.ProcessEvent(config, "com1", "knob_inner", "rotate_cw");
+}
+
+TEST(EventProcessorTest, DataRefSet_ArrayFloat) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    void* drRef = reinterpret_cast<void*>(0x1234);
+    std::string drName = "sim/cockpit2/switches/panel_brightness_ratio[0]";
+    
+    EXPECT_CALL(mockSdk, FindDataRef(StrEq("sim/cockpit2/switches/panel_brightness_ratio"))).WillOnce(Return(drRef));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(drRef)).WillOnce(Return(static_cast<int>(DataRefType::FloatArray)));
+    EXPECT_CALL(mockSdk, SetDatafArray(drRef, 0.8f, 0)).Times(1);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                {"knob_inner", {
+                    {"button_press", {
+                        {"type", "dataref-set"},
+                        {"value", drName},
+                        {"adjustment", 0.8}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    processor.ProcessEvent(config, "com1", "knob_inner", "button_press");
 }

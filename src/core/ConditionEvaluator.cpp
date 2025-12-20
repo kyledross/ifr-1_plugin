@@ -1,22 +1,48 @@
 #include "ConditionEvaluator.h"
 #include <string>
+#include <regex>
+
+namespace {
+    struct DataRefInfo {
+        std::string name;
+        int index = -1;
+    };
+
+    DataRefInfo ParseDataRef(const std::string& rawName) {
+        std::regex re("(.+)\\[([0-9]+)\\]");
+        std::smatch match;
+        if (std::regex_match(rawName, match, re)) {
+            return {match[1].str(), std::stoi(match[2].str())};
+        }
+        return {rawName, -1};
+    }
+}
 
 bool ConditionEvaluator::EvaluateCondition(const nlohmann::json& condition, bool verbose) const {
     if (!condition.contains("dataref")) return false;
 
-    std::string drName = condition["dataref"];
-    void* drRef = m_sdk.FindDataRef(drName.c_str());
+    std::string rawDrName = condition["dataref"];
+    auto info = ParseDataRef(rawDrName);
+    void* drRef = m_sdk.FindDataRef(info.name.c_str());
     if (!drRef) {
-        m_sdk.Log(LogLevel::Verbose, ("Condition failed - DataRef not found: " + drName).c_str());
+        m_sdk.Log(LogLevel::Verbose, ("Condition failed - DataRef not found: " + info.name).c_str());
         return false;
     }
 
     int types = m_sdk.GetDataRefTypes(drRef);
     double val = 0.0;
-    if (types & static_cast<int>(DataRefType::Int)) {
-        val = static_cast<double>(m_sdk.GetDatai(drRef));
+    if (info.index != -1) {
+        if (types & static_cast<int>(DataRefType::IntArray)) {
+            val = static_cast<double>(m_sdk.GetDataiArray(drRef, info.index));
+        } else {
+            val = static_cast<double>(m_sdk.GetDatafArray(drRef, info.index));
+        }
     } else {
-        val = static_cast<double>(m_sdk.GetDataf(drRef));
+        if (types & static_cast<int>(DataRefType::Int)) {
+            val = static_cast<double>(m_sdk.GetDatai(drRef));
+        } else {
+            val = static_cast<double>(m_sdk.GetDataf(drRef));
+        }
     }
 
     bool result = false;
@@ -38,7 +64,7 @@ bool ConditionEvaluator::EvaluateCondition(const nlohmann::json& condition, bool
     }
 
     if (verbose) {
-        std::string msg = "Testing " + drName + " (value: " + std::to_string(val) + ") against " + testDesc + " -> " + (result ? "TRUE" : "FALSE");
+        std::string msg = "Testing " + rawDrName + " (value: " + std::to_string(val) + ") against " + testDesc + " -> " + (result ? "TRUE" : "FALSE");
         m_sdk.Log(LogLevel::Verbose, msg.c_str());
     }
 

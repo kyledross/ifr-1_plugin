@@ -30,6 +30,26 @@ public:
     void SetDataf(void* dataRef, float value) override {
         XPLMSetDataf(static_cast<XPLMDataRef>(dataRef), value);
     }
+    
+    int GetDataiArray(void* dataRef, int index) override {
+        int val = 0;
+        XPLMGetDatavi(static_cast<XPLMDataRef>(dataRef), &val, index, 1);
+        return val;
+    }
+
+    void SetDataiArray(void* dataRef, int value, int index) override {
+        XPLMSetDatavi(static_cast<XPLMDataRef>(dataRef), &value, index, 1);
+    }
+
+    float GetDatafArray(void* dataRef, int index) override {
+        float val = 0.0f;
+        XPLMGetDatavf(static_cast<XPLMDataRef>(dataRef), &val, index, 1);
+        return val;
+    }
+
+    void SetDatafArray(void* dataRef, float value, int index) override {
+        XPLMSetDatavf(static_cast<XPLMDataRef>(dataRef), &value, index, 1);
+    }
 
     int GetDatab(void* dataRef, void* outData, int offset, int maxLength) override {
         return XPLMGetDatab(static_cast<XPLMDataRef>(dataRef), outData, offset, maxLength);

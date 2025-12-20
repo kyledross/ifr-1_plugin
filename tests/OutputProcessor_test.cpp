@@ -17,6 +17,10 @@ public:
     MOCK_METHOD(void, SetDatai, (void* dataRef, int value), (override));
     MOCK_METHOD(float, GetDataf, (void* dataRef), (override));
     MOCK_METHOD(void, SetDataf, (void* dataRef, float value), (override));
+    MOCK_METHOD(int, GetDataiArray, (void* dataRef, int index), (override));
+    MOCK_METHOD(void, SetDataiArray, (void* dataRef, int value, int index), (override));
+    MOCK_METHOD(float, GetDatafArray, (void* dataRef, int index), (override));
+    MOCK_METHOD(void, SetDatafArray, (void* dataRef, float value, int index), (override));
     MOCK_METHOD(int, GetDatab, (void* dataRef, void* outData, int offset, int maxLength), (override));
     MOCK_METHOD(void*, FindCommand, (const char* name), (override));
     MOCK_METHOD(void, CommandOnce, (void* commandRef), (override));

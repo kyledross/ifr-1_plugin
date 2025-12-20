@@ -1,5 +1,22 @@
 #include "EventProcessor.h"
 #include <cmath>
+#include <regex>
+
+namespace {
+    struct DataRefInfo {
+        std::string name;
+        int index = -1;
+    };
+
+    DataRefInfo ParseDataRef(const std::string& rawName) {
+        std::regex re("(.+)\\[([0-9]+)\\]");
+        std::smatch match;
+        if (std::regex_match(rawName, match, re)) {
+            return {match[1].str(), std::stoi(match[2].str())};
+        }
+        return {rawName, -1};
+    }
+}
 
 void EventProcessor::ProcessEvent(const nlohmann::json& config, 
                                   const std::string& mode, 
@@ -46,30 +63,50 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig) const
             m_sdk.Log(LogLevel::Error, ("Command not found: " + value).c_str());
         }
     } else if (type == "dataref-set") {
-        if (void* drRef = m_sdk.FindDataRef(value.c_str())) {
+        auto info = ParseDataRef(value);
+        if (void* drRef = m_sdk.FindDataRef(info.name.c_str())) {
             if (actionConfig.contains("adjustment")) {
                 float adj = actionConfig["adjustment"].get<float>();
                 m_sdk.Log(LogLevel::Verbose, ("Setting dataref: " + value + " to " + std::to_string(adj)).c_str());
                 int types = m_sdk.GetDataRefTypes(drRef);
-                if (types & static_cast<int>(DataRefType::Int)) {
-                    m_sdk.SetDatai(drRef, static_cast<int>(adj));
+                if (info.index != -1) {
+                    if (types & static_cast<int>(DataRefType::IntArray)) {
+                        m_sdk.SetDataiArray(drRef, static_cast<int>(adj), info.index);
+                    } else {
+                        m_sdk.SetDatafArray(drRef, adj, info.index);
+                    }
                 } else {
-                    m_sdk.SetDataf(drRef, adj);
+                    if (types & static_cast<int>(DataRefType::Int)) {
+                        m_sdk.SetDatai(drRef, static_cast<int>(adj));
+                    } else {
+                        m_sdk.SetDataf(drRef, adj);
+                    }
                 }
             }
         } else {
             m_sdk.Log(LogLevel::Error, ("DataRef not found: " + value).c_str());
         }
     } else if (type == "dataref-adjust") {
-        if (void* drRef = m_sdk.FindDataRef(value.c_str())) {
+        auto info = ParseDataRef(value);
+        if (void* drRef = m_sdk.FindDataRef(info.name.c_str())) {
             int types = m_sdk.GetDataRefTypes(drRef);
             float current = 0.0f;
-            bool isInt = (types & static_cast<int>(DataRefType::Int));
+            bool isInt = false;
             
-            if (isInt) {
-                current = static_cast<float>(m_sdk.GetDatai(drRef));
+            if (info.index != -1) {
+                isInt = (types & static_cast<int>(DataRefType::IntArray));
+                if (isInt) {
+                    current = static_cast<float>(m_sdk.GetDataiArray(drRef, info.index));
+                } else {
+                    current = m_sdk.GetDatafArray(drRef, info.index);
+                }
             } else {
-                current = m_sdk.GetDataf(drRef);
+                isInt = (types & static_cast<int>(DataRefType::Int));
+                if (isInt) {
+                    current = static_cast<float>(m_sdk.GetDatai(drRef));
+                } else {
+                    current = m_sdk.GetDataf(drRef);
+                }
             }
 
             float adj = actionConfig.value("adjustment", 0.0f);
@@ -92,10 +129,18 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig) const
             
             m_sdk.Log(LogLevel::Verbose, ("Adjusting dataref: " + value + " (current: " + std::to_string(current) + ", adj: " + std::to_string(adj) + ") -> " + std::to_string(next)).c_str());
 
-            if (isInt) {
-                m_sdk.SetDatai(drRef, static_cast<int>(std::round(next)));
+            if (info.index != -1) {
+                if (isInt) {
+                    m_sdk.SetDataiArray(drRef, static_cast<int>(std::round(next)), info.index);
+                } else {
+                    m_sdk.SetDatafArray(drRef, next, info.index);
+                }
             } else {
-                m_sdk.SetDataf(drRef, next);
+                if (isInt) {
+                    m_sdk.SetDatai(drRef, static_cast<int>(std::round(next)));
+                } else {
+                    m_sdk.SetDataf(drRef, next);
+                }
             }
         } else {
             m_sdk.Log(LogLevel::Error, ("DataRef not found: " + value).c_str());

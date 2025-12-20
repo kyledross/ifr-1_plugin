@@ -490,12 +490,20 @@
     "ap-alt": {
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/instruments/panel_bright_up"
+          "type": "dataref-adjust",
+          "value": "sim/cockpit2/switches/generic_lights_switch[6]",
+          "adjustment": 0.025,
+          "min": 0,
+          "max": 1,
+          "limit-type": "stop"
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/instruments/panel_bright_down"
+          "type": "dataref-adjust",
+          "value": "sim/cockpit2/switches/generic_lights_switch[6]",
+          "adjustment": -0.025,
+          "min": 0,
+          "max": 1,
+          "limit-type": "stop"
         }
       },
       "inner-knob": {

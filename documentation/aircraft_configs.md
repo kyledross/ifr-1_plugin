@@ -89,6 +89,12 @@ Increments or decrements a dataref.
 - `max`: (Optional) Maximum allowed value.
 - `limit-type`: (Optional) `"stop"` (clamped) or `"wrap"`. Defaults to `"stop"`.
 
+### Array Datarefs
+Many X-Plane datarefs are arrays (e.g., `sim/cockpit2/switches/panel_brightness_ratio` which has 4 values). You can access a specific index by appending `[index]` to the dataref name.
+
+- Example: `sim/cockpit2/switches/panel_brightness_ratio[0]`
+- This syntax works in `dataref-set`, `dataref-adjust`, and within `conditions`.
+
 ---
 
 ## Conditional and Multiple Actions
