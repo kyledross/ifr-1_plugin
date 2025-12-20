@@ -95,10 +95,10 @@ TEST(DeviceHandlerTest, Update_ProcessesKnobRotation) {
     uint8_t report[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 1, 0, 0, 0}; 
     
     EXPECT_CALL(mockHw, Read(_, _, _))
-        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int timeout) {
+        .WillOnce([&](uint8_t* buf, size_t len, int timeout) {
             std::memcpy(buf, report, IFR1::HID_REPORT_SIZE);
             return IFR1::HID_REPORT_SIZE;
-        }))
+        })
         .WillOnce(Return(0)); // Second call returns 0 to stop loop
     
     void* dummyCmd = reinterpret_cast<void*>(0x1234);
@@ -132,10 +132,10 @@ TEST(DeviceHandlerTest, Update_ProcessesShortPress) {
     reportPressed[2] |= (1 << (IFR1::BitPosition::SWAP - 1));
     
     EXPECT_CALL(mockHw, Read(_, _, _))
-        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
+        .WillOnce([&](uint8_t* buf, size_t len, int t) {
             std::memcpy(buf, reportPressed, IFR1::HID_REPORT_SIZE);
             return IFR1::HID_REPORT_SIZE;
-        }))
+        })
         .WillOnce(Return(0));
     
     handler.Update(config, 0.0f);
@@ -143,10 +143,10 @@ TEST(DeviceHandlerTest, Update_ProcessesShortPress) {
     // Frame 2: Button released
     uint8_t reportReleased[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
     EXPECT_CALL(mockHw, Read(_, _, _))
-        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
+        .WillOnce([&](uint8_t* buf, size_t len, int t) {
             std::memcpy(buf, reportReleased, IFR1::HID_REPORT_SIZE);
             return IFR1::HID_REPORT_SIZE;
-        }))
+        })
         .WillOnce(Return(0));
     
     void* dummyCmd = reinterpret_cast<void*>(0x1234);
@@ -182,10 +182,10 @@ TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
     // 1. Set mode to COM1 and long press INNER_KNOB to shift
     uint8_t reportShiftPressed[IFR1::HID_REPORT_SIZE] = {0, 0, 0x02, 0, 0, 0, 0, 0, 0}; 
     EXPECT_CALL(mockHw, Read(_, _, _))
-        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
+        .WillOnce([&](uint8_t* buf, size_t len, int t) {
             std::memcpy(buf, reportShiftPressed, IFR1::HID_REPORT_SIZE);
             return IFR1::HID_REPORT_SIZE;
-        }))
+        })
         .WillOnce(Return(0));
     handler.Update(config, 0.0f);
     
@@ -196,10 +196,10 @@ TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
     // Now shifted should be true. Verify by rotating outer knob (should trigger hdg_cmd)
     uint8_t reportRotate[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 1, 0, 0, 0}; 
     EXPECT_CALL(mockHw, Read(_, _, _))
-        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
+        .WillOnce([&](uint8_t* buf, size_t len, int t) {
             std::memcpy(buf, reportRotate, IFR1::HID_REPORT_SIZE);
             return IFR1::HID_REPORT_SIZE;
-        }))
+        })
         .WillOnce(Return(0));
     
     void* hdgCmd = reinterpret_cast<void*>(0x1);
@@ -210,20 +210,20 @@ TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
     // 2. Change mode to COM2
     uint8_t reportModeChange[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 0, 0, static_cast<uint8_t>(IFR1::Mode::COM2), 0};
     EXPECT_CALL(mockHw, Read(_, _, _))
-        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
+        .WillOnce([&](uint8_t* buf, size_t len, int t) {
             std::memcpy(buf, reportModeChange, IFR1::HID_REPORT_SIZE);
             return IFR1::HID_REPORT_SIZE;
-        }))
+        })
         .WillOnce(Return(0));
     handler.Update(config, 0.8f);
 
     // 3. Rotate outer knob again. It should trigger com2_cmd, NOT its shifted version (which would be baro)
     uint8_t reportRotate2[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 1, 0, static_cast<uint8_t>(IFR1::Mode::COM2), 0}; 
     EXPECT_CALL(mockHw, Read(_, _, _))
-        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int t) {
+        .WillOnce([&](uint8_t* buf, size_t len, int t) {
             std::memcpy(buf, reportRotate2, IFR1::HID_REPORT_SIZE);
             return IFR1::HID_REPORT_SIZE;
-        }))
+        })
         .WillOnce(Return(0));
 
     void* com2Cmd = reinterpret_cast<void*>(0x2);
@@ -244,11 +244,11 @@ TEST(DeviceHandlerTest, ClearLEDs_SendsZeroReportAndResetsState) {
     
     // Expect a write with HID_LED_REPORT_ID and 0
     EXPECT_CALL(mockHw, Write(_, 2))
-        .WillOnce(::testing::Invoke([](const uint8_t* data, size_t len) {
+        .WillOnce([](const uint8_t* data, size_t len) {
             EXPECT_EQ(data[0], IFR1::HID_LED_REPORT_ID);
             EXPECT_EQ(data[1], 0);
             return 2;
-        }));
+        });
     
     handler.ClearLEDs();
 }
@@ -278,10 +278,10 @@ TEST(DeviceHandlerTest, Update_PlaysSoundOnLongPress) {
     // 1. Press button (swap is bit 0 of byte 2)
     uint8_t pressReport[IFR1::HID_REPORT_SIZE] = {0, 0, 0x01, 0, 0, 0, 0, 0, 0}; 
     EXPECT_CALL(mockHw, Read(_, _, _))
-        .WillOnce(::testing::Invoke([&](uint8_t* buf, size_t len, int timeout) {
+        .WillOnce([&](uint8_t* buf, size_t len, int timeout) {
             std::memcpy(buf, pressReport, IFR1::HID_REPORT_SIZE);
             return IFR1::HID_REPORT_SIZE;
-        }))
+        })
         .WillOnce(Return(0));
     
     handler.Update(config, 0.0f);
