@@ -1,6 +1,6 @@
 # Aircraft Configuration Guide
 
-The Octavi IFR-1 Flex plugin uses JSON configuration files to map hardware events to X-Plane commands and datarefs. This guide explains the structure and available options for creating your own aircraft configurations.
+The IFR-1 Flex plugin uses JSON configuration files to map hardware events to X-Plane commands and datarefs. This guide explains the structure and available options for creating your own aircraft configurations.
 
 ## File Location and Loading
 
