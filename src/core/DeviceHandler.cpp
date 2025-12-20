@@ -38,7 +38,7 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
     // Process long presses even if no new HID report (timer based)
     for (int i = 0; i < 12; ++i) {
         if (m_buttonStates[i].currentlyHeld && !m_buttonStates[i].longPressDetected) {
-            if (currentTime - m_buttonStates[i].pressStartTime >= 0.5f) {
+            if (currentTime - m_buttonStates[i].pressStartTime >= 0.3f) {
                 m_buttonStates[i].longPressDetected = true;
                 
                 auto btn = static_cast<IFR1::Button>(i);
