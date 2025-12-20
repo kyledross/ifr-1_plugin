@@ -1045,6 +1045,12 @@
       }
     },
     "xpdr-mode": {
+      "inner-knob-button": {
+        "short-press": {
+          "type": "command",
+          "value": "sim/transponder/transponder_ident"
+        }
+      },
       "inner-knob": {
         "rotate-clockwise": {
           "type": "command",

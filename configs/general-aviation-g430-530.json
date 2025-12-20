@@ -270,6 +270,11 @@
       }
     },
     "xpdr-mode": {
+      "inner-knob-button": {
+        "short-press": {
+          "type": "command",
+          "value": "sim/transponder/transponder_ident"
+        },
       "outer-knob": {
         "rotate-clockwise": { "type": "command", "value": "sim/transponder/transponder_up" },
         "rotate-counterclockwise": { "type": "command", "value": "sim/transponder/transponder_dn" }
