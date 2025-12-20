@@ -25,4 +25,5 @@ private:
     ConditionEvaluator m_evaluator;
 
     void ExecuteAction(const nlohmann::json& actionConfig) const;
+    [[nodiscard]] bool ShouldEvaluateNext(const nlohmann::json& actionConfig) const;
 };

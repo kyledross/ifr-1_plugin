@@ -20,7 +20,9 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
             for (const auto& actionConfig : actionData) {
                 if (m_evaluator.EvaluateConditions(actionConfig, m_sdk.GetLogLevel() >= LogLevel::Verbose)) {
                     ExecuteAction(actionConfig);
-                    break; // First one that matches wins
+                    if (!ShouldEvaluateNext(actionConfig)) {
+                        break; // First one that matches wins (unless requested to continue)
+                    }
                 }
             }
         } else {
@@ -99,4 +101,29 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig) const
             m_sdk.Log(LogLevel::Error, ("DataRef not found: " + value).c_str());
         }
     }
+}
+
+bool EventProcessor::ShouldEvaluateNext(const nlohmann::json& actionConfig) const
+{
+    // Check at action level
+    if (actionConfig.value("evaluate_next_condition", false)) return true;
+
+    // Check at single condition level
+    if (actionConfig.contains("condition")) {
+        if (actionConfig["condition"].value("evaluate_next_condition", false)) return true;
+    }
+
+    // Check at multiple conditions level
+    if (actionConfig.contains("conditions")) {
+        const auto& conditions = actionConfig["conditions"];
+        if (conditions.is_array()) {
+            for (const auto& cond : conditions) {
+                if (cond.is_object() && cond.value("evaluate_next_condition", false)) return true;
+            }
+        } else if (conditions.is_object()) {
+            if (conditions.value("evaluate_next_condition", false)) return true;
+        }
+    }
+
+    return false;
 }

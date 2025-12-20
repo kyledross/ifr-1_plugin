@@ -208,3 +208,84 @@ TEST(EventProcessorTest, ProcessEvent_LogsAtVerboseLevel) {
 
     processor.ProcessEvent(config, "com1", "swap", "short-press");
 }
+
+TEST(EventProcessorTest, ProcessEvent_ExecutesMultipleActionsWhenRequested) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                {"swap", {
+                    {"short-press", {
+                        {
+                            {"condition", {{"dataref", "sim/test/dr1"}, {"min", 1}, {"max", 1}, {"evaluate_next_condition", true}}},
+                            {"type", "command"},
+                            {"value", "sim/test/cmd1"}
+                        },
+                        {
+                            {"type", "command"},
+                            {"value", "sim/test/cmd2"}
+                        }
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* dr1 = reinterpret_cast<void*>(0x1);
+    void* cmd1 = reinterpret_cast<void*>(0x10);
+    void* cmd2 = reinterpret_cast<void*>(0x20);
+
+    EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/test/dr1"))).WillRepeatedly(::testing::Return(dr1));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(dr1)).WillRepeatedly(::testing::Return(1)); // Int
+    EXPECT_CALL(mockSdk, GetDatai(dr1)).WillRepeatedly(::testing::Return(1));
+
+    EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("sim/test/cmd1"))).WillOnce(::testing::Return(cmd1));
+    EXPECT_CALL(mockSdk, CommandOnce(cmd1));
+
+    EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("sim/test/cmd2"))).WillOnce(::testing::Return(cmd2));
+    EXPECT_CALL(mockSdk, CommandOnce(cmd2));
+
+    processor.ProcessEvent(config, "com1", "swap", "short-press");
+}
+
+TEST(EventProcessorTest, ProcessEvent_StopsAtFirstMatchByDefaultForArray) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                {"swap", {
+                    {"short-press", {
+                        {
+                            {"condition", {{"dataref", "sim/test/dr1"}, {"min", 1}, {"max", 1}}},
+                            {"type", "command"},
+                            {"value", "sim/test/cmd1"}
+                        },
+                        {
+                            {"type", "command"},
+                            {"value", "sim/test/cmd2"}
+                        }
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* dr1 = reinterpret_cast<void*>(0x1);
+    void* cmd1 = reinterpret_cast<void*>(0x10);
+
+    EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/test/dr1"))).WillRepeatedly(::testing::Return(dr1));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(dr1)).WillRepeatedly(::testing::Return(1)); // Int
+    EXPECT_CALL(mockSdk, GetDatai(dr1)).WillRepeatedly(::testing::Return(1));
+
+    EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("sim/test/cmd1"))).WillOnce(::testing::Return(cmd1));
+    EXPECT_CALL(mockSdk, CommandOnce(cmd1));
+
+    // cmd2 should NOT be called
+    EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("sim/test/cmd2"))).Times(0);
+
+    processor.ProcessEvent(config, "com1", "swap", "short-press");
+}
