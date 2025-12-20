@@ -72,6 +72,12 @@ docker run --rm \
         echo "Building plugin..."
         cmake --build . --target ifr1flex -j$(nproc)
         echo ""
+        echo "Building tests..."
+        cmake --build . --target ifr1flex_tests -j$(nproc)
+        echo ""
+        echo "Running tests..."
+        ctest --output-on-failure
+        echo ""
         echo "Copying output to /output..."
         cp -v ifr1flex.xpl /output/ifr1flex.xpl
         cp -v /source/install.sh /output/install.sh

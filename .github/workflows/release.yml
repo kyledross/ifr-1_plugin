@@ -17,7 +17,7 @@ jobs:
       - name: Make script executable
         run: chmod +x docker-build.sh
 
-      - name: Build Plugin
+      - name: Build and Test Plugin
         run: ./docker-build.sh
 
       - name: Create Release Package

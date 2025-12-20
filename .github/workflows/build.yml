@@ -17,7 +17,7 @@ jobs:
       - name: Make script executable
         run: chmod +x docker-build.sh
 
-      - name: Run Docker Build Script
+      - name: Run Docker Build and Test
         run: ./docker-build.sh
 
       - name: Upload Plugin Artifact
