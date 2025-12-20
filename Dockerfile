@@ -12,6 +12,9 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     libudev-dev \
     libusb-1.0-0-dev \
+    python3 \
+    python3-pil \
+    libgl1-mesa-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Create workspace directory

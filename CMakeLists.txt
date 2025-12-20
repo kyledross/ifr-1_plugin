@@ -9,6 +9,8 @@ set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 # 2. External Libraries (Google Test & JSON)
 include(FetchContent)
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+find_package(OpenGL REQUIRED)
 
 FetchContent_Declare(
   googletest
@@ -51,6 +53,32 @@ set(XPLANE_SDK_PATH "${CMAKE_SOURCE_DIR}/SDK" CACHE PATH "Path to X-Plane SDK")
 add_definitions(-DAPL=0 -DIBM=0 -DLIN=1)
 add_definitions(-DXPLM200 -DXPLM210 -DXPLM300 -DXPLM301 -DXPLM302 -DXPLM303 -DXPLM400)
 
+# 5.1 Generated embedded resources
+set(EMBEDDED_PNG_HEADER ${CMAKE_CURRENT_BINARY_DIR}/src/resources_embedded.h)
+set(EMBEDDED_LICENSE_HEADER ${CMAKE_CURRENT_BINARY_DIR}/src/license_embedded.h)
+
+add_custom_command(
+    OUTPUT ${EMBEDDED_PNG_HEADER}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/src
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/embed_png.py
+            ${CMAKE_CURRENT_SOURCE_DIR}/resources/graphics/buy-me-a-coffee-qr-code.png
+            ${EMBEDDED_PNG_HEADER}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/resources/graphics/buy-me-a-coffee-qr-code.png ${CMAKE_CURRENT_SOURCE_DIR}/tools/embed_png.py
+    VERBATIM
+)
+
+add_custom_command(
+    OUTPUT ${EMBEDDED_LICENSE_HEADER}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/src
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/embed_text.py
+            ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE
+            ${EMBEDDED_LICENSE_HEADER}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/tools/embed_text.py
+    VERBATIM
+)
+
+add_custom_target(embed_resources DEPENDS ${EMBEDDED_PNG_HEADER} ${EMBEDDED_LICENSE_HEADER})
+
 # 6. Core Logic Library (Testable)
 add_library(ifr1flex_core STATIC
         src/core/ConfigManager.cpp
@@ -73,8 +101,19 @@ target_link_libraries(ifr1flex_core PUBLIC
 )
 
 # 7. Create Library (Plugin Target)
-add_library(ifr1flex SHARED src/plugin_main.cpp)
-target_link_libraries(ifr1flex PRIVATE ifr1flex_core)
+add_library(ifr1flex SHARED 
+    src/plugin_main.cpp
+    src/ui/AboutWindow.cpp
+)
+add_dependencies(ifr1flex embed_resources)
+target_include_directories(ifr1flex PRIVATE 
+    src
+    ${CMAKE_CURRENT_BINARY_DIR}/src
+)
+target_link_libraries(ifr1flex PRIVATE 
+    ifr1flex_core 
+    OpenGL::GL
+)
 # ifr1flex needs SDK headers too, which it gets from ifr1flex_core PUBLIC includes
 
 # 8. Static Linking

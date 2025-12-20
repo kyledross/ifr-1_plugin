@@ -9,6 +9,7 @@
 #include "XPLMUtilities.h"
 #include "XPLMProcessing.h"
 #include "XPLMDataAccess.h"
+#include "XPLMMenus.h"
 
 #include "ConfigManager.h"
 #include "EventProcessor.h"
@@ -16,6 +17,7 @@
 #include "HIDManager.h"
 #include "DeviceHandler.h"
 #include "XPlaneSDK.h"
+#include "ui/AboutWindow.h"
 
 namespace fs = std::filesystem;
 
@@ -32,6 +34,18 @@ static std::string gCurrentAircraftPath;
 static void* gAcfPathRef = nullptr;
 
 static XPLMFlightLoopID gFlightLoop = nullptr;
+
+// Menu and UI
+static XPLMMenuID gSubMenu = nullptr;
+static int gSubMenuIndex = -1;
+
+// Menu handler
+static void MenuHandler(void* /*inMenuRef*/, void* inItemRef) {
+    auto item = reinterpret_cast<intptr_t>(inItemRef);
+    if (item == 1) {
+        ui::about::Show();
+    }
+}
 
 // ReSharper disable once CppDFAConstantFunctionResult
 float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void* inRefcon) {
@@ -130,6 +144,15 @@ PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
         gSDK->Log(LogLevel::Info, msg);
     }
 
+    // Create Plugins menu: "IFR-1" -> "About..."
+    if (XPLMMenuID pluginsMenu = XPLMFindPluginsMenu()) {
+        gSubMenuIndex = XPLMAppendMenuItem(pluginsMenu, "IFR-1 Flex", nullptr, 0);
+        gSubMenu = XPLMCreateMenu("IFR-1 Flex", pluginsMenu, gSubMenuIndex, MenuHandler, nullptr);
+        if (gSubMenu) {
+            XPLMAppendMenuItem(gSubMenu, "About...", reinterpret_cast<void*>(1), 0);
+        }
+    }
+
     return 1;
 }
 
@@ -139,6 +162,14 @@ PLUGIN_API void XPluginStop(void) {
         gFlightLoop = nullptr;
     }
     
+    // Destroy UI/menu if still present
+    ui::about::Close();
+    if (gSubMenu) {
+        XPLMDestroyMenu(gSubMenu);
+        gSubMenu = nullptr;
+        gSubMenuIndex = -1;
+    }
+
     gDeviceHandler.reset();
     gHIDManager.reset();
     gOutputProcessor.reset();
@@ -158,6 +189,9 @@ PLUGIN_API void XPluginDisable(void) {
     if (gHIDManager) {
         gHIDManager->Disconnect();
     }
+
+    // Ensure any modal is closed when disabling
+    ui::about::Close();
 }
 
 PLUGIN_API int XPluginEnable(void) {
