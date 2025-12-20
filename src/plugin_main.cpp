@@ -6,7 +6,6 @@
 
 #include "XPLMPlugin.h"
 #include "XPLMDisplay.h"
-#include "XPLMUtilities.h"
 #include "XPLMProcessing.h"
 #include "XPLMDataAccess.h"
 #include "XPLMMenus.h"
