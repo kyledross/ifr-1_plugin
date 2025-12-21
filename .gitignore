@@ -2,3 +2,7 @@
 /docker-output/
 .output.txt
 /deploy.sh
+/build/
+
+/Testing/
+/WARP.md

@@ -232,7 +232,7 @@ TEST(EventProcessorTest, ProcessEvent_ExecutesMultipleActionsWhenRequested) {
                 {"swap", {
                     {"short-press", {
                         {
-                            {"condition", {{"dataref", "sim/test/dr1"}, {"min", 1}, {"max", 1}, {"evaluate-next-condition", true}}},
+                            {"condition", {{"dataref", "sim/test/dr1"}, {"min", 1}, {"max", 1}, {"continue-to-next-action", true}}},
                             {"type", "command"},
                             {"value", "sim/test/cmd1"}
                         },
@@ -391,8 +391,8 @@ TEST(EventProcessorTest, DataRefSet_ArrayFloat) {
 
     processor.ProcessEvent(config, "com1", "knob_inner", "button_press");
 }
-// New tests for command send-x-times
-TEST(EventProcessorTest, Command_SendXTimes_DefaultSendsOnce) {
+// New tests for command send-count
+TEST(EventProcessorTest, Command_SendCount_DefaultSendsOnce) {
     MockXPlaneSDK mockSdk;
     EventProcessor processor(mockSdk);
 
@@ -417,7 +417,7 @@ TEST(EventProcessorTest, Command_SendXTimes_DefaultSendsOnce) {
     processor.ProcessQueue();
 }
 
-TEST(EventProcessorTest, Command_SendXTimes_Multiple) {
+TEST(EventProcessorTest, Command_SendCount_Multiple) {
     MockXPlaneSDK mockSdk;
     EventProcessor processor(mockSdk);
 
@@ -428,7 +428,7 @@ TEST(EventProcessorTest, Command_SendXTimes_Multiple) {
                     {"press", {
                         {"type", "command"},
                         {"value", "sim/operation/screenshot"},
-                        {"send-x-times", 3}
+                        {"send-count", 3}
                     }}
                 }}
             }}
@@ -445,7 +445,7 @@ TEST(EventProcessorTest, Command_SendXTimes_Multiple) {
     processor.ProcessQueue();
 }
 
-TEST(EventProcessorTest, Command_SendXTimes_Zero) {
+TEST(EventProcessorTest, Command_SendCount_Zero) {
     MockXPlaneSDK mockSdk;
     EventProcessor processor(mockSdk);
 
@@ -456,7 +456,7 @@ TEST(EventProcessorTest, Command_SendXTimes_Zero) {
                     {"press", {
                         {"type", "command"},
                         {"value", "sim/operation/screenshot"},
-                        {"send-x-times", 0}
+                        {"send-count", 0}
                     }}
                 }}
             }}
@@ -471,7 +471,7 @@ TEST(EventProcessorTest, Command_SendXTimes_Zero) {
     processor.ProcessQueue();
 }
 
-TEST(EventProcessorTest, Command_SendXTimes_Negative) {
+TEST(EventProcessorTest, Command_SendCount_Negative) {
     MockXPlaneSDK mockSdk;
     EventProcessor processor(mockSdk);
 
@@ -482,7 +482,7 @@ TEST(EventProcessorTest, Command_SendXTimes_Negative) {
                     {"press", {
                         {"type", "command"},
                         {"value", "sim/operation/screenshot"},
-                        {"send-x-times", -2}
+                        {"send-count", -2}
                     }}
                 }}
             }}
@@ -509,7 +509,7 @@ TEST(EventProcessorTest, CommandQueueLimit_EnforcedAtTen) {
                     {"press", {
                         {"type", "command"},
                         {"value", "sim/test/cmd"},
-                        {"send-x-times", 15}
+                        {"send-count", 15}
                     }}
                 }}
             }}

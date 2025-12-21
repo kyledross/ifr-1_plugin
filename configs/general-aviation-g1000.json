@@ -942,7 +942,7 @@
             "min": 0,
             "max": 1,
             "limit-type": "clamp",
-            "evaluate-next-condition": true
+            "continue-to-next-action": true
           },
           {
             "type": "command",
@@ -957,7 +957,7 @@
             "min": 0,
             "max": 1,
             "limit-type": "clamp",
-            "evaluate-next-condition": true
+            "continue-to-next-action": true
           },
           {
             "type": "command",
@@ -969,12 +969,12 @@
         "rotate-clockwise": {
           "type": "command",
           "value": "sim/instruments/instrument_bright_up",
-          "send-x-times": 3
+          "send-count": 3
         },
         "rotate-counterclockwise": {
           "type": "command",
           "value": "sim/instruments/instrument_bright_down",
-          "send-x-times": 3
+          "send-count": 3
         }
       }
     },

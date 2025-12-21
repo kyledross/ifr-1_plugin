@@ -75,7 +75,7 @@ There are three types of actions you can trigger:
 #### 1. `command`
 Executes a standard X-Plane command.
 - `value`: The command path (e.g., `sim/radios/com1_standy_flip`).
-- `send-x-times`: (Optional) The number of times to send the command. Defaults to `1`. `0` means don't send. Negative values are treated as positive (e.g., `-2` sends the command `2` times). Commands are sent at a rate of one per frame to ensure X-Plane processes each one. The command queue has a maximum size of 10; any commands beyond this limit will be discarded.
+- `send-count`: (Optional) The number of times to send the command. Defaults to `1`. `0` means don't send. Negative values are treated as positive (e.g., `-2` sends the command `2` times). Commands are sent at a rate of one per frame to ensure X-Plane processes each one. The command queue has a maximum size of 10; any commands beyond this limit will be discarded.
 
 #### 2. `dataref-set`
 Sets a dataref to a specific value.
@@ -107,14 +107,14 @@ If you want an event to do different things depending on the aircraft's state, o
 - For each action, it evaluates the `condition` (or `conditions`).
 - If the conditions are met, the action is executed.
 - By default, after executing an action, the plugin **stops** and does not evaluate any further actions in the array for that event.
-- If you want to continue to the next action even after a match, add `"evaluate-next-condition": true` to the condition object or the action itself.
+- If you want to continue to the next action even after a match, add `"continue-to-next-action": true` to the condition object or the action itself.
 
 ### Condition Syntax
 A condition checks a dataref value:
 - `dataref`: The name of the dataref to check.
 - `min` and `max`: (Required for range) Inclusive range the value must fall into.
 - `bit`: (Alternative to range) A 0-indexed bit that must be set in the integer value.
-- `evaluate-next-condition`: (Optional) If `true`, the plugin will continue to evaluate subsequent actions in the array even if this action's conditions were met and it was executed.
+- `continue-to-next-action`: (Optional) If `true`, the plugin will continue to evaluate subsequent actions in the array even if this action's conditions were met and it was executed.
 
 ```json
 "alt": {
@@ -123,7 +123,7 @@ A condition checks a dataref value:
       "condition": { 
         "dataref": "sim/cockpit2/autopilot/altitude_mode", 
         "min": 5, "max": 5, 
-        "evaluate-next-condition": true 
+        "continue-to-next-action": true 
       },
       "type": "command",
       "value": "sim/autopilot/airspeed_up"

@@ -57,7 +57,7 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
 
     if (type == "command") {
         if (void* cmdRef = m_sdk.FindCommand(value.c_str())) {
-            int times = actionConfig.value("send-x-times", 1);
+            int times = actionConfig.value("send-count", 1);
             if (times < 0) times = -times;
             
             if (times > 0) {
@@ -70,7 +70,7 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
                     }
                 }
             } else {
-                m_sdk.Log(LogLevel::Verbose, ("Skipping command: " + value + " (send-x-times is 0)").c_str());
+                m_sdk.Log(LogLevel::Verbose, ("Skipping command: " + value + " (send-count is 0)").c_str());
             }
         } else {
             m_sdk.Log(LogLevel::Error, ("Command not found: " + value).c_str());
@@ -164,11 +164,11 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
 bool EventProcessor::ShouldEvaluateNext(const nlohmann::json& actionConfig) const
 {
     // Check at action level
-    if (actionConfig.value("evaluate-next-condition", false)) return true;
+    if (actionConfig.value("continue-to-next-action", false)) return true;
 
     // Check at single condition level
     if (actionConfig.contains("condition")) {
-        if (actionConfig["condition"].value("evaluate-next-condition", false)) return true;
+        if (actionConfig["condition"].value("continue-to-next-action", false)) return true;
     }
 
     // Check at multiple conditions level
@@ -176,10 +176,10 @@ bool EventProcessor::ShouldEvaluateNext(const nlohmann::json& actionConfig) cons
         const auto& conditions = actionConfig["conditions"];
         if (conditions.is_array()) {
             for (const auto& cond : conditions) {
-                if (cond.is_object() && cond.value("evaluate-next-condition", false)) return true;
+                if (cond.is_object() && cond.value("continue-to-next-action", false)) return true;
             }
         } else if (conditions.is_object()) {
-            if (conditions.value("evaluate-next-condition", false)) return true;
+            if (conditions.value("continue-to-next-action", false)) return true;
         }
     }
 
