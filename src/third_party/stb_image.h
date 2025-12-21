@@ -1,7 +1,6 @@
 // stb_image - v2.29 - public domain image loader - https://github.com/nothings/stb
 // This is a trimmed copy sufficient for PNG/JPG/BMP/TGA/GIF/PSD/PIC/PNM
-// For full license details, see the original repository. Placed in the project
-// to avoid external dependencies as requested.
+// For full license details, see the original repository.
 
 #ifndef STB_IMAGE_H
 #define STB_IMAGE_H
