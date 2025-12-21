@@ -9,6 +9,7 @@
 #include <vector>
 #include <map>
 #include <cstring>
+#include <filesystem>
 
 struct SoundBuffer {
     std::vector<char> data;
@@ -117,6 +118,10 @@ public:
         char path[512];
         XPLMGetSystemPath(path);
         return std::string(path);
+    }
+
+    bool FileExists(const std::string& path) override {
+        return std::filesystem::exists(path);
     }
 
     void PlaySound(const std::string& path) override {

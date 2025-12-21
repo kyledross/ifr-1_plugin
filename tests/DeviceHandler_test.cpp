@@ -19,6 +19,7 @@ public:
     MockXPlaneSDK() {
         ON_CALL(*this, Log(::testing::_, ::testing::_)).WillByDefault(::testing::Return());
         ON_CALL(*this, GetLogLevel()).WillByDefault(::testing::Return(LogLevel::Info));
+        ON_CALL(*this, FileExists(::testing::_)).WillByDefault(::testing::Return(true));
     }
 
     MOCK_METHOD(void*, FindDataRef, (const char* name), (override));
@@ -41,6 +42,7 @@ public:
     MOCK_METHOD(LogLevel, GetLogLevel, (), (const, override));
     MOCK_METHOD(float, GetElapsedTime, (), (override));
     MOCK_METHOD(std::string, GetSystemPath, (), (override));
+    MOCK_METHOD(bool, FileExists, (const std::string& path), (override));
     MOCK_METHOD(void, PlaySound, (const std::string& path), (override));
 };
 
@@ -253,7 +255,7 @@ TEST(DeviceHandlerTest, ClearLEDs_SendsZeroReportAndResetsState) {
     handler.ClearLEDs();
 }
 
-TEST(DeviceHandlerTest, Update_PlaysSoundOnLongPress) {
+TEST(DeviceHandlerTest, Update_OtherButtonLongPressDoesNotPlaySound) {
     MockHardwareManager mockHw;
     MockXPlaneSDK mockSdk;
     
@@ -292,7 +294,84 @@ TEST(DeviceHandlerTest, Update_PlaysSoundOnLongPress) {
     void* dummyCmd = reinterpret_cast<void*>(0x1234);
     EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("long_cmd"))).WillOnce(Return(dummyCmd));
     EXPECT_CALL(mockSdk, CommandOnce(dummyCmd));
+    
+    // Should NOT play sound
+    EXPECT_CALL(mockSdk, PlaySound(_)).Times(0);
+    
+    handler.Update(config, 0.4f);
+}
+
+TEST(DeviceHandlerTest, Update_InnerKnobLongPressPlaysSound) {
+    MockHardwareManager mockHw;
+    MockXPlaneSDK mockSdk;
+    
+    EXPECT_CALL(mockSdk, GetSystemPath()).WillRepeatedly(Return("/xplane/"));
+    
+    EventProcessor eventProc(mockSdk);
+    OutputProcessor outputProc(mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
+    
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {}}
+        }}
+    };
+    
+    EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
+    
+    // INNER_KNOB is bit 1 of byte 2 (0x02)
+    uint8_t pressReport[IFR1::HID_REPORT_SIZE] = {0, 0, 0x02, 0, 0, 0, 0, 0, 0}; 
+    EXPECT_CALL(mockHw, Read(_, _, _))
+        .WillOnce([&](uint8_t* buf, size_t len, int timeout) {
+            std::memcpy(buf, pressReport, IFR1::HID_REPORT_SIZE);
+            return IFR1::HID_REPORT_SIZE;
+        })
+        .WillOnce(Return(0));
+    
+    handler.Update(config, 0.0f);
+    
+    EXPECT_CALL(mockHw, Read(_, _, _)).WillRepeatedly(Return(0));
+    // Should play sound for inner knob
     EXPECT_CALL(mockSdk, PlaySound(::testing::StrEq("/xplane/Resources/sounds/systems/click.wav")));
+    
+    handler.Update(config, 0.4f);
+}
+
+TEST(DeviceHandlerTest, Update_InnerKnobLongPressDoesNotPlaySoundIfFileNotFound) {
+    MockHardwareManager mockHw;
+    MockXPlaneSDK mockSdk;
+    
+    EXPECT_CALL(mockSdk, GetSystemPath()).WillRepeatedly(Return("/xplane/"));
+    // Explicitly say the file does NOT exist
+    EXPECT_CALL(mockSdk, FileExists(::testing::StrEq("/xplane/Resources/sounds/systems/click.wav")))
+        .WillOnce(Return(false));
+    
+    EventProcessor eventProc(mockSdk);
+    OutputProcessor outputProc(mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
+    
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {}}
+        }}
+    };
+    
+    EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
+    
+    // INNER_KNOB is bit 1 of byte 2 (0x02)
+    uint8_t pressReport[IFR1::HID_REPORT_SIZE] = {0, 0, 0x02, 0, 0, 0, 0, 0, 0}; 
+    EXPECT_CALL(mockHw, Read(_, _, _))
+        .WillOnce([&](uint8_t* buf, size_t len, int timeout) {
+            std::memcpy(buf, pressReport, IFR1::HID_REPORT_SIZE);
+            return IFR1::HID_REPORT_SIZE;
+        })
+        .WillOnce(Return(0));
+    
+    handler.Update(config, 0.0f);
+    
+    EXPECT_CALL(mockHw, Read(_, _, _)).WillRepeatedly(Return(0));
+    // Should NOT play sound if file not found
+    EXPECT_CALL(mockSdk, PlaySound(_)).Times(0);
     
     handler.Update(config, 0.4f);
 }

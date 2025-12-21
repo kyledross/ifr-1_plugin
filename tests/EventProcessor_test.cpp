@@ -13,6 +13,7 @@ public:
     MockXPlaneSDK() {
         ON_CALL(*this, Log(::testing::_, ::testing::_)).WillByDefault(::testing::Return());
         ON_CALL(*this, GetLogLevel()).WillByDefault(::testing::Return(LogLevel::Info));
+        ON_CALL(*this, FileExists(::testing::_)).WillByDefault(::testing::Return(true));
     }
 
     MOCK_METHOD(void*, FindDataRef, (const char* name), (override));
@@ -35,6 +36,7 @@ public:
     MOCK_METHOD(LogLevel, GetLogLevel, (), (const, override));
     MOCK_METHOD(float, GetElapsedTime, (), (override));
     MOCK_METHOD(std::string, GetSystemPath, (), (override));
+    MOCK_METHOD(bool, FileExists, (const std::string& path), (override));
     MOCK_METHOD(void, PlaySound, (const std::string& path), (override));
 };
 

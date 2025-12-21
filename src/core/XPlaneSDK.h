@@ -50,6 +50,7 @@ public:
     virtual LogLevel GetLogLevel() const = 0;
     virtual float GetElapsedTime() = 0;
     virtual std::string GetSystemPath() = 0;
+    virtual bool FileExists(const std::string& path) = 0;
 
     // Sound
     virtual void PlaySound(const std::string& path) = 0;
