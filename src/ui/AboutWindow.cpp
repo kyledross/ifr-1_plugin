@@ -184,7 +184,7 @@ namespace ui::about
 
     int l, t, r, b;
     XPLMGetScreenBoundsGlobal(&l, &t, &r, &b);
-    int width = 480;   // slightly narrower
+    int width = 600;   // slightly narrower
     int height = 460;  // slightly shorter overall
     int left = (l + r - width) / 2;
     int top = (t + b + height) / 2;   // top coordinate
