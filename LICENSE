@@ -1,17 +1,16 @@
 IFR-1 Flex - X-Plane plugin for the IFR-1 controller
 Copyright 2025 Kyle D. Ross All Rights Reserved.
 
-===================================================================================================================
+Installation and use of this software indicates your agreement to the following
+licenses for this and third-party software used in this project.
+=================================================================================
 SOFTWARE LICENSE AGREEMENT
 
 Copyright (c) 2025 Kyle D. Ross All Rights Reserved.
 
-1. GRANT OF LICENSE Kyle D. Ross grants you a personal, non-exclusive, non-transferable,
-limited license to install and use the software ("the Software") solely for your personal
-or internal business purposes.
+1. GRANT OF LICENSE Kyle D. Ross grants you a personal, non-exclusive, non-transferable, limited license to install and use the software ("the Software") solely for your personal or internal business purposes.
 
-2. OWNERSHIP The Software is licensed, not sold. Kyle D. Ross retains all right, title,
-and interest in and to the Software, including all intellectual property rights therein.
+2. OWNERSHIP The Software is licensed, not sold. Kyle D. Ross retains all right, title, and interest in and to the Software, including all intellectual property rights therein.
 
 3. RESTRICTIONS You agree not to, and you will not permit others to:
 
@@ -23,20 +22,14 @@ Sell/Rent: Sell, rent, lease, sublicense, or otherwise transfer rights to the So
 
 Reverse Engineer: Decompile, reverse engineer, disassemble, or attempt to derive the source code of the Software.
 
-4. TERMINATION This license is effective until terminated. Your rights under this license
-will terminate automatically without notice if you fail to comply with any term(s) of this agreement.
-Upon termination, you must cease all use of the Software and destroy all copies in your possession.
+4. TERMINATION This license is effective until terminated. Your rights under this license will terminate automatically without notice if you fail to comply with any term(s) of this agreement. Upon termination, you must cease all use of the Software and destroy all copies in your possession.
 
-5. DISCLAIMER OF WARRANTY THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
-NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES,
-OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF,
-OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+5. DISCLAIMER OF WARRANTY THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-===================================================================================================================
+=================================================================================
 Third-party licenses
-===================================================================================================================
+=================================================================================
 
 X-Plane SDK
 
@@ -68,7 +61,7 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-===================================================================================================================
+=================================================================================
 
 HIDAPI
 Copyright 2009, Alan Ott, Signal 11 Software.
@@ -77,7 +70,7 @@ All Rights Reserved.
 This software may be used by anyone for any reason so long as the copyright notice in the source files remains intact.
 
 
-===================================================================================================================
+=================================================================================
 
 nlohmann/json
 
@@ -103,7 +96,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-===================================================================================================================
+=================================================================================
 
 google/googletest
 
@@ -136,7 +129,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-===================================================================================================================
+=================================================================================
 
 nothings/stb
 

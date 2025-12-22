@@ -61,6 +61,10 @@ namespace ui::about
   static int g_licenseWrapWidthCached = -1; // in pixels
   static int g_licenseScrollPx = 0;         // vertical scroll in pixels
 
+  // Scrollbar dragging state
+  static bool g_isDraggingScrollbar = false;
+  static float g_scrollbarDragClickOffset = 0.0f; // Offset within the thumb where the user clicked
+
   static void EnsureWrappedLicense(int max_width_px) {
     if (max_width_px <= 0) return;
     if (g_licenseWrapWidthCached == max_width_px && !g_licenseWrappedLines.empty()) return;
@@ -181,6 +185,7 @@ namespace ui::about
 
   void Show() {
     if (g_aboutWindow) return;
+    g_isDraggingScrollbar = false;
 
     int l, t, r, b;
     XPLMGetScreenBoundsGlobal(&l, &t, &r, &b);
@@ -231,6 +236,7 @@ namespace ui::about
       g_aboutMonitorRegistered = false;
     }
     DestroyQRTexture();
+    g_isDraggingScrollbar = false;
   }
 
   static void DrawAboutWindow(XPLMWindowID inWindowID, void * /*inRefcon*/) {
@@ -351,8 +357,9 @@ namespace ui::about
     // Removed instructional caption above the text area (unnecessary)
 
     // Compute visible lines and wrap text into width
+    const int scrollbar_w = 12;
     const int inner_left = box_left + 6;
-    const int inner_right = box_right - 6;
+    const int inner_right = box_right - (scrollbar_w + 12);
     const int inner_top = box_top - 8;  // tighter top padding inside box
     const int inner_bottom = box_bottom + 6;
     const int wrap_px = inner_right - inner_left;
@@ -360,6 +367,51 @@ namespace ui::about
 
     // Compute how many lines fit
     const int lines_fit = std::max(0, (inner_top - inner_bottom) / line_h);
+    const int total_lines = static_cast<int>(g_licenseWrappedLines.size());
+    const int max_first_line = std::max(0, total_lines - lines_fit);
+    const int max_scroll_px = (line_h > 0) ? (max_first_line * line_h) : 0;
+
+    // Scrollbar track
+    const int sb_track_l = box_right - (scrollbar_w + 4);
+    const int sb_track_r = box_right - 4;
+    const int sb_track_t = box_top - 4;
+    const int sb_track_b = box_bottom + 4;
+
+    // Draw track background
+    glColor4f(0.2f, 0.2f, 0.2f, 0.5f);
+    glBegin(GL_QUADS);
+    glVertex2i(sb_track_l, sb_track_t);
+    glVertex2i(sb_track_r, sb_track_t);
+    glVertex2i(sb_track_r, sb_track_b);
+    glVertex2i(sb_track_l, sb_track_b);
+    glEnd();
+
+    // Scrollbar thumb
+    if (total_lines > lines_fit && max_scroll_px > 0) {
+      const float visible_ratio = static_cast<float>(lines_fit) / static_cast<float>(total_lines);
+      const int track_h = sb_track_t - sb_track_b;
+      int thumb_h = static_cast<int>(static_cast<float>(track_h) * visible_ratio);
+      if (thumb_h < 10) thumb_h = 10; // Minimum thumb height
+      if (thumb_h >= track_h) thumb_h = track_h - 1;
+
+      const float scroll_ratio = static_cast<float>(g_licenseScrollPx) / static_cast<float>(max_scroll_px);
+      const int thumb_top = sb_track_t - static_cast<int>(static_cast<float>(track_h - thumb_h) * scroll_ratio);
+      const int thumb_bottom = thumb_top - thumb_h;
+
+      // Draw thumb
+      if (g_isDraggingScrollbar)
+        glColor3f(0.7f, 0.7f, 0.7f);
+      else
+        glColor3f(0.5f, 0.5f, 0.5f);
+
+      glBegin(GL_QUADS);
+      glVertex2i(sb_track_l + 1, thumb_top);
+      glVertex2i(sb_track_r - 1, thumb_top);
+      glVertex2i(sb_track_r - 1, thumb_bottom);
+      glVertex2i(sb_track_l + 1, thumb_bottom);
+      glEnd();
+    }
+
     // Convert scroll in px to the starting line
     int first_line = 0;
     if (line_h > 0) first_line = std::max(0, g_licenseScrollPx / line_h);
@@ -377,13 +429,79 @@ namespace ui::about
     g_mouseX = x;
     g_mouseY = y;
 
+    int char_w, line_h;
+    XPLMGetFontDimensions(xplmFont_Basic, &char_w, &line_h, nullptr);
+
+    // Recompute metrics
+    const int scrollbar_w = 12;
+    const int sb_track_l = g_licenseR - (scrollbar_w + 4);
+    const int sb_track_r = g_licenseR - 4;
+    const int sb_track_t = g_licenseT - 4;
+    const int sb_track_b = g_licenseB + 4;
+    const int track_h = sb_track_t - sb_track_b;
+
+    const int inner_top = g_licenseT - 8;
+    const int inner_bottom = g_licenseB + 6;
+    const int lines_fit = (line_h > 0) ? std::max(0, (inner_top - inner_bottom) / line_h) : 0;
+    const int total_lines = static_cast<int>(g_licenseWrappedLines.size());
+    const int max_first_line = std::max(0, total_lines - lines_fit);
+    const int max_scroll_px = (line_h > 0) ? (max_first_line * line_h) : 0;
+
     if (inMouse == xplm_MouseDown) {
       // If click is inside QR code, open URL
       if (x >= g_qrLeft && x <= g_qrRight && y >= g_qrBottom && y <= g_qrTop) {
         OpenURLCrossPlatform("https://buymeacoffee.com/kyledross");
         return 1;
       }
+
+      // Scrollbar interaction
+      if (x >= sb_track_l && x <= sb_track_r && y >= sb_track_b && y <= sb_track_t) {
+        if (total_lines > lines_fit && max_scroll_px > 0) {
+          const float visible_ratio = static_cast<float>(lines_fit) / static_cast<float>(total_lines);
+          int thumb_h = static_cast<int>(static_cast<float>(track_h) * visible_ratio);
+          if (thumb_h < 10) thumb_h = 10;
+          if (thumb_h >= track_h) thumb_h = track_h - 1; // Ensure thumb is smaller than track
+
+          const float scroll_ratio = static_cast<float>(g_licenseScrollPx) / static_cast<float>(max_scroll_px);
+          const int thumb_top = sb_track_t - static_cast<int>(static_cast<float>(track_h - thumb_h) * scroll_ratio);
+          const int thumb_bottom = thumb_top - thumb_h;
+
+          if (y >= thumb_bottom && y <= thumb_top) {
+            // Clicked on thumb, start dragging
+            g_isDraggingScrollbar = true;
+            g_scrollbarDragClickOffset = static_cast<float>(thumb_top - y);
+          } else {
+            // Clicked on track, jump to position
+            float new_scroll_ratio = static_cast<float>(sb_track_t - y - thumb_h / 2) / static_cast<float>(track_h - thumb_h);
+            g_licenseScrollPx = static_cast<int>(new_scroll_ratio * static_cast<float>(max_scroll_px));
+            g_licenseScrollPx = std::clamp(g_licenseScrollPx, 0, max_scroll_px);
+            g_isDraggingScrollbar = true;
+            g_scrollbarDragClickOffset = static_cast<float>(thumb_h) / 2.0f;
+          }
+          return 1;
+        }
+      }
+    } else if (inMouse == xplm_MouseDrag) {
+      if (g_isDraggingScrollbar) {
+        const float visible_ratio = static_cast<float>(lines_fit) / static_cast<float>(total_lines);
+        int thumb_h = static_cast<int>(static_cast<float>(track_h) * visible_ratio);
+        if (thumb_h < 10) thumb_h = 10;
+        if (thumb_h >= track_h) thumb_h = track_h - 1;
+
+        float target_thumb_top = static_cast<float>(y) + g_scrollbarDragClickOffset;
+        float new_scroll_ratio = (static_cast<float>(sb_track_t) - target_thumb_top) / static_cast<float>(track_h - thumb_h);
+
+        g_licenseScrollPx = static_cast<int>(new_scroll_ratio * static_cast<float>(max_scroll_px));
+        g_licenseScrollPx = std::clamp(g_licenseScrollPx, 0, max_scroll_px);
+        return 1;
+      }
+    } else if (inMouse == xplm_MouseUp) {
+      if (g_isDraggingScrollbar) {
+        g_isDraggingScrollbar = false;
+        return 1;
+      }
     }
+
     return 0;
   }
 
@@ -401,8 +519,9 @@ namespace ui::about
       XPLMGetFontDimensions(xplmFont_Basic, &char_w, &line_h, nullptr);
 
       // Recompute the same inner box metrics used by DrawAboutWindow()
+      const int scrollbar_w = 12;
       const int inner_left = g_licenseL + 6;
-      const int inner_right = g_licenseR - 6;
+      const int inner_right = g_licenseR - (scrollbar_w + 12);
       const int inner_top = g_licenseT - 8;
       const int inner_bottom = g_licenseB + 6;
       const int wrap_px = inner_right - inner_left;
