@@ -5,6 +5,13 @@
 uint8_t OutputProcessor::EvaluateLEDs(const nlohmann::json& config, float currentTime) const
 {
     if (config.empty() || !config.contains("output")) {
+        if (!config.empty() && config.is_object() && m_sdk.GetLogLevel() >= LogLevel::Verbose) {
+            std::string keys;
+            for (auto it = config.begin(); it != config.end(); ++it) {
+                keys += it.key() + ", ";
+            }
+            m_sdk.Log(LogLevel::Verbose, ("Config missing 'output'. Keys: " + keys).c_str());
+        }
         return IFR1::LEDMask::OFF;
     }
 

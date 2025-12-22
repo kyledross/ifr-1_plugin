@@ -33,12 +33,25 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
     if (currentlyConnected && !m_lastConnectedState) {
         m_sdk.Log(LogLevel::Info, "Device connected.");
         ClearLEDs();
+        m_totalWrites = 0;
+        m_failedWrites = 0;
     } else if (!currentlyConnected && m_lastConnectedState) {
         m_sdk.Log(LogLevel::Error, "Device disconnected.");
     }
     m_lastConnectedState = currentlyConnected;
 
     if (!currentlyConnected) return;
+
+    // Log write stats periodically if there are errors
+    static uint32_t lastTotal = 0;
+    static uint32_t lastFailed = 0;
+    if (m_failedWrites > lastFailed || (m_totalWrites % 100 == 0 && m_totalWrites != lastTotal)) {
+        if (m_failedWrites > 0) {
+            m_sdk.Log(LogLevel::Error, ("HID Write Stats - Total: " + std::to_string(m_totalWrites) + ", Failed: " + std::to_string(m_failedWrites)).c_str());
+        }
+        lastTotal = m_totalWrites;
+        lastFailed = m_failedWrites;
+    }
 
     // Process all available reports from the queue
     while (auto report = m_inputQueue.Pop()) {
@@ -224,8 +237,9 @@ void DeviceHandler::ProcessHardware() {
             return;
         }
         m_isConnected = true;
-        // Clear input queue on fresh connection to avoid stale reports
+        // Clear queues on fresh connection to avoid stale reports/updates
         m_inputQueue.Clear();
+        m_outputQueue.Clear();
     } else {
         m_isConnected = true;
     }
@@ -252,10 +266,12 @@ void DeviceHandler::ProcessHardware() {
     while (auto ledBits = m_outputQueue.Pop()) {
         uint8_t report[2] = { IFR1::HID_LED_REPORT_ID, *ledBits };
         if (m_hw.Write(report, 2) < 0) {
+            m_failedWrites++;
             m_hw.Disconnect();
             m_isConnected = false;
             break;
         }
+        m_totalWrites++;
     }
 }
 

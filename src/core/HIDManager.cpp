@@ -14,7 +14,7 @@ bool HIDManager::Connect(uint16_t vendorId, uint16_t productId) {
     DisconnectInternal();
     m_device = hid_open(vendorId, productId, nullptr);
     if (m_device) {
-        hid_set_nonblocking(m_device, 1);
+        hid_set_nonblocking(m_device, 0);
     }
     return m_device != nullptr;
 }

@@ -59,6 +59,8 @@ private:
     ThreadSafeQueue<std::array<uint8_t, IFR1::HID_REPORT_SIZE + 1>> m_inputQueue;
     ThreadSafeQueue<uint8_t> m_outputQueue;
     std::atomic<bool> m_isConnected{false};
+    std::atomic<uint32_t> m_totalWrites{0};
+    std::atomic<uint32_t> m_failedWrites{0};
 
     // State
     IFR1::Mode m_currentMode = IFR1::Mode::COM1;

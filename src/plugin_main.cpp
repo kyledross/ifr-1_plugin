@@ -62,7 +62,11 @@ float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceL
             gSDK->Log(LogLevel::Info, ("Aircraft changed to " + currentPath).c_str());
             gCurrentAircraftPath = currentPath;
             gDeviceHandler->ClearLEDs();
-            gCurrentConfig = gConfigManager->GetConfigForAircraft(currentPath);
+            gCurrentConfig = gConfigManager->GetConfigForAircraft(currentPath, *gSDK);
+
+            if (!gCurrentConfig.empty() && !gCurrentConfig.contains("output")) {
+                gSDK->Log(LogLevel::Error, ("Loaded config '" + gCurrentConfig.value("name", "unknown") + "' is missing 'output' section!").c_str());
+            }
 
             // Update log level based on config
             if (gCurrentConfig.value("debug", false)) {
@@ -125,7 +129,7 @@ PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
     
     size_t loaded = 0;
     if (!configDir.empty()) {
-        loaded = gConfigManager->LoadConfigs(configDir.string());
+        loaded = gConfigManager->LoadConfigs(configDir.string(), *gSDK);
     }
     
     char msg[1024];

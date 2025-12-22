@@ -651,118 +651,118 @@
         "short-press": {
           "type": "command",
           "value": "sim/transponder/transponder_ident"
-        },
-        "outer-knob": {
-          "rotate-clockwise": {
-            "type": "command",
-            "value": "sim/transponder/transponder_up"
-          },
-          "rotate-counterclockwise": {
-            "type": "command",
-            "value": "sim/transponder/transponder_dn"
-          }
-        },
-        "inner-knob": {
-          "rotate-clockwise": {
-            "type": "command",
-            "value": "sim/transponder/transponder_up"
-          },
-          "rotate-counterclockwise": {
-            "type": "command",
-            "value": "sim/transponder/transponder_dn"
-          }
-        },
-        "ap": {
-          "short-press": {
-            "type": "command",
-            "value": "sim/transponder/transponder_standby"
-          }
-        },
-        "hdg": {
-          "short-press": {
-            "type": "command",
-            "value": "sim/transponder/transponder_on"
-          }
-        },
-        "nav": {
-          "short-press": {
-            "type": "command",
-            "value": "sim/transponder/transponder_alt"
-          }
         }
-      }
-    },
-    "output": {
+      },
+      "outer-knob": {
+        "rotate-clockwise": {
+          "type": "command",
+          "value": "sim/transponder/transponder_up"
+        },
+        "rotate-counterclockwise": {
+          "type": "command",
+          "value": "sim/transponder/transponder_dn"
+        }
+      },
+      "inner-knob": {
+        "rotate-clockwise": {
+          "type": "command",
+          "value": "sim/transponder/transponder_up"
+        },
+        "rotate-counterclockwise": {
+          "type": "command",
+          "value": "sim/transponder/transponder_dn"
+        }
+      },
       "ap": {
-        "conditions": [
-          {
-            "dataref": "sim/cockpit/autopilot/autopilot_mode",
-            "min": 2,
-            "max": 2,
-            "mode": "solid"
-          }
-        ]
+        "short-press": {
+          "type": "command",
+          "value": "sim/transponder/transponder_standby"
+        }
       },
       "hdg": {
-        "conditions": [
-          {
-            "dataref": "sim/cockpit/autopilot/autopilot_state",
-            "bit": 1,
-            "mode": "solid"
-          }
-        ]
+        "short-press": {
+          "type": "command",
+          "value": "sim/transponder/transponder_on"
+        }
       },
       "nav": {
-        "conditions": [
-          {
-            "dataref": "sim/cockpit/autopilot/autopilot_state",
-            "bit": 9,
-            "mode": "solid"
-          }
-        ]
-      },
-      "apr": {
-        "conditions": [
-          {
-            "dataref": "sim/cockpit2/autopilot/approach_status",
-            "min": 1,
-            "max": 1,
-            "mode": "blink"
-          },
-          {
-            "dataref": "sim/cockpit2/autopilot/approach_status",
-            "min": 2,
-            "max": 2,
-            "mode": "solid"
-          }
-        ]
-      },
-      "alt": {
-        "conditions": [
-          {
-            "dataref": "sim/cockpit2/autopilot/altitude_mode",
-            "min": 6,
-            "max": 6,
-            "mode": "solid"
-          },
-          {
-            "dataref": "sim/cockpit2/autopilot/altitude_mode",
-            "min": 5,
-            "max": 5,
-            "mode": "blink"
-          }
-        ]
-      },
-      "vs": {
-        "conditions": [
-          {
-            "dataref": "sim/cockpit2/autopilot/altitude_mode",
-            "min": 4,
-            "max": 4,
-            "mode": "solid"
-          }
-        ]
+        "short-press": {
+          "type": "command",
+          "value": "sim/transponder/transponder_alt"
+        }
       }
+    }
+  },
+  "output": {
+    "ap": {
+      "conditions": [
+        {
+          "dataref": "sim/cockpit/autopilot/autopilot_mode",
+          "min": 2,
+          "max": 2,
+          "mode": "solid"
+        }
+      ]
+    },
+    "hdg": {
+      "conditions": [
+        {
+          "dataref": "sim/cockpit/autopilot/autopilot_state",
+          "bit": 1,
+          "mode": "solid"
+        }
+      ]
+    },
+    "nav": {
+      "conditions": [
+        {
+          "dataref": "sim/cockpit/autopilot/autopilot_state",
+          "bit": 9,
+          "mode": "solid"
+        }
+      ]
+    },
+    "apr": {
+      "conditions": [
+        {
+          "dataref": "sim/cockpit2/autopilot/approach_status",
+          "min": 1,
+          "max": 1,
+          "mode": "blink"
+        },
+        {
+          "dataref": "sim/cockpit2/autopilot/approach_status",
+          "min": 2,
+          "max": 2,
+          "mode": "solid"
+        }
+      ]
+    },
+    "alt": {
+      "conditions": [
+        {
+          "dataref": "sim/cockpit2/autopilot/altitude_mode",
+          "min": 6,
+          "max": 6,
+          "mode": "solid"
+        },
+        {
+          "dataref": "sim/cockpit2/autopilot/altitude_mode",
+          "min": 5,
+          "max": 5,
+          "mode": "blink"
+        }
+      ]
+    },
+    "vs": {
+      "conditions": [
+        {
+          "dataref": "sim/cockpit2/autopilot/altitude_mode",
+          "min": 4,
+          "max": 4,
+          "mode": "solid"
+        }
+      ]
     }
   }
 }

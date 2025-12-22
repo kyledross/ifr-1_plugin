@@ -267,6 +267,55 @@ TEST(DeviceHandlerTest, ClearLEDs_SendsZeroReportAndResetsState) {
     handler.ProcessHardware();
 }
 
+TEST(DeviceHandlerTest, UpdateLEDs_PushesToQueueAndWrites) {
+    MockHardwareManager mockHw;
+    MockXPlaneSDK mockSdk;
+    EventProcessor eventProc(mockSdk);
+    OutputProcessor outputProc(mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+
+    nlohmann::json config = {
+        {"output", {
+            {"ap", {
+                {"conditions", nlohmann::json::array({
+                    {{"dataref", "sim/test/ap"}, {"min", 1}, {"max", 1}, {"mode", "solid"}}
+                })}
+            }}
+        }}
+    };
+
+    EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
+    
+    // 1. Initially LEDs are off
+    EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/test/ap"))).WillRepeatedly(Return(reinterpret_cast<void*>(0x1)));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(_)).WillRepeatedly(Return(static_cast<int>(DataRefType::Int)));
+    EXPECT_CALL(mockSdk, GetDatai(_)).WillRepeatedly(Return(0));
+
+    // Force connection state in handler
+    handler.ProcessHardware(); 
+    
+    // Should be connected now.
+    // Set lastLedBits to 0
+    handler.ClearLEDs();
+    EXPECT_CALL(mockHw, Write(_, 2)).WillOnce(Return(2)); // From ClearLEDs
+    handler.ProcessHardware();
+
+    // 2. Change dataref to turn on AP LED
+    EXPECT_CALL(mockSdk, GetDatai(_)).WillRepeatedly(Return(1));
+    
+    // UpdateLEDs should detect change and push to queue
+    handler.UpdateLEDs(config, 1.0f);
+    
+    // ProcessHardware should pop and write
+    EXPECT_CALL(mockHw, Write(::testing::Pointee(IFR1::HID_LED_REPORT_ID), 2))
+        .WillOnce([](const uint8_t* data, size_t len) {
+            EXPECT_EQ(data[1], IFR1::LEDMask::AP);
+            return 2;
+        });
+    
+    handler.ProcessHardware();
+}
+
 TEST(DeviceHandlerTest, Update_OtherButtonLongPressDoesNotPlaySound) {
     MockHardwareManager mockHw;
     MockXPlaneSDK mockSdk;
@@ -319,6 +368,7 @@ TEST(DeviceHandlerTest, Update_InnerKnobLongPressPlaysSound) {
     MockHardwareManager mockHw;
     MockXPlaneSDK mockSdk;
     
+    EXPECT_CALL(mockSdk, FileExists(::testing::_)).WillRepeatedly(::testing::Return(true));
     EXPECT_CALL(mockSdk, GetSystemPath()).WillRepeatedly(Return("/xplane/"));
     
     EventProcessor eventProc(mockSdk);
