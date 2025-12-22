@@ -133,6 +133,7 @@ add_executable(ifr1flex_tests
         tests/OutputProcessor_test.cpp
         tests/DeviceHandler_test.cpp
         tests/ConditionalAction_test.cpp
+        tests/ConfigValidation_test.cpp
 )
 target_include_directories(ifr1flex_tests PRIVATE tests)
 target_link_libraries(ifr1flex_tests PRIVATE
