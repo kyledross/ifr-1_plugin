@@ -56,21 +56,24 @@ TEST(DeviceHandlerTest, Update_ConnectsWhenDisconnected) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
     
     EXPECT_CALL(mockHw, IsConnected())
         .WillOnce(Return(false))
         .WillRepeatedly(Return(true));
     EXPECT_CALL(mockHw, Connect(IFR1::VENDOR_ID, IFR1::PRODUCT_ID)).WillOnce(Return(true));
     
-    // ClearLEDs will be called on connect
+    // ClearLEDs will be called on connect, pushing to output queue
+    // ProcessHardware will then pop from output queue and call Write
     EXPECT_CALL(mockHw, Write(_, 2)).WillOnce(Return(2));
     
-    // Read will be called in the loop
+    // Read will be called in ProcessHardware
     EXPECT_CALL(mockHw, Read(_, _, _)).WillRepeatedly(Return(0));
 
     nlohmann::json config;
-    handler.Update(config, 0.0f);
+    handler.ProcessHardware(); // Connects
+    handler.Update(config, 0.0f); // Detects connection, calls ClearLEDs (pushes to output queue)
+    handler.ProcessHardware(); // Pops from output queue and writes to hardware
 }
 
 TEST(DeviceHandlerTest, Update_ProcessesKnobRotation) {
@@ -78,7 +81,7 @@ TEST(DeviceHandlerTest, Update_ProcessesKnobRotation) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -107,6 +110,7 @@ TEST(DeviceHandlerTest, Update_ProcessesKnobRotation) {
     EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("test_cmd"))).WillOnce(Return(dummyCmd));
     EXPECT_CALL(mockSdk, CommandOnce(dummyCmd));
     
+    handler.ProcessHardware(); // Read report
     handler.Update(config, 0.0f);
 }
 
@@ -115,7 +119,7 @@ TEST(DeviceHandlerTest, Update_ProcessesShortPress) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -140,6 +144,7 @@ TEST(DeviceHandlerTest, Update_ProcessesShortPress) {
         })
         .WillOnce(Return(0));
     
+    handler.ProcessHardware(); // Read pressed
     handler.Update(config, 0.0f);
     
     // Frame 2: Button released
@@ -155,6 +160,7 @@ TEST(DeviceHandlerTest, Update_ProcessesShortPress) {
     EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("swap_cmd"))).WillOnce(Return(dummyCmd));
     EXPECT_CALL(mockSdk, CommandOnce(dummyCmd));
     
+    handler.ProcessHardware(); // Read released
     handler.Update(config, 0.1f);
 }
 
@@ -163,7 +169,7 @@ TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -189,10 +195,12 @@ TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
             return IFR1::HID_REPORT_SIZE;
         })
         .WillOnce(Return(0));
+    handler.ProcessHardware();
     handler.Update(config, 0.0f);
     
     // Trigger long press (0.5s)
     EXPECT_CALL(mockHw, Read(_, _, _)).WillRepeatedly(Return(0));
+    handler.ProcessHardware();
     handler.Update(config, 0.6f); 
     
     // Now shifted should be true. Verify by rotating outer knob (should trigger hdg_cmd)
@@ -207,6 +215,7 @@ TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
     void* hdgCmd = reinterpret_cast<void*>(0x1);
     EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("hdg_cmd"))).WillOnce(Return(hdgCmd));
     EXPECT_CALL(mockSdk, CommandOnce(hdgCmd));
+    handler.ProcessHardware();
     handler.Update(config, 0.7f);
 
     // 2. Change mode to COM2
@@ -217,6 +226,7 @@ TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
             return IFR1::HID_REPORT_SIZE;
         })
         .WillOnce(Return(0));
+    handler.ProcessHardware();
     handler.Update(config, 0.8f);
 
     // 3. Rotate outer knob again. It should trigger com2_cmd, NOT its shifted version (which would be baro)
@@ -232,6 +242,7 @@ TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
     EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq("com2_cmd"))).WillOnce(Return(com2Cmd));
     EXPECT_CALL(mockSdk, CommandOnce(com2Cmd));
     
+    handler.ProcessHardware();
     handler.Update(config, 0.9f);
 }
 
@@ -240,7 +251,7 @@ TEST(DeviceHandlerTest, ClearLEDs_SendsZeroReportAndResetsState) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
     
     EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
     
@@ -253,6 +264,7 @@ TEST(DeviceHandlerTest, ClearLEDs_SendsZeroReportAndResetsState) {
         });
     
     handler.ClearLEDs();
+    handler.ProcessHardware();
 }
 
 TEST(DeviceHandlerTest, Update_OtherButtonLongPressDoesNotPlaySound) {
@@ -263,7 +275,7 @@ TEST(DeviceHandlerTest, Update_OtherButtonLongPressDoesNotPlaySound) {
     
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -286,6 +298,7 @@ TEST(DeviceHandlerTest, Update_OtherButtonLongPressDoesNotPlaySound) {
         })
         .WillOnce(Return(0));
     
+    handler.ProcessHardware();
     handler.Update(config, 0.0f);
     
     // 2. Advance time for long press
@@ -298,6 +311,7 @@ TEST(DeviceHandlerTest, Update_OtherButtonLongPressDoesNotPlaySound) {
     // Should NOT play sound
     EXPECT_CALL(mockSdk, PlaySound(_)).Times(0);
     
+    handler.ProcessHardware();
     handler.Update(config, 0.4f);
 }
 
@@ -309,7 +323,7 @@ TEST(DeviceHandlerTest, Update_InnerKnobLongPressPlaysSound) {
     
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -328,12 +342,14 @@ TEST(DeviceHandlerTest, Update_InnerKnobLongPressPlaysSound) {
         })
         .WillOnce(Return(0));
     
+    handler.ProcessHardware();
     handler.Update(config, 0.0f);
     
     EXPECT_CALL(mockHw, Read(_, _, _)).WillRepeatedly(Return(0));
     // Should play sound for inner knob
     EXPECT_CALL(mockSdk, PlaySound(::testing::StrEq("/xplane/Resources/sounds/systems/click.wav")));
     
+    handler.ProcessHardware();
     handler.Update(config, 0.4f);
 }
 
@@ -348,7 +364,7 @@ TEST(DeviceHandlerTest, Update_InnerKnobLongPressDoesNotPlaySoundIfFileNotFound)
     
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -367,11 +383,13 @@ TEST(DeviceHandlerTest, Update_InnerKnobLongPressDoesNotPlaySoundIfFileNotFound)
         })
         .WillOnce(Return(0));
     
+    handler.ProcessHardware();
     handler.Update(config, 0.0f);
     
     EXPECT_CALL(mockHw, Read(_, _, _)).WillRepeatedly(Return(0));
     // Should NOT play sound if file not found
     EXPECT_CALL(mockSdk, PlaySound(_)).Times(0);
     
+    handler.ProcessHardware();
     handler.Update(config, 0.4f);
 }

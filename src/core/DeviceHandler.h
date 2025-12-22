@@ -4,11 +4,15 @@
 #include "EventProcessor.h"
 #include "OutputProcessor.h"
 #include "XPlaneSDK.h"
+#include "ThreadSafeQueue.h"
 #include <array>
+#include <thread>
+#include <atomic>
 
 class DeviceHandler {
 public:
-    DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk);
+    DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk, bool startThread = true);
+    ~DeviceHandler();
 
     /**
      * @brief Polls the device and processes any new data.
@@ -29,6 +33,12 @@ public:
      */
     void ClearLEDs();
 
+    /**
+     * @brief Performs one iteration of the hardware communication logic.
+     * Used by the worker thread or manually in tests.
+     */
+    void ProcessHardware();
+
 private:
     void ProcessReport(const uint8_t* data, const nlohmann::json& config, float currentTime);
     static std::string GetModeString(IFR1::Mode mode, bool shifted);
@@ -36,16 +46,25 @@ private:
     void HandleKnobs(const IFR1::HardwareEvent& event, const nlohmann::json& config) const;
     void HandleButtons(const IFR1::HardwareEvent& event, const nlohmann::json& config, float currentTime);
     
+    void WorkerThread();
 
     IHardwareManager& m_hw;
     EventProcessor& m_eventProc;
     OutputProcessor& m_outputProc;
     IXPlaneSDK& m_sdk;
 
+    // Threading
+    std::thread m_thread;
+    std::atomic<bool> m_running{false};
+    ThreadSafeQueue<std::array<uint8_t, IFR1::HID_REPORT_SIZE + 1>> m_inputQueue;
+    ThreadSafeQueue<uint8_t> m_outputQueue;
+    std::atomic<bool> m_isConnected{false};
+
     // State
     IFR1::Mode m_currentMode = IFR1::Mode::COM1;
     bool m_shifted = false;
     uint8_t m_lastLedBits = 0;
+    bool m_lastConnectedState = false;
     
     // Button state tracking
     struct ButtonState {

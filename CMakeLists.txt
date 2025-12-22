@@ -88,6 +88,9 @@ add_library(ifr1flex_core STATIC
         src/core/OutputProcessor.cpp
         src/core/DeviceHandler.cpp
         src/core/ConditionEvaluator.cpp
+        src/core/ThreadSafeQueue.h
+        src/core/IHardwareManager.h
+        src/core/IFR1Protocol.h
 )
 target_include_directories(ifr1flex_core PUBLIC 
     src/core

@@ -1,7 +1,7 @@
 #include "DeviceHandler.h"
 #include <iostream>
 
-DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk)
+DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk, bool startThread)
     : m_hw(hw), m_eventProc(eventProc), m_outputProc(outputProc), m_sdk(sdk) {
     for (auto& state : m_buttonStates) {
         state.currentlyHeld = false;
@@ -10,31 +10,39 @@ DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, Ou
     }
     m_clickSoundPath = m_sdk.GetSystemPath() + "Resources/sounds/systems/click.wav";
     m_clickSoundExists = m_sdk.FileExists(m_clickSoundPath);
+
+    if (startThread) {
+        m_running = true;
+        m_thread = std::thread(&DeviceHandler::WorkerThread, this);
+    }
+}
+
+DeviceHandler::~DeviceHandler() {
+    m_running = false;
+    if (m_thread.joinable()) {
+        m_thread.join();
+    }
+    if (m_hw.IsConnected()) {
+        m_hw.Disconnect();
+    }
 }
 
 void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
-    if (!m_hw.IsConnected()) {
-        if (!m_hw.Connect(IFR1::VENDOR_ID, IFR1::PRODUCT_ID)) {
-            return;
-        }
+    bool currentlyConnected = m_isConnected;
+
+    if (currentlyConnected && !m_lastConnectedState) {
         m_sdk.Log(LogLevel::Info, "Device connected.");
-        ClearLEDs(); // Reset state and clear LEDs on connect
+        ClearLEDs();
+    } else if (!currentlyConnected && m_lastConnectedState) {
+        m_sdk.Log(LogLevel::Error, "Device disconnected.");
     }
+    m_lastConnectedState = currentlyConnected;
 
-    uint8_t buffer[IFR1::HID_REPORT_SIZE + 1];
-    int bytesRead;
-    int reportsProcessed = 0;
+    if (!currentlyConnected) return;
 
-    // Read all available reports
-    while ((bytesRead = m_hw.Read(buffer, IFR1::HID_REPORT_SIZE, 0)) > 0) {
-        ProcessReport(buffer, config, currentTime);
-        reportsProcessed++;
-        if (reportsProcessed > 10) break; // Safety break
-    }
-
-    if (bytesRead < 0) {
-        m_sdk.Log(LogLevel::Error, "Device disconnected (read error).");
-        m_hw.Disconnect();
+    // Process all available reports from the queue
+    while (auto report = m_inputQueue.Pop()) {
+        ProcessReport(report->data(), config, currentTime);
     }
 
     // Process long presses even if no new HID report (timer based)
@@ -61,7 +69,7 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
 }
 
 void DeviceHandler::UpdateLEDs(const nlohmann::json& config, float currentTime) {
-    if (!m_hw.IsConnected()) return;
+    if (!m_isConnected) return;
 
     uint8_t ledBits = m_outputProc.EvaluateLEDs(config, currentTime);
     
@@ -72,8 +80,7 @@ void DeviceHandler::UpdateLEDs(const nlohmann::json& config, float currentTime) 
 
     if (ledBits != m_lastLedBits) {
         m_sdk.Log(LogLevel::Verbose, ("LEDs being updated.  Bits: " + std::to_string(ledBits)).c_str());
-        uint8_t report[2] = { IFR1::HID_LED_REPORT_ID, ledBits };
-        m_hw.Write(report, 2);
+        m_outputQueue.Push(ledBits);
         m_lastLedBits = ledBits;
     }
 }
@@ -81,10 +88,7 @@ void DeviceHandler::UpdateLEDs(const nlohmann::json& config, float currentTime) 
 void DeviceHandler::ClearLEDs() {
     m_shifted = false;
     m_lastLedBits = 0;
-    if (m_hw.IsConnected()) {
-        uint8_t report[2] = { IFR1::HID_LED_REPORT_ID, 0 };
-        m_hw.Write(report, 2);
-    }
+    m_outputQueue.Push(0);
 }
 
 void DeviceHandler::ProcessReport(const uint8_t* data, const nlohmann::json& config, float currentTime) {
@@ -207,5 +211,65 @@ std::string DeviceHandler::GetControlString(IFR1::Button button) {
         case IFR1::Button::VS: return "vs";
         case IFR1::Button::INNER_KNOB: return "inner-knob-button";
         default: return "";
+    }
+}
+
+void DeviceHandler::ProcessHardware() {
+    uint8_t readBuffer[IFR1::HID_REPORT_SIZE + 1]{};
+
+    bool currentlyConnected = m_hw.IsConnected();
+    if (!currentlyConnected) {
+        m_isConnected = false;
+        if (!m_hw.Connect(IFR1::VENDOR_ID, IFR1::PRODUCT_ID)) {
+            return;
+        }
+        m_isConnected = true;
+        // Clear input queue on fresh connection to avoid stale reports
+        m_inputQueue.Clear();
+    } else {
+        m_isConnected = true;
+    }
+
+    // 1. Read from device
+    int bytesRead = m_hw.Read(readBuffer, IFR1::HID_REPORT_SIZE, 10); // 10ms timeout
+    int reportsRead = 0;
+    while (bytesRead > 0) {
+        std::array<uint8_t, IFR1::HID_REPORT_SIZE + 1> report{};
+        std::memcpy(report.data(), readBuffer, static_cast<size_t>(bytesRead));
+        m_inputQueue.Push(report);
+        
+        if (++reportsRead >= 10) break;
+        bytesRead = m_hw.Read(readBuffer, IFR1::HID_REPORT_SIZE, 0); // No timeout for subsequent reads
+    }
+
+    if (bytesRead < 0) {
+        m_hw.Disconnect();
+        m_isConnected = false;
+        return;
+    }
+
+    // 2. Write to device
+    while (auto ledBits = m_outputQueue.Pop()) {
+        uint8_t report[2] = { IFR1::HID_LED_REPORT_ID, *ledBits };
+        if (m_hw.Write(report, 2) < 0) {
+            m_hw.Disconnect();
+            m_isConnected = false;
+            break;
+        }
+    }
+}
+
+void DeviceHandler::WorkerThread() {
+    while (m_running) {
+        bool wasConnected = m_isConnected;
+        ProcessHardware();
+        
+        // Small sleep to prevent tight loop if Read is non-blocking or returns immediately
+        // or if we're waiting for reconnection
+        if (!m_isConnected && !wasConnected) {
+             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        } else {
+             std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
     }
 }
