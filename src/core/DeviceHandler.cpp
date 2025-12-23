@@ -1,6 +1,5 @@
 #include "DeviceHandler.h"
 #include <iostream>
-#include <algorithm>
 
 DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk, bool startThread)
     : m_hw(hw), m_eventProc(eventProc), m_outputProc(outputProc), m_sdk(sdk) {
@@ -189,7 +188,7 @@ void DeviceHandler::HandleButtons(const IFR1::HardwareEvent& event, const nlohma
             }
             m_buttonStates[i].currentlyHeld = false;
             m_buttonStates[i].longPressDetected = false;
-            m_heldButtons.erase(std::remove(m_heldButtons.begin(), m_heldButtons.end(), i), m_heldButtons.end());
+            std::erase(m_heldButtons, i);
         }
     }
 }
@@ -288,23 +287,23 @@ void DeviceHandler::ProcessHardware() {
     while (auto ledBits = m_outputQueue.Pop()) {
         uint8_t report[2] = { IFR1::HID_LED_REPORT_ID, *ledBits };
         if (m_hw.Write(report, 2) < 0) {
-            m_failedWrites++;
+            ++m_failedWrites;
             m_hw.Disconnect();
             m_isConnected = false;
             break;
         }
-        m_totalWrites++;
+        ++m_totalWrites;
     }
 }
 
 void DeviceHandler::WorkerThread() {
-    while (m_running) {
+    while (m_running || !m_outputQueue.IsEmpty()) {
         bool wasConnected = m_isConnected;
         ProcessHardware();
         
         // Small sleep to prevent tight loop if Read is non-blocking or returns immediately
         // or if we're waiting for reconnection
-        if (!m_isConnected && !wasConnected) {
+        if (!m_isConnected && !wasConnected && m_running) {
              std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         } else {
              std::this_thread::sleep_for(std::chrono::milliseconds(1));

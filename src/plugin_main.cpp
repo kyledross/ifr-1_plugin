@@ -184,13 +184,15 @@ PLUGIN_API void XPluginStop(void) {
 PLUGIN_API void XPluginDisable(void) {
     if (gDeviceHandler) {
         gDeviceHandler->ClearLEDs();
+        gDeviceHandler.reset();
     }
+    if (gHIDManager) {
+        gHIDManager.reset();
+    }
+
     if (gFlightLoop) {
         XPLMDestroyFlightLoop(gFlightLoop);
         gFlightLoop = nullptr;
-    }
-    if (gHIDManager) {
-        gHIDManager->Disconnect();
     }
 
     // Ensure any modal is closed when disabling
@@ -198,6 +200,13 @@ PLUGIN_API void XPluginDisable(void) {
 }
 
 PLUGIN_API int XPluginEnable(void) {
+    if (!gHIDManager) {
+        gHIDManager = std::make_unique<HIDManager>();
+    }
+    if (!gDeviceHandler) {
+        gDeviceHandler = std::make_unique<DeviceHandler>(*gHIDManager, *gEventProcessor, *gOutputProcessor, *gSDK);
+    }
+
     gAcfPathRef = XPLMFindDataRef("sim/aircraft/view/acf_relative_path");
     gCurrentAircraftPath.clear();
     
