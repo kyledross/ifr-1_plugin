@@ -1,7 +1,6 @@
 #pragma once
 #include <queue>
 #include <mutex>
-#include <condition_variable>
 #include <optional>
 
 template <typename T>
@@ -12,7 +11,6 @@ public:
     void Push(T value) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_queue.push(std::move(value));
-        m_cond.notify_one();
     }
 
     std::optional<T> Pop() {
@@ -45,5 +43,4 @@ public:
 private:
     mutable std::mutex m_mutex;
     std::queue<T> m_queue;
-    std::condition_variable m_cond;
 };
