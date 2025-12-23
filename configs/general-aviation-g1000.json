@@ -573,7 +573,7 @@
           ]
         }
       },
-      "ap": {
+      "cdi": {
         "short-press": {
           "description": "Cycles through the CDI navigation sources on the G1000 PFD.",
           "actions": [
@@ -584,7 +584,7 @@
           ]
         }
       },
-      "hdg": {
+      "obs": {
         "short-press": {
           "description": "Toggles OBS mode on the G1000 PFD.",
           "actions": [
@@ -595,7 +595,7 @@
           ]
         }
       },
-      "nav": {
+      "msg": {
         "short-press": {
           "description": "Presses the 12th softkey on the G1000 PFD, typically used to view messages.",
           "actions": [
@@ -606,7 +606,7 @@
           ]
         }
       },
-      "apr": {
+      "fpl": {
         "short-press": {
           "description": "Opens the Flight Plan page on the G1000 PFD.",
           "actions": [
@@ -617,7 +617,7 @@
           ]
         }
       },
-      "alt": {
+      "vnav": {
         "short-press": {
           "description": "Toggles the autopilot vertical navigation (VNAV) mode.",
           "actions": [
@@ -628,7 +628,7 @@
           ]
         }
       },
-      "vs": {
+      "proc": {
         "short-press": {
           "description": "Opens the Procedures page on the G1000 PFD.",
           "actions": [
@@ -736,7 +736,7 @@
           ]
         }
       },
-      "ap": {
+      "cdi": {
         "short-press": {
           "description": "Cycles through the CDI navigation sources on the G1000 PFD 2.",
           "actions": [
@@ -747,7 +747,7 @@
           ]
         }
       },
-      "hdg": {
+      "obs": {
         "short-press": {
           "description": "Toggles OBS mode on the G1000 PFD 2.",
           "actions": [
@@ -758,7 +758,7 @@
           ]
         }
       },
-      "nav": {
+      "msg": {
         "short-press": {
           "description": "Opens the message window on the G1000 PFD 2.",
           "actions": [
@@ -769,7 +769,7 @@
           ]
         }
       },
-      "apr": {
+      "fpl": {
         "short-press": {
           "description": "Opens the Flight Plan page on the G1000 PFD 2.",
           "actions": [
@@ -780,7 +780,7 @@
           ]
         }
       },
-      "alt": {
+      "vnav": {
         "short-press": {
           "description": "Toggles the autopilot vertical navigation (VNAV) mode.",
           "actions": [
@@ -791,7 +791,7 @@
           ]
         }
       },
-      "vs": {
+      "proc": {
         "short-press": {
           "description": "Opens the Procedures page on the G1000 PFD 2.",
           "actions": [

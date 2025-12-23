@@ -541,37 +541,37 @@
           ]
         }
       },
-      "ap": {
+      "cdi": {
         "short-press": {
           "type": "command",
           "value": "sim/GPS/g430n1_cdi"
         }
       },
-      "hdg": {
+      "obs": {
         "short-press": {
           "type": "command",
           "value": "sim/GPS/g430n1_obs"
         }
       },
-      "nav": {
+      "msg": {
         "short-press": {
           "type": "command",
           "value": "sim/GPS/g430n1_msg"
         }
       },
-      "apr": {
+      "fpl": {
         "short-press": {
           "type": "command",
           "value": "sim/GPS/g430n1_fpl"
         }
       },
-      "alt": {
+      "vnav": {
         "short-press": {
           "type": "command",
           "value": "sim/GPS/g430n1_vnav"
         }
       },
-      "vs": {
+      "proc": {
         "short-press": {
           "type": "command",
           "value": "sim/GPS/g430n1_proc"
@@ -663,37 +663,37 @@
           ]
         }
       },
-      "ap": {
+      "cdi": {
         "short-press": {
           "type": "command",
           "value": "sim/GPS/g430n2_cdi"
         }
       },
-      "hdg": {
+      "obs": {
         "short-press": {
           "type": "command",
           "value": "sim/GPS/g430n2_obs"
         }
       },
-      "nav": {
+      "msg": {
         "short-press": {
           "type": "command",
           "value": "sim/GPS/g430n2_msg"
         }
       },
-      "apr": {
+      "fpl": {
         "short-press": {
           "type": "command",
           "value": "sim/GPS/g430n2_fpl"
         }
       },
-      "alt": {
+      "vnav": {
         "short-press": {
           "type": "command",
           "value": "sim/GPS/g430n2_vnav"
         }
       },
-      "vs": {
+      "proc": {
         "short-press": {
           "type": "command",
           "value": "sim/GPS/g430n2_proc"

@@ -473,3 +473,65 @@ TEST(DeviceHandlerTest, Update_InnerKnobLongPressDoesNotPlaySoundIfFileNotFound)
     handler.ProcessHardware();
     handler.Update(config, 0.4f);
 }
+
+TEST(DeviceHandlerTest, Update_UsesNewButtonNamesInFMSMode) {
+    MockHardwareManager mockHw;
+    MockXPlaneSDK mockSdk;
+    EventProcessor eventProc(mockSdk);
+    OutputProcessor outputProc(mockSdk);
+    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    
+    nlohmann::json config = {
+        {"modes", {
+            {"fms1", {
+                {"cdi", {{"short-press", {{"actions", {{{"type", "command"}, {"value", "cdi_cmd"}}}}}}}},
+                {"obs", {{"short-press", {{"actions", {{{"type", "command"}, {"value", "obs_cmd"}}}}}}}},
+                {"msg", {{"short-press", {{"actions", {{{"type", "command"}, {"value", "msg_cmd"}}}}}}}},
+                {"fpl", {{"short-press", {{"actions", {{{"type", "command"}, {"value", "fpl_cmd"}}}}}}}},
+                {"vnav", {{"short-press", {{"actions", {{{"type", "command"}, {"value", "vnav_cmd"}}}}}}}},
+                {"proc", {{"short-press", {{"actions", {{{"type", "command"}, {"value", "proc_cmd"}}}}}}}}
+            }}
+        }}
+    };
+    
+    EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
+    
+    auto testButton = [&](uint8_t byteIndex, uint8_t bitPos, const std::string& expectedCmd) {
+        // Press
+        uint8_t reportPressed[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 0, 0, static_cast<uint8_t>(IFR1::Mode::FMS1), 0};
+        reportPressed[byteIndex] |= (1 << (bitPos - 1));
+        
+        EXPECT_CALL(mockHw, Read(_, _, _))
+            .WillOnce([&](uint8_t* buf, size_t len, int t) {
+                std::memcpy(buf, reportPressed, IFR1::HID_REPORT_SIZE);
+                return IFR1::HID_REPORT_SIZE;
+            })
+            .WillOnce(Return(0));
+        
+        handler.ProcessHardware();
+        handler.Update(config, 0.0f);
+        
+        // Release
+        uint8_t reportReleased[IFR1::HID_REPORT_SIZE] = {0, 0, 0, 0, 0, 0, 0, static_cast<uint8_t>(IFR1::Mode::FMS1), 0};
+        EXPECT_CALL(mockHw, Read(_, _, _))
+            .WillOnce([&](uint8_t* buf, size_t len, int t) {
+                std::memcpy(buf, reportReleased, IFR1::HID_REPORT_SIZE);
+                return IFR1::HID_REPORT_SIZE;
+            })
+            .WillOnce(Return(0));
+        
+        void* dummyCmd = reinterpret_cast<void*>(0x1234);
+        EXPECT_CALL(mockSdk, FindCommand(::testing::StrEq(expectedCmd))).WillOnce(Return(dummyCmd));
+        EXPECT_CALL(mockSdk, CommandOnce(dummyCmd));
+        
+        handler.ProcessHardware();
+        handler.Update(config, 0.1f);
+    };
+
+    testButton(2, IFR1::BitPosition::AP, "cdi_cmd");
+    testButton(2, IFR1::BitPosition::HDG, "obs_cmd");
+    testButton(3, IFR1::BitPosition::NAV, "msg_cmd");
+    testButton(3, IFR1::BitPosition::APR, "fpl_cmd");
+    testButton(3, IFR1::BitPosition::ALT, "vnav_cmd");
+    testButton(3, IFR1::BitPosition::VS, "proc_cmd");
+}

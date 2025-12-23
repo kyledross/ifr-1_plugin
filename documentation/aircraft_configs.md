@@ -37,7 +37,7 @@ To enable verbose logging for a specific aircraft, add `"debug": true` at the to
 
 ## Modes and the Shifted State
 
-The IFR-1 controller has 8 primary modes, selected by the physical mode knob. Each mode also has a "shifted" state, toggled by a **long-press (0.5 seconds) on the inner knob**.
+The IFR-1 controller has 8 primary modes, selected by pressing one of the 8 mode buttons. Each mode also has a "shifted" state, toggled by a **long-press (0.5 seconds) on the inner knob**.
 
 The plugin uses different identifiers for these states in the JSON:
 

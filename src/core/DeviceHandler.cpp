@@ -66,14 +66,14 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
                 m_buttonStates[i].longPressDetected = true;
 
                 auto btn = static_cast<IFR1::Button>(i);
-                m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(btn) + " long-press").c_str());
+                m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(btn, m_currentMode) + " long-press").c_str());
                 if (btn == IFR1::Button::INNER_KNOB) {
                     if (m_clickSoundExists) {
                         m_sdk.PlaySound(m_clickSoundPath);
                     }
                     m_shifted = !m_shifted;
                 } else {
-                    m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), GetControlString(btn), "long-press");
+                    m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), GetControlString(btn, m_currentMode), "long-press");
                 }
             }
         }
@@ -175,17 +175,17 @@ void DeviceHandler::HandleButtons(const IFR1::HardwareEvent& event, const nlohma
 
         if (current && !last) {
             // Pressed
-            m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(static_cast<IFR1::Button>(i)) + " pressed").c_str());
+            m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(static_cast<IFR1::Button>(i), m_currentMode) + " pressed").c_str());
             m_buttonStates[i].currentlyHeld = true;
             m_buttonStates[i].pressStartTime = currentTime;
             m_buttonStates[i].longPressDetected = false;
             m_heldButtons.push_back(i);
         } else if (!current && last) {
             // Released
-            m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(static_cast<IFR1::Button>(i)) + " released").c_str());
+            m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(static_cast<IFR1::Button>(i), m_currentMode) + " released").c_str());
             if (!m_buttonStates[i].longPressDetected) {
                 // Short press
-                m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), GetControlString(static_cast<IFR1::Button>(i)), "short-press");
+                m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), GetControlString(static_cast<IFR1::Button>(i), m_currentMode), "short-press");
             }
             m_buttonStates[i].currentlyHeld = false;
             m_buttonStates[i].longPressDetected = false;
@@ -221,7 +221,19 @@ std::string DeviceHandler::GetModeString(IFR1::Mode mode, bool shifted) {
     return "";
 }
 
-std::string DeviceHandler::GetControlString(IFR1::Button button) {
+std::string DeviceHandler::GetControlString(IFR1::Button button, IFR1::Mode mode) {
+    if (mode == IFR1::Mode::FMS1 || mode == IFR1::Mode::FMS2) {
+        switch (button) {
+            case IFR1::Button::AP: return "cdi";
+            case IFR1::Button::HDG: return "obs";
+            case IFR1::Button::NAV: return "msg";
+            case IFR1::Button::APR: return "fpl";
+            case IFR1::Button::ALT: return "vnav";
+            case IFR1::Button::VS: return "proc";
+            default: break;
+        }
+    }
+
     switch (button) {
         case IFR1::Button::DIRECT: return "direct-to";
         case IFR1::Button::MENU: return "menu";

@@ -43,7 +43,7 @@ public:
 private:
     void ProcessReport(const IFR1::HardwareEvent& event, const nlohmann::json& config, float currentTime);
     static std::string GetModeString(IFR1::Mode mode, bool shifted);
-    static std::string GetControlString(IFR1::Button button);
+    static std::string GetControlString(IFR1::Button button, IFR1::Mode mode);
     void HandleKnobs(const IFR1::HardwareEvent& event, const nlohmann::json& config) const;
     void HandleButtons(const IFR1::HardwareEvent& event, const nlohmann::json& config, float currentTime);
     
