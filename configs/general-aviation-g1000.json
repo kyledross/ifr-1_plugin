@@ -573,6 +573,72 @@
           ]
         }
       },
+      "ap": {
+        "short-press": {
+          "description": "Cycles through the CDI navigation sources on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_cdi"
+            }
+          ]
+        }
+      },
+      "hdg": {
+        "short-press": {
+          "description": "Toggles OBS mode on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_obs"
+            }
+          ]
+        }
+      },
+      "nav": {
+        "short-press": {
+          "description": "Presses the 12th softkey on the G1000 PFD, typically used to view messages.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_softkey12"
+            }
+          ]
+        }
+      },
+      "apr": {
+        "short-press": {
+          "description": "Opens the Flight Plan page on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_fpl"
+            }
+          ]
+        }
+      },
+      "alt": {
+        "short-press": {
+          "description": "Toggles the autopilot vertical navigation (VNAV) mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/vnav"
+            }
+          ]
+        }
+      },
+      "vs": {
+        "short-press": {
+          "description": "Opens the Procedures page on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_proc"
+            }
+          ]
+        }
+      },
       "outer-knob": {
         "rotate-clockwise": {
           "description": "Cycles forward through page groups on the G1000 PFD.",
@@ -666,6 +732,72 @@
             {
               "type": "command",
               "value": "sim/GPS/g1000n3_ent"
+            }
+          ]
+        }
+      },
+      "ap": {
+        "short-press": {
+          "description": "Cycles through the CDI navigation sources on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_cdi"
+            }
+          ]
+        }
+      },
+      "hdg": {
+        "short-press": {
+          "description": "Toggles OBS mode on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_obs"
+            }
+          ]
+        }
+      },
+      "nav": {
+        "short-press": {
+          "description": "Opens the message window on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_msg"
+            }
+          ]
+        }
+      },
+      "apr": {
+        "short-press": {
+          "description": "Opens the Flight Plan page on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_fpl"
+            }
+          ]
+        }
+      },
+      "alt": {
+        "short-press": {
+          "description": "Toggles the autopilot vertical navigation (VNAV) mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/vnav"
+            }
+          ]
+        }
+      },
+      "vs": {
+        "short-press": {
+          "description": "Opens the Procedures page on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_proc"
             }
           ]
         }
