@@ -52,74 +52,6 @@
             }
           ]
         }
-      },
-      "ap": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/servos_toggle"
-            }
-          ]
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/heading"
-            }
-          ]
-        }
-      },
-      "nav": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/NAV"
-            }
-          ]
-        }
-      },
-      "apr": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/approach"
-            }
-          ]
-        }
-      },
-      "alt": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/altitude_hold"
-            }
-          ]
-        },
-        "long-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/flight_level_change"
-            }
-          ]
-        }
-      },
-      "vs": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/vertical_speed"
-            }
-          ]
-        }
       }
     },
     "com2": {
@@ -165,74 +97,6 @@
             {
               "type": "command",
               "value": "sim/radios/com2_standy_flip"
-            }
-          ]
-        }
-      },
-      "ap": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/servos_toggle"
-            }
-          ]
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/heading"
-            }
-          ]
-        }
-      },
-      "nav": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/NAV"
-            }
-          ]
-        }
-      },
-      "apr": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/approach"
-            }
-          ]
-        }
-      },
-      "alt": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/altitude_hold"
-            }
-          ]
-        },
-        "long-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/flight_level_change"
-            }
-          ]
-        }
-      },
-      "vs": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/vertical_speed"
             }
           ]
         }
@@ -284,74 +148,6 @@
             }
           ]
         }
-      },
-      "ap": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/servos_toggle"
-            }
-          ]
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/heading"
-            }
-          ]
-        }
-      },
-      "nav": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/NAV"
-            }
-          ]
-        }
-      },
-      "apr": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/approach"
-            }
-          ]
-        }
-      },
-      "alt": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/altitude_hold"
-            }
-          ]
-        },
-        "long-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/flight_level_change"
-            }
-          ]
-        }
-      },
-      "vs": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/vertical_speed"
-            }
-          ]
-        }
       }
     },
     "nav2": {
@@ -397,74 +193,6 @@
             {
               "type": "command",
               "value": "sim/radios/nav2_standy_flip"
-            }
-          ]
-        }
-      },
-      "ap": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/servos_toggle"
-            }
-          ]
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/heading"
-            }
-          ]
-        }
-      },
-      "nav": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/NAV"
-            }
-          ]
-        }
-      },
-      "apr": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/approach"
-            }
-          ]
-        }
-      },
-      "alt": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/altitude_hold"
-            }
-          ]
-        },
-        "long-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/flight_level_change"
-            }
-          ]
-        }
-      },
-      "vs": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/vertical_speed"
             }
           ]
         }
@@ -766,66 +494,6 @@
             }
           ]
         }
-      },
-      "ap": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/GPS/g430n1_cdi"
-            }
-          ]
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/GPS/g430n1_obs"
-            }
-          ]
-        }
-      },
-      "nav": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/GPS/g430n1_msg"
-            }
-          ]
-        }
-      },
-      "apr": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/GPS/g430n1_fpl"
-            }
-          ]
-        }
-      },
-      "alt": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/GPS/g430n1_vnav"
-            }
-          ]
-        }
-      },
-      "vs": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/GPS/g430n1_proc"
-            }
-          ]
-        }
       }
     },
     "fms2": {
@@ -901,66 +569,6 @@
             {
               "type": "command",
               "value": "sim/GPS/g430n2_ent"
-            }
-          ]
-        }
-      },
-      "ap": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/GPS/g430n2_cdi"
-            }
-          ]
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/GPS/g430n2_obs"
-            }
-          ]
-        }
-      },
-      "nav": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/GPS/g430n2_msg"
-            }
-          ]
-        }
-      },
-      "apr": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/GPS/g430n2_fpl"
-            }
-          ]
-        }
-      },
-      "alt": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/GPS/g430n2_vnav"
-            }
-          ]
-        }
-      },
-      "vs": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/GPS/g430n2_proc"
             }
           ]
         }
@@ -1277,36 +885,6 @@
             {
               "type": "command",
               "value": "sim/transponder/transponder_dn"
-            }
-          ]
-        }
-      },
-      "ap": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/transponder/transponder_standby"
-            }
-          ]
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/transponder/transponder_on"
-            }
-          ]
-        }
-      },
-      "nav": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/transponder/transponder_alt"
             }
           ]
         }

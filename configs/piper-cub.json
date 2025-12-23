@@ -638,66 +638,6 @@
             }
           ]
         }
-      },
-      "ap": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/servos_toggle"
-            }
-          ]
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/heading"
-            }
-          ]
-        }
-      },
-      "nav": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/NAV"
-            }
-          ]
-        }
-      },
-      "apr": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/approach"
-            }
-          ]
-        }
-      },
-      "alt": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/altitude_hold"
-            }
-          ]
-        }
-      },
-      "vs": {
-        "short-press": {
-          "actions": [
-            {
-              "type": "command",
-              "value": "sim/autopilot/vertical_speed"
-            }
-          ]
-        }
       }
     }
   },
