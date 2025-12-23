@@ -34,24 +34,12 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
     if (currentlyConnected && !m_lastConnectedState) {
         IFR1_LOG_INFO(m_sdk, "Device connected.");
         ClearLEDs();
-        m_totalWrites = 0;
-        m_failedWrites = 0;
     } else if (!currentlyConnected && m_lastConnectedState) {
         IFR1_LOG_ERROR(m_sdk, "Device disconnected.");
     }
     m_lastConnectedState = currentlyConnected;
 
     if (!currentlyConnected) return;
-
-    // Log write stats periodically if there are errors or every 10 seconds
-    if (m_failedWrites > m_lastFailedWrites || (currentTime - m_lastStatsLogTime >= 10.0f)) {
-        if (m_failedWrites > 0 || m_totalWrites != m_lastTotalWrites) {
-            IFR1_LOG_INFO(m_sdk, "HID Write Stats - Total: {}, Failed: {}", m_totalWrites.load(), m_failedWrites.load());
-        }
-        m_lastTotalWrites = m_totalWrites;
-        m_lastFailedWrites = m_failedWrites;
-        m_lastStatsLogTime = currentTime;
-    }
 
     // Process all available reports from the queue
     while (auto event = m_inputQueue.Pop()) {
@@ -288,12 +276,10 @@ void DeviceHandler::ProcessHardware() {
     while (auto ledBits = m_outputQueue.Pop()) {
         uint8_t report[2] = { IFR1::HID_LED_REPORT_ID, *ledBits };
         if (m_hw.Write(report, 2) < 0) {
-            ++m_failedWrites;
             m_hw.Disconnect();
             m_isConnected = false;
             break;
         }
-        ++m_totalWrites;
     }
 }
 

@@ -61,11 +61,6 @@ private:
     ThreadSafeQueue<IFR1::HardwareEvent> m_inputQueue;
     ThreadSafeQueue<uint8_t> m_outputQueue;
     std::atomic<bool> m_isConnected{false};
-    std::atomic<uint32_t> m_totalWrites{0};
-    std::atomic<uint32_t> m_failedWrites{0};
-    uint32_t m_lastTotalWrites = 0;
-    uint32_t m_lastFailedWrites = 0;
-    float m_lastStatsLogTime = 0.0f;
 
     // State
     IFR1::Mode m_currentMode = IFR1::Mode::COM1;
