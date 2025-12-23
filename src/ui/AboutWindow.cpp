@@ -1,6 +1,7 @@
 // AboutWindow.cpp - Implementation of the plugin's About dialog
 
 #include "ui/AboutWindow.h"
+#include "ui/GLTextureHandle.h"
 
 #include "XPLMDisplay.h"
 #include "XPLMGraphics.h"
@@ -15,15 +16,6 @@
 #define RESOURCES_EMBED_IMPL
 #include "resources_embedded.h"
 #include "license_embedded.h"
-
-// OpenGL for texture creation/draw
-#if defined(_WIN32)
-  #include <GL/gl.h>
-#elif defined(__APPLE__)
-  #include <OpenGL/gl.h>
-#else
-  #include <GL/gl.h>
-#endif
 
 #if defined(_WIN32)
   #include <windows.h>
@@ -43,7 +35,7 @@ namespace ui::about
   static bool g_aboutMonitorRegistered = false;
 
   // QR image/texture state
-  static GLuint g_qrTexture = 0;
+  static GLTextureHandle g_qrTexture;
   static int g_qrImgW = 0;
   static int g_qrImgH = 0;
   static bool g_qrTextureLoaded = false;
@@ -133,7 +125,7 @@ namespace ui::about
     constexpr int w = (int)::g_qr_w;
     constexpr int h = (int)::g_qr_h;
 
-    glGenTextures(1, &g_qrTexture);
+    g_qrTexture.Gen();
     glBindTexture(GL_TEXTURE_2D, g_qrTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -147,10 +139,7 @@ namespace ui::about
   }
 
   static void DestroyQRTexture() {
-    if (g_qrTexture != 0) {
-      glDeleteTextures(1, &g_qrTexture);
-      g_qrTexture = 0;
-    }
+    g_qrTexture.Reset();
     g_qrTextureLoaded = false;
     g_qrImgW = g_qrImgH = 0;
   }
