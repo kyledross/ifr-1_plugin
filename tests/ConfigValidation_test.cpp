@@ -10,6 +10,11 @@ namespace fs = std::filesystem;
 class ConfigValidationTest : public ::testing::Test {
 protected:
     static std::string GetConfigDir() {
+#ifdef TEST_CONFIG_DIR
+        if (fs::exists(TEST_CONFIG_DIR) && fs::is_directory(TEST_CONFIG_DIR)) {
+            return TEST_CONFIG_DIR;
+        }
+#endif
         // Try several locations to find the configs directory
         std::vector<std::string> searchPaths = {
             "configs",           // Current directory (if run from project root)

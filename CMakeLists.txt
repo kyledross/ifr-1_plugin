@@ -136,6 +136,7 @@ add_executable(ifr1flex_tests
         tests/ConfigValidation_test.cpp
 )
 target_include_directories(ifr1flex_tests PRIVATE tests)
+target_compile_definitions(ifr1flex_tests PRIVATE TEST_CONFIG_DIR="${CMAKE_CURRENT_SOURCE_DIR}/configs")
 target_link_libraries(ifr1flex_tests PRIVATE
         ifr1flex_core
         gtest_main
