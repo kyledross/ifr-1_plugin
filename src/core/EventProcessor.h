@@ -33,5 +33,5 @@ private:
     std::queue<void*> m_commandQueue;
 
     void ExecuteAction(const nlohmann::json& actionConfig);
-    [[nodiscard]] bool ShouldEvaluateNext(const nlohmann::json& actionConfig) const;
+    static bool ShouldEvaluateNext(const nlohmann::json& actionConfig);
 };

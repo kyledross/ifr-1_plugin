@@ -1,4 +1,5 @@
 #include "DeviceHandler.h"
+#include "Logger.h"
 #include <iostream>
 
 DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk, bool startThread)
@@ -31,12 +32,12 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
     bool currentlyConnected = m_isConnected;
 
     if (currentlyConnected && !m_lastConnectedState) {
-        m_sdk.Log(LogLevel::Info, "Device connected.");
+        IFR1_LOG_INFO(m_sdk, "Device connected.");
         ClearLEDs();
         m_totalWrites = 0;
         m_failedWrites = 0;
     } else if (!currentlyConnected && m_lastConnectedState) {
-        m_sdk.Log(LogLevel::Error, "Device disconnected.");
+        IFR1_LOG_ERROR(m_sdk, "Device disconnected.");
     }
     m_lastConnectedState = currentlyConnected;
 
@@ -45,7 +46,7 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
     // Log write stats periodically if there are errors or every 10 seconds
     if (m_failedWrites > m_lastFailedWrites || (currentTime - m_lastStatsLogTime >= 10.0f)) {
         if (m_failedWrites > 0 || m_totalWrites != m_lastTotalWrites) {
-            m_sdk.Log(LogLevel::Info, ("HID Write Stats - Total: " + std::to_string(m_totalWrites) + ", Failed: " + std::to_string(m_failedWrites)).c_str());
+            IFR1_LOG_INFO(m_sdk, "HID Write Stats - Total: {}, Failed: {}", m_totalWrites.load(), m_failedWrites.load());
         }
         m_lastTotalWrites = m_totalWrites;
         m_lastFailedWrites = m_failedWrites;
@@ -65,7 +66,7 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
                 m_buttonStates[i].longPressDetected = true;
 
                 auto btn = static_cast<IFR1::Button>(i);
-                m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(btn, m_currentMode) + " long-press").c_str());
+                IFR1_LOG_VERBOSE(m_sdk, "Button {} long-press", GetControlString(btn, m_currentMode));
                 if (btn == IFR1::Button::INNER_KNOB) {
                     if (m_clickSoundExists) {
                         m_sdk.PlaySound(m_clickSoundPath);
@@ -92,7 +93,7 @@ void DeviceHandler::UpdateLEDs(const nlohmann::json& config, float currentTime) 
     }
 
     if (ledBits != m_lastLedBits) {
-        m_sdk.Log(LogLevel::Verbose, ("LEDs being updated.  Bits: " + std::to_string(ledBits)).c_str());
+        IFR1_LOG_VERBOSE(m_sdk, "LEDs being updated.  Bits: {}", ledBits);
         m_outputQueue.Push(ledBits);
         m_lastLedBits = ledBits;
     }
@@ -153,14 +154,14 @@ void DeviceHandler::HandleKnobs(const IFR1::HardwareEvent& event, const nlohmann
 {
     if (event.outerKnobRotation != 0) {
         std::string action = (event.outerKnobRotation > 0) ? "rotate-clockwise" : "rotate-counterclockwise";
-        m_sdk.Log(LogLevel::Verbose, ("Outer knob " + action).c_str());
+        IFR1_LOG_VERBOSE(m_sdk, "Outer knob {}", action);
         for (int i = 0; i < std::abs(event.outerKnobRotation); ++i) {
             m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), "outer-knob", action);
         }
     }
     if (event.innerKnobRotation != 0) {
         std::string action = (event.innerKnobRotation > 0) ? "rotate-clockwise" : "rotate-counterclockwise";
-        m_sdk.Log(LogLevel::Verbose, ("Inner knob " + action).c_str());
+        IFR1_LOG_VERBOSE(m_sdk, "Inner knob {}", action);
         for (int i = 0; i < std::abs(event.innerKnobRotation); ++i) {
             m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), "inner-knob", action);
         }
@@ -174,14 +175,14 @@ void DeviceHandler::HandleButtons(const IFR1::HardwareEvent& event, const nlohma
 
         if (current && !last) {
             // Pressed
-            m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(static_cast<IFR1::Button>(i), m_currentMode) + " pressed").c_str());
+            IFR1_LOG_VERBOSE(m_sdk, "Button {} pressed", GetControlString(static_cast<IFR1::Button>(i), m_currentMode));
             m_buttonStates[i].currentlyHeld = true;
             m_buttonStates[i].pressStartTime = currentTime;
             m_buttonStates[i].longPressDetected = false;
             m_heldButtons.push_back(i);
         } else if (!current && last) {
             // Released
-            m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(static_cast<IFR1::Button>(i), m_currentMode) + " released").c_str());
+            IFR1_LOG_VERBOSE(m_sdk, "Button {} released", GetControlString(static_cast<IFR1::Button>(i), m_currentMode));
             if (!m_buttonStates[i].longPressDetected) {
                 // Short press
                 m_eventProc.ProcessEvent(config, GetModeString(m_currentMode, m_shifted), GetControlString(static_cast<IFR1::Button>(i), m_currentMode), "short-press");

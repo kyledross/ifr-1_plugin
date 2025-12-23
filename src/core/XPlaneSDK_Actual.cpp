@@ -10,11 +10,12 @@
 #include <map>
 #include <cstring>
 #include <filesystem>
+#include <format>
 
 struct SoundBuffer {
     std::vector<char> data;
-    int frequency;
-    int channels;
+    int frequency{};
+    int channels{};
 };
 
 class XPlaneSDK : public IXPlaneSDK {
@@ -106,7 +107,7 @@ public:
         m_logLevel = level;
     }
 
-    LogLevel GetLogLevel() const override {
+    [[nodiscard]] LogLevel GetLogLevel() const override {
         return m_logLevel;
     }
 
@@ -117,7 +118,7 @@ public:
     std::string GetSystemPath() override {
         char path[512];
         XPLMGetSystemPath(path);
-        return std::string(path);
+        return std::string{path};
     }
 
     bool FileExists(const std::string& path) override {
@@ -131,7 +132,7 @@ public:
             if (LoadWav(path, buffer)) {
                 it = m_sounds.emplace(path, std::move(buffer)).first;
             } else {
-                Log(LogLevel::Error, ("Failed to load sound: " + path).c_str());
+                Log(LogLevel::Error, std::format("Failed to load sound: {}", path).c_str());
                 return;
             }
         }
@@ -154,7 +155,7 @@ private:
     LogLevel m_logLevel = LogLevel::Info;
     std::map<std::string, SoundBuffer> m_sounds;
 
-    bool LoadWav(const std::string& path, SoundBuffer& buffer) {
+    static bool LoadWav(const std::string& path, SoundBuffer& buffer) {
         std::ifstream file(path, std::ios::binary);
         if (!file) return false;
 

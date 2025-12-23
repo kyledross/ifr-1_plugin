@@ -1,16 +1,19 @@
 #include "OutputProcessor.h"
 #include "IFR1Protocol.h"
+#include "Logger.h"
 #include <cmath>
 
 uint8_t OutputProcessor::EvaluateLEDs(const nlohmann::json& config, float currentTime) const
 {
     if (config.empty() || !config.contains("output")) {
-        if (!config.empty() && config.is_object() && m_sdk.GetLogLevel() >= LogLevel::Verbose) {
-            std::string keys;
-            for (auto it = config.begin(); it != config.end(); ++it) {
-                keys += it.key() + ", ";
-            }
-            m_sdk.Log(LogLevel::Verbose, ("Config missing 'output'. Keys: " + keys).c_str());
+        if (!config.empty() && config.is_object()) {
+            IFR1_LOG_VERBOSE(m_sdk, "Config missing 'output'. Keys: {}", [&] {
+                std::string keys;
+                for (auto it = config.begin(); it != config.end(); ++it) {
+                    keys += it.key() + ", ";
+                }
+                return keys;
+            }());
         }
         return IFR1::LEDMask::OFF;
     }

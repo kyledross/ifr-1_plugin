@@ -1,4 +1,5 @@
 #include "ConfigManager.h"
+#include "Logger.h"
 #include <fstream>
 #include <filesystem>
 
@@ -8,10 +9,10 @@ size_t ConfigManager::LoadConfigs(const std::string& directoryPath, IXPlaneSDK& 
     m_configs.clear();
     m_fallbackConfig.clear();
     
-    sdk.Log(LogLevel::Info, ("Loading configurations from: " + directoryPath).c_str());
+    IFR1_LOG_INFO(sdk, "Loading configurations from: {}", directoryPath);
     
     if (!fs::exists(directoryPath) || !fs::is_directory(directoryPath)) {
-        sdk.Log(LogLevel::Error, "Config directory does not exist or is not a directory.");
+        IFR1_LOG_ERROR(sdk, "Config directory does not exist or is not a directory.");
         return 0;
     }
 
@@ -30,7 +31,7 @@ size_t ConfigManager::LoadConfigs(const std::string& directoryPath, IXPlaneSDK& 
                     bool isFallback = config.value("fallback", false);
                     bool hasOutput = config.contains("output");
                     
-                    sdk.Log(LogLevel::Info, ("  - Loaded " + configName + (isFallback ? " (fallback)" : "") + (hasOutput ? " [has output]" : " [NO OUTPUT!]")).c_str());
+                    IFR1_LOG_INFO(sdk, "  - Loaded {}{}{}", configName, (isFallback ? " (fallback)" : ""), (hasOutput ? " [has output]" : " [NO OUTPUT!]"));
                     
                     if (isFallback) {
                         m_fallbackConfig = config;
@@ -39,20 +40,20 @@ size_t ConfigManager::LoadConfigs(const std::string& directoryPath, IXPlaneSDK& 
                     }
                 }
             } catch (const std::exception& e) {
-                sdk.Log(LogLevel::Error, ("Error loading config " + entry.path().string() + ": " + e.what()).c_str());
+                IFR1_LOG_ERROR(sdk, "Error loading config {}: {}", entry.path().string(), e.what());
             }
         }
     }
     
     if (m_fallbackConfig.empty()) {
-        sdk.Log(LogLevel::Info, "No fallback configuration was found.");
+        IFR1_LOG_INFO(sdk, "No fallback configuration was found.");
     }
     
     return m_configs.size() + (m_fallbackConfig.empty() ? 0 : 1);
 }
 
 nlohmann::json ConfigManager::GetConfigForAircraft(const std::string& aircraftFilename, IXPlaneSDK& sdk) const {
-    sdk.Log(LogLevel::Info, ("Matching configuration for aircraft: " + aircraftFilename).c_str());
+    IFR1_LOG_INFO(sdk, "Matching configuration for aircraft: {}", aircraftFilename);
     
     for (const auto& config : m_configs) {
         if (config.contains("aircraft") && config["aircraft"].is_array()) {
@@ -60,7 +61,7 @@ nlohmann::json ConfigManager::GetConfigForAircraft(const std::string& aircraftFi
                 if (aircraft.is_string()) {
                     std::string aircraftPattern = aircraft.get<std::string>();
                     if (aircraftFilename.find(aircraftPattern) != std::string::npos) {
-                        sdk.Log(LogLevel::Info, ("  - Matched specific config: " + config.value("name", "unknown")).c_str());
+                        IFR1_LOG_INFO(sdk, "  - Matched specific config: {}", config.value("name", "unknown"));
                         return config;
                     }
                 }
@@ -69,10 +70,10 @@ nlohmann::json ConfigManager::GetConfigForAircraft(const std::string& aircraftFi
     }
     
     if (!m_fallbackConfig.empty()) {
-        sdk.Log(LogLevel::Info, ("  - No specific match, using fallback: " + m_fallbackConfig.value("name", "unknown")).c_str());
+        IFR1_LOG_INFO(sdk, "  - No specific match, using fallback: {}", m_fallbackConfig.value("name", "unknown"));
         return m_fallbackConfig;
     }
     
-    sdk.Log(LogLevel::Info, "  - No match found and no fallback available.");
+    IFR1_LOG_INFO(sdk, "  - No match found and no fallback available.");
     return {};
 }

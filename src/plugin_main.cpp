@@ -17,6 +17,7 @@
 #include "DeviceHandler.h"
 #include "XPlaneSDK.h"
 #include "ui/AboutWindow.h"
+#include "core/Logger.h"
 
 namespace fs = std::filesystem;
 
@@ -59,13 +60,13 @@ float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceL
         path[bytes] = '\0';
         std::string currentPath(path);
         if (currentPath != gCurrentAircraftPath) {
-            gSDK->Log(LogLevel::Info, ("Aircraft changed to " + currentPath).c_str());
+            IFR1_LOG_INFO(*gSDK, "Aircraft changed to {}", currentPath);
             gCurrentAircraftPath = currentPath;
             gDeviceHandler->ClearLEDs();
             gCurrentConfig = gConfigManager->GetConfigForAircraft(currentPath, *gSDK);
 
             if (!gCurrentConfig.empty() && !gCurrentConfig.contains("output")) {
-                gSDK->Log(LogLevel::Error, ("Loaded config '" + gCurrentConfig.value("name", "unknown") + "' is missing 'output' section!").c_str());
+                IFR1_LOG_ERROR(*gSDK, "Loaded config '{}' is missing 'output' section!", gCurrentConfig.value("name", "unknown"));
             }
 
             // Update log level based on config
@@ -76,13 +77,13 @@ float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceL
             }
 
             if (gCurrentConfig.empty()) {
-                gSDK->Log(LogLevel::Info, "No configuration found for this aircraft.");
+                IFR1_LOG_INFO(*gSDK, "No configuration found for this aircraft.");
             } else {
                 std::string configName = gCurrentConfig.value("name", "Unknown");
                 if (gCurrentConfig.value("fallback", false)) {
-                    gSDK->Log(LogLevel::Info, ("Using fallback configuration: " + configName).c_str());
+                    IFR1_LOG_INFO(*gSDK, "Using fallback configuration: {}", configName);
                 } else {
-                    gSDK->Log(LogLevel::Info, ("Configuration loaded: " + configName).c_str());
+                    IFR1_LOG_INFO(*gSDK, "Configuration loaded: {}", configName);
                 }
             }
         }
@@ -137,14 +138,14 @@ PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
         if (configDir.empty()) {
             std::snprintf(msg, sizeof(msg), "ERROR: Could not find 'configs' directory. Tried:\n  1. %s\n  2. %s\n", 
                          p1.string().c_str(), p2.string().c_str());
-            gSDK->Log(LogLevel::Error, msg);
+            IFR1_LOG_ERROR(*gSDK, "{}", msg);
         } else {
             std::snprintf(msg, sizeof(msg), "WARNING: No configuration files found in %s\n", configDir.string().c_str());
-            gSDK->Log(LogLevel::Info, msg);
+            IFR1_LOG_INFO(*gSDK, "{}", msg);
         }
     } else {
         std::snprintf(msg, sizeof(msg), "Loaded %zu configurations from %s\n", loaded, configDir.string().c_str());
-        gSDK->Log(LogLevel::Info, msg);
+        IFR1_LOG_INFO(*gSDK, "{}", msg);
     }
 
     // Create Plugins menu: "IFR-1" -> "About..."

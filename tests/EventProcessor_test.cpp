@@ -235,7 +235,7 @@ TEST(EventProcessorTest, ProcessEvent_LogsAtVerboseLevel) {
     EXPECT_CALL(mockSdk, CommandOnce(dummyCmd));
     
     // GetLogLevel should be called to check if verbose logging is enabled for conditions
-    EXPECT_CALL(mockSdk, GetLogLevel()).WillRepeatedly(Return(LogLevel::Info));
+    EXPECT_CALL(mockSdk, GetLogLevel()).WillRepeatedly(Return(LogLevel::Verbose));
 
     // Log should be called with Verbose level for the event and action
     EXPECT_CALL(mockSdk, Log(LogLevel::Verbose, ::testing::_)).WillRepeatedly(Return());
@@ -578,6 +578,7 @@ TEST(EventProcessorTest, CommandQueueLimit_EnforcedAtTen) {
 
     void* cmdRef = reinterpret_cast<void*>(0x123);
     EXPECT_CALL(mockSdk, FindCommand(StrEq("sim/test/cmd"))).WillOnce(Return(cmdRef));
+    EXPECT_CALL(mockSdk, GetLogLevel()).WillRepeatedly(Return(LogLevel::Verbose));
     
     // Allow other log calls
     EXPECT_CALL(mockSdk, Log(::testing::_, ::testing::_)).WillRepeatedly(::testing::Return());
