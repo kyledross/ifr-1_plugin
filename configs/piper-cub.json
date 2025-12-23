@@ -7,6 +7,7 @@
     "com1": {
       "outer-knob": {
         "rotate-clockwise": {
+          "description": "Increases the COM1 standby frequency in coarse (1 MHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -15,6 +16,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the COM1 standby frequency in coarse (1 MHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -25,6 +27,7 @@
       },
       "inner-knob": {
         "rotate-clockwise": {
+          "description": "Increases the COM1 standby frequency in fine (25 kHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -33,6 +36,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the COM1 standby frequency in fine (25 kHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -43,6 +47,7 @@
       },
       "swap": {
         "short-press": {
+          "description": "Swaps the active and standby frequencies for COM1.",
           "actions": [
             {
               "type": "command",
@@ -55,6 +60,7 @@
     "com2": {
       "outer-knob": {
         "rotate-clockwise": {
+          "description": "Increases the COM2 standby frequency in coarse (1 MHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -63,6 +69,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the COM2 standby frequency in coarse (1 MHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -73,6 +80,7 @@
       },
       "inner-knob": {
         "rotate-clockwise": {
+          "description": "Increases the COM2 standby frequency in fine (25 kHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -81,6 +89,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the COM2 standby frequency in fine (25 kHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -91,6 +100,7 @@
       },
       "swap": {
         "short-press": {
+          "description": "Swaps the active and standby frequencies for COM2.",
           "actions": [
             {
               "type": "command",
@@ -103,6 +113,7 @@
     "nav1": {
       "outer-knob": {
         "rotate-clockwise": {
+          "description": "Increases the NAV1 standby frequency in coarse (1 MHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -111,6 +122,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the NAV1 standby frequency in coarse (1 MHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -121,6 +133,7 @@
       },
       "inner-knob": {
         "rotate-clockwise": {
+          "description": "Increases the NAV1 standby frequency in fine (50 kHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -129,6 +142,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the NAV1 standby frequency in fine (50 kHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -139,6 +153,7 @@
       },
       "swap": {
         "short-press": {
+          "description": "Swaps the active and standby frequencies for NAV1.",
           "actions": [
             {
               "type": "command",
@@ -151,6 +166,7 @@
     "nav2": {
       "outer-knob": {
         "rotate-clockwise": {
+          "description": "Increases the NAV2 standby frequency in coarse (1 MHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -159,6 +175,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the NAV2 standby frequency in coarse (1 MHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -169,6 +186,7 @@
       },
       "inner-knob": {
         "rotate-clockwise": {
+          "description": "Increases the NAV2 standby frequency in fine (50 kHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -177,6 +195,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the NAV2 standby frequency in fine (50 kHz) increments.",
           "actions": [
             {
               "type": "command",
@@ -187,6 +206,7 @@
       },
       "swap": {
         "short-press": {
+          "description": "Swaps the active and standby frequencies for NAV2.",
           "actions": [
             {
               "type": "command",
@@ -199,6 +219,7 @@
     "hdg": {
       "inner-knob-button": {
         "short-press": {
+          "description": "Synchronizes the heading bug to the current aircraft heading.",
           "actions": [
             {
               "type": "command",
@@ -209,6 +230,7 @@
       },
       "outer-knob": {
         "rotate-clockwise": {
+          "description": "Increases the autopilot heading bug in 10-degree increments.",
           "actions": [
             {
               "type": "dataref-adjust",
@@ -221,6 +243,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the autopilot heading bug in 10-degree increments.",
           "actions": [
             {
               "type": "dataref-adjust",
@@ -235,6 +258,7 @@
       },
       "inner-knob": {
         "rotate-clockwise": {
+          "description": "Increases the autopilot heading bug in 1-degree increments.",
           "actions": [
             {
               "type": "dataref-adjust",
@@ -247,6 +271,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the autopilot heading bug in 1-degree increments.",
           "actions": [
             {
               "type": "dataref-adjust",
@@ -263,6 +288,7 @@
     "baro": {
       "inner-knob-button": {
         "short-press": {
+          "description": "Sets the altimeter barometer to the standard 29.92 inHg.",
           "actions": [
             {
               "type": "command",
@@ -273,6 +299,7 @@
       },
       "outer-knob": {
         "rotate-clockwise": {
+          "description": "Increases the altimeter barometer setting by 0.01 inHg.",
           "actions": [
             {
               "type": "command",
@@ -281,6 +308,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the altimeter barometer setting by 0.01 inHg.",
           "actions": [
             {
               "type": "command",
@@ -291,6 +319,7 @@
       },
       "inner-knob": {
         "rotate-clockwise": {
+          "description": "Increases the altimeter barometer setting by 0.01 inHg.",
           "actions": [
             {
               "type": "command",
@@ -299,6 +328,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the altimeter barometer setting by 0.01 inHg.",
           "actions": [
             {
               "type": "command",
@@ -311,6 +341,7 @@
     "crs1": {
       "outer-knob": {
         "rotate-clockwise": {
+          "description": "Adjusts the NAV1 OBS course in 10-degree increments.",
           "actions": [
             {
               "type": "dataref-adjust",
@@ -323,6 +354,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Adjusts the NAV1 OBS course in 10-degree increments.",
           "actions": [
             {
               "type": "dataref-adjust",
@@ -337,6 +369,7 @@
       },
       "inner-knob": {
         "rotate-clockwise": {
+          "description": "Adjusts the NAV1 OBS course in 1-degree increments.",
           "actions": [
             {
               "type": "dataref-adjust",
@@ -349,6 +382,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Adjusts the NAV1 OBS course in 1-degree increments.",
           "actions": [
             {
               "type": "dataref-adjust",
@@ -365,6 +399,7 @@
     "crs2": {
       "outer-knob": {
         "rotate-clockwise": {
+          "description": "Adjusts the NAV2 OBS course in 10-degree increments.",
           "actions": [
             {
               "type": "dataref-adjust",
@@ -377,6 +412,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Adjusts the NAV2 OBS course in 10-degree increments.",
           "actions": [
             {
               "type": "dataref-adjust",
@@ -391,6 +427,7 @@
       },
       "inner-knob": {
         "rotate-clockwise": {
+          "description": "Adjusts the NAV2 OBS course in 1-degree increments.",
           "actions": [
             {
               "type": "dataref-adjust",
@@ -403,6 +440,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Adjusts the NAV2 OBS course in 1-degree increments.",
           "actions": [
             {
               "type": "dataref-adjust",
@@ -419,6 +457,7 @@
     "ap": {
       "outer-knob": {
         "rotate-clockwise": {
+          "description": "Increases the autopilot pre-selected altitude.",
           "actions": [
             {
               "type": "command",
@@ -427,6 +466,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the autopilot pre-selected altitude.",
           "actions": [
             {
               "type": "command",
@@ -437,6 +477,7 @@
       },
       "inner-knob": {
         "rotate-clockwise": {
+          "description": "Increases the autopilot target airspeed while in flight level change (FLC) mode. Increases the autopilot target vertical speed.",
           "actions": [
             {
               "type": "command",
@@ -445,6 +486,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the autopilot target airspeed while in flight level change (FLC) mode. Decreases the autopilot target vertical speed.",
           "actions": [
             {
               "type": "command",
@@ -455,6 +497,7 @@
       },
       "swap": {
         "short-press": {
+          "description": "Toggles the autopilot flight level change (FLC) mode.",
           "actions": [
             {
               "type": "command",
@@ -465,6 +508,7 @@
       },
       "ap": {
         "short-press": {
+          "description": "Toggles the autopilot servos on or off.",
           "actions": [
             {
               "type": "command",
@@ -475,6 +519,7 @@
       },
       "hdg": {
         "short-press": {
+          "description": "Toggles the autopilot heading hold mode.",
           "actions": [
             {
               "type": "command",
@@ -485,6 +530,7 @@
       },
       "nav": {
         "short-press": {
+          "description": "Toggles the autopilot navigation mode.",
           "actions": [
             {
               "type": "command",
@@ -495,6 +541,7 @@
       },
       "apr": {
         "short-press": {
+          "description": "Toggles the autopilot approach mode.",
           "actions": [
             {
               "type": "command",
@@ -505,6 +552,7 @@
       },
       "alt": {
         "short-press": {
+          "description": "Toggles the autopilot altitude hold mode.",
           "actions": [
             {
               "type": "command",
@@ -515,6 +563,7 @@
       },
       "vs": {
         "short-press": {
+          "description": "Toggles the autopilot vertical speed mode.",
           "actions": [
             {
               "type": "command",
@@ -527,6 +576,7 @@
     "ap-alt": {
       "outer-knob": {
         "rotate-clockwise": {
+          "description": "Increases the instrument panel lighting brightness.",
           "actions": [
             {
               "type": "command",
@@ -535,6 +585,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the instrument panel lighting brightness.",
           "actions": [
             {
               "type": "command",
@@ -545,6 +596,7 @@
       },
       "inner-knob": {
         "rotate-clockwise": {
+          "description": "Increases the instrument lighting brightness.",
           "actions": [
             {
               "type": "command",
@@ -553,6 +605,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the instrument lighting brightness.",
           "actions": [
             {
               "type": "command",
@@ -565,6 +618,7 @@
     "xpdr": {
       "outer-knob": {
         "rotate-clockwise": {
+          "description": "Increases the first two digits of the transponder code.",
           "actions": [
             {
               "type": "command",
@@ -573,6 +627,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the first two digits of the transponder code.",
           "actions": [
             {
               "type": "command",
@@ -583,6 +638,7 @@
       },
       "inner-knob": {
         "rotate-clockwise": {
+          "description": "Increases the last two digits of the transponder code.",
           "actions": [
             {
               "type": "command",
@@ -591,6 +647,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Decreases the last two digits of the transponder code.",
           "actions": [
             {
               "type": "command",
@@ -601,6 +658,7 @@
       },
       "inner-knob-button": {
         "short-press": {
+          "description": "Activates the transponder IDENT function.",
           "actions": [
             {
               "type": "command",
@@ -613,6 +671,7 @@
     "xpdr-mode": {
       "inner-knob-button": {
         "short-press": {
+          "description": "Activates the transponder IDENT function.",
           "actions": [
             {
               "type": "command",
@@ -623,6 +682,7 @@
       },
       "inner-knob": {
         "rotate-clockwise": {
+          "description": "Cycles forward through transponder modes (STBY, ON, ALT).",
           "actions": [
             {
               "type": "command",
@@ -631,6 +691,7 @@
           ]
         },
         "rotate-counterclockwise": {
+          "description": "Cycles backward through transponder modes (STBY, ON, ALT).",
           "actions": [
             {
               "type": "command",
