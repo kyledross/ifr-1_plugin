@@ -32,9 +32,10 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
         
         m_sdk.Log(LogLevel::Verbose, ("Event - mode: " + mode + ", control: " + control + ", action: " + action).c_str());
 
-        const auto& actionData = config["modes"][mode][control][action];
-        if (actionData.is_array()) {
-            for (const auto& actionConfig : actionData) {
+        const auto& eventConfig = config["modes"][mode][control][action];
+        
+        auto processActions = [&](const nlohmann::json& actions) {
+            for (const auto& actionConfig : actions) {
                 if (m_evaluator.EvaluateConditions(actionConfig, m_sdk.GetLogLevel() >= LogLevel::Verbose)) {
                     ExecuteAction(actionConfig);
                     if (!ShouldEvaluateNext(actionConfig)) {
@@ -42,10 +43,12 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
                     }
                 }
             }
+        };
+
+        if (eventConfig.is_object() && eventConfig.contains("actions") && eventConfig["actions"].is_array()) {
+            processActions(eventConfig["actions"]);
         } else {
-            if (m_evaluator.EvaluateConditions(actionData, m_sdk.GetLogLevel() >= LogLevel::Verbose)) {
-                ExecuteAction(actionData);
-            }
+            m_sdk.Log(LogLevel::Error, ("Event " + control + "/" + action + " in mode " + mode + " missing required 'actions' array").c_str());
         }
     }
 }

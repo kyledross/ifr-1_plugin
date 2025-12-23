@@ -56,7 +56,7 @@ The plugin uses different identifiers for these states in the JSON:
 
 ## Defining Actions
 
-Within each mode, you map **Controls** to **Actions** based on **Event Types**.
+Within each mode, you map **Controls** to **Actions** based on **Event Types**. Each event **must** contain an `actions` array, even if it only performs a single action. You can also provide an optional `description` for the entire event.
 
 ### Hardware Controls
 - **Knobs**: `outer-knob`, `inner-knob`
@@ -70,7 +70,7 @@ Within each mode, you map **Controls** to **Actions** based on **Event Types**.
 - **For Buttons**: `short-press`, `long-press`
 
 ### Action Types
-There are three types of actions you can trigger:
+There are three types of actions you can trigger within the `actions` array:
 
 #### 1. `command`
 Executes a standard X-Plane command.
@@ -90,24 +90,34 @@ Increments or decrements a dataref.
 - `max`: (Optional) Maximum allowed value.
 - `limit-type`: (Optional) `"clamp"` (default) or `"wrap"`.
 
-### Array Datarefs
-Many X-Plane datarefs are arrays (e.g., `sim/cockpit2/switches/panel_brightness_ratio` which has 4 values). You can access a specific index by appending `[index]` to the dataref name.
-
-- Example: `sim/cockpit2/switches/panel_brightness_ratio[0]`
-- This syntax works in `dataref-set`, `dataref-adjust`, and within `conditions`.
+### Example of Single-Action Event
+Even for a single action, the `actions` array is required.
+```json
+"swap": {
+  "short-press": {
+    "description": "Swaps COM1 active and standby frequencies.",
+    "actions": [
+      { "type": "command", "value": "sim/radios/com1_standy_flip" }
+    ]
+  }
+}
+```
 
 ---
 
 ## Conditional and Multiple Actions
 
-If you want an event to do different things depending on the aircraft's state, or to perform multiple actions, you can use an array of actions with `conditions`. 
+The `actions` array allows you to define multiple actions for an event, optionally with conditions.
 
 ### Execution Logic
-- The plugin iterates through the array of actions.
+- The plugin iterates through the `actions` array.
 - For each action, it evaluates the `condition` (or `conditions`).
 - If the conditions are met, the action is executed.
 - By default, after executing an action, the plugin **stops** and does not evaluate any further actions in the array for that event.
 - If you want to continue to the next action even after a match, add `"continue-to-next-action": true` to the condition object or the action itself.
+
+### Description Field
+Each event (like `short-press` or `rotate-clockwise`) can have an optional `description` field. This is used for documentation and help purposes. It is a sibling to the `actions` array.
 
 ### Condition Syntax
 A condition checks a dataref value:
@@ -116,23 +126,27 @@ A condition checks a dataref value:
 - `bit`: (Alternative to range) A 0-indexed bit that must be set in the integer value.
 - `continue-to-next-action`: (Optional) If `true`, the plugin will continue to evaluate subsequent actions in the array even if this action's conditions were met and it was executed.
 
+### Multi-action Syntax
 ```json
 "alt": {
-  "short-press": [
-    {
-      "condition": { 
-        "dataref": "sim/cockpit2/autopilot/altitude_mode", 
-        "min": 5, "max": 5, 
-        "continue-to-next-action": true 
+  "short-press": {
+    "description": "Increases airspeed if in FLC mode, otherwise toggles altitude hold.",
+    "actions": [
+      {
+        "condition": { 
+          "dataref": "sim/cockpit2/autopilot/altitude_mode", 
+          "min": 5, "max": 5, 
+          "continue-to-next-action": true 
+        },
+        "type": "command",
+        "value": "sim/autopilot/airspeed_up"
       },
-      "type": "command",
-      "value": "sim/autopilot/airspeed_up"
-    },
-    {
-      "type": "command",
-      "value": "sim/autopilot/altitude_hold"
-    }
-  ]
+      {
+        "type": "command",
+        "value": "sim/autopilot/altitude_hold"
+      }
+    ]
+  }
 }
 ```
 

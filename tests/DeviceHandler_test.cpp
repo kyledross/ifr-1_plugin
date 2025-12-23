@@ -87,7 +87,11 @@ TEST(DeviceHandlerTest, Update_ProcessesKnobRotation) {
         {"modes", {
             {"com1", {
                 {"outer-knob", {
-                    {"rotate-clockwise", {{"type", "command"}, {"value", "test_cmd"}}}
+                    {"rotate-clockwise", {
+                        {"actions", {
+                            {{"type", "command"}, {"value", "test_cmd"}}
+                        }}
+                    }}
                 }}
             }}
         }}
@@ -125,7 +129,11 @@ TEST(DeviceHandlerTest, Update_ProcessesShortPress) {
         {"modes", {
             {"com1", {
                 {"swap", {
-                    {"short-press", {{"type", "command"}, {"value", "swap_cmd"}}}
+                    {"short-press", {
+                        {"actions", {
+                            {{"type", "command"}, {"value", "swap_cmd"}}
+                        }}
+                    }}
                 }}
             }}
         }}
@@ -174,13 +182,31 @@ TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
     nlohmann::json config = {
         {"modes", {
             {"com1", {
-                {"outer-knob", {{"rotate-clockwise", {{"type", "command"}, {"value", "com1_cmd"}}}}}
+                {"outer-knob", {
+                    {"rotate-clockwise", {
+                        {"actions", {
+                            {{"type", "command"}, {"value", "com1_cmd"}}
+                        }}
+                    }}
+                }}
             }},
             {"hdg", {
-                {"outer-knob", {{"rotate-clockwise", {{"type", "command"}, {"value", "hdg_cmd"}}}}}
+                {"outer-knob", {
+                    {"rotate-clockwise", {
+                        {"actions", {
+                            {{"type", "command"}, {"value", "hdg_cmd"}}
+                        }}
+                    }}
+                }}
             }},
             {"com2", {
-                {"outer-knob", {{"rotate-clockwise", {{"type", "command"}, {"value", "com2_cmd"}}}}}
+                {"outer-knob", {
+                    {"rotate-clockwise", {
+                        {"actions", {
+                            {{"type", "command"}, {"value", "com2_cmd"}}
+                        }}
+                    }}
+                }}
             }}
         }}
     };
@@ -330,7 +356,11 @@ TEST(DeviceHandlerTest, Update_OtherButtonLongPressDoesNotPlaySound) {
         {"modes", {
             {"com1", {
                 {"swap", {
-                    {"long-press", {{"type", "command"}, {"value", "long_cmd"}}}
+                    {"long-press", {
+                        {"actions", {
+                            {{"type", "command"}, {"value", "long_cmd"}}
+                        }}
+                    }}
                 }}
             }}
         }}
