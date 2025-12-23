@@ -32,5 +32,5 @@ jobs:
         with:
           files: ifr1flex_Linux_Install.tar.gz
           generate_release_notes: true
-          draft: false
+          draft: true
           prerelease: false
