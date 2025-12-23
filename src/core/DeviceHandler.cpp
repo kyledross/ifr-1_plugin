@@ -304,9 +304,9 @@ void DeviceHandler::WorkerThread() {
         // Small sleep to prevent tight loop if Read is non-blocking or returns immediately
         // or if we're waiting for reconnection
         if (!m_isConnected && !wasConnected && m_running) {
-             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         } else {
-             std::this_thread::sleep_for(std::chrono::milliseconds(1));
+             std::this_thread::sleep_for(std::chrono::milliseconds(20));
         }
     }
 }
