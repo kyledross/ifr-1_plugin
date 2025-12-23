@@ -1,5 +1,6 @@
 #include "DeviceHandler.h"
 #include <iostream>
+#include <algorithm>
 
 DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk, bool startThread)
     : m_hw(hw), m_eventProc(eventProc), m_outputProc(outputProc), m_sdk(sdk) {
@@ -42,25 +43,25 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
 
     if (!currentlyConnected) return;
 
-    // Log write stats periodically if there are errors
-    static uint32_t lastTotal = 0;
-    static uint32_t lastFailed = 0;
-    if (m_failedWrites > lastFailed || (m_totalWrites % 100 == 0 && m_totalWrites != lastTotal)) {
-        if (m_failedWrites > 0) {
-            m_sdk.Log(LogLevel::Error, ("HID Write Stats - Total: " + std::to_string(m_totalWrites) + ", Failed: " + std::to_string(m_failedWrites)).c_str());
+    // Log write stats periodically if there are errors or every 10 seconds
+    if (m_failedWrites > m_lastFailedWrites || (currentTime - m_lastStatsLogTime >= 10.0f)) {
+        if (m_failedWrites > 0 || m_totalWrites != m_lastTotalWrites) {
+            m_sdk.Log(LogLevel::Info, ("HID Write Stats - Total: " + std::to_string(m_totalWrites) + ", Failed: " + std::to_string(m_failedWrites)).c_str());
         }
-        lastTotal = m_totalWrites;
-        lastFailed = m_failedWrites;
+        m_lastTotalWrites = m_totalWrites;
+        m_lastFailedWrites = m_failedWrites;
+        m_lastStatsLogTime = currentTime;
     }
 
     // Process all available reports from the queue
-    while (auto report = m_inputQueue.Pop()) {
-        ProcessReport(report->data(), config, currentTime);
+    while (auto event = m_inputQueue.Pop()) {
+        ProcessReport(*event, config, currentTime);
     }
 
     // Process long presses even if no new HID report (timer based)
-    for (int i = 0; i < 12; ++i) {
-        if (m_buttonStates[i].currentlyHeld && !m_buttonStates[i].longPressDetected) {
+    // Only check buttons that are actually currently held
+    for (int i : m_heldButtons) {
+        if (!m_buttonStates[i].longPressDetected) {
             if (currentTime - m_buttonStates[i].pressStartTime >= 0.3f) {
                 m_buttonStates[i].longPressDetected = true;
 
@@ -102,9 +103,24 @@ void DeviceHandler::ClearLEDs() {
     m_shifted = false;
     m_lastLedBits = 0;
     m_outputQueue.Push(0);
+    m_heldButtons.clear();
+    for (auto& state : m_buttonStates) {
+        state.currentlyHeld = false;
+        state.longPressDetected = false;
+    }
 }
 
-void DeviceHandler::ProcessReport(const uint8_t* data, const nlohmann::json& config, float currentTime) {
+void DeviceHandler::ProcessReport(const IFR1::HardwareEvent& event, const nlohmann::json& config, float currentTime) {
+    if (event.mode != m_currentMode) {
+        m_shifted = false;
+        m_currentMode = event.mode;
+    }
+
+    HandleKnobs(event, config);
+    HandleButtons(event, config, currentTime);
+}
+
+IFR1::HardwareEvent DeviceHandler::ParseReport(const uint8_t* data) {
     // data[1..3] buttons, data[5] outer knob, data[6] inner knob, data[7] mode
     
     IFR1::HardwareEvent event;
@@ -112,11 +128,6 @@ void DeviceHandler::ProcessReport(const uint8_t* data, const nlohmann::json& con
     event.innerKnobRotation = static_cast<int8_t>(data[6]);
     event.mode = static_cast<IFR1::Mode>(data[7]);
     
-    if (event.mode != m_currentMode) {
-        m_shifted = false;
-        m_currentMode = event.mode;
-    }
-
     auto checkBit = [](uint8_t val, uint8_t bit) {
         return (val & (1 << (bit - 1))) != 0;
     };
@@ -136,8 +147,7 @@ void DeviceHandler::ProcessReport(const uint8_t* data, const nlohmann::json& con
     event.buttonStates[static_cast<int>(IFR1::Button::ALT)] = checkBit(data[3], IFR1::BitPosition::ALT);
     event.buttonStates[static_cast<int>(IFR1::Button::VS)] = checkBit(data[3], IFR1::BitPosition::VS);
 
-    HandleKnobs(event, config);
-    HandleButtons(event, config, currentTime);
+    return event;
 }
 
 void DeviceHandler::HandleKnobs(const IFR1::HardwareEvent& event, const nlohmann::json& config) const
@@ -169,6 +179,7 @@ void DeviceHandler::HandleButtons(const IFR1::HardwareEvent& event, const nlohma
             m_buttonStates[i].currentlyHeld = true;
             m_buttonStates[i].pressStartTime = currentTime;
             m_buttonStates[i].longPressDetected = false;
+            m_heldButtons.push_back(i);
         } else if (!current && last) {
             // Released
             m_sdk.Log(LogLevel::Verbose, ("Button " + GetControlString(static_cast<IFR1::Button>(i)) + " released").c_str());
@@ -178,6 +189,7 @@ void DeviceHandler::HandleButtons(const IFR1::HardwareEvent& event, const nlohma
             }
             m_buttonStates[i].currentlyHeld = false;
             m_buttonStates[i].longPressDetected = false;
+            m_heldButtons.erase(std::remove(m_heldButtons.begin(), m_heldButtons.end(), i), m_heldButtons.end());
         }
     }
 }
@@ -248,9 +260,7 @@ void DeviceHandler::ProcessHardware() {
     int bytesRead = m_hw.Read(readBuffer, IFR1::HID_REPORT_SIZE, 10); // 10ms timeout
     int reportsRead = 0;
     while (bytesRead > 0) {
-        std::array<uint8_t, IFR1::HID_REPORT_SIZE + 1> report{};
-        std::memcpy(report.data(), readBuffer, static_cast<size_t>(bytesRead));
-        m_inputQueue.Push(report);
+        m_inputQueue.Push(ParseReport(readBuffer));
         
         if (++reportsRead >= 10) break;
         bytesRead = m_hw.Read(readBuffer, IFR1::HID_REPORT_SIZE, 0); // No timeout for subsequent reads
