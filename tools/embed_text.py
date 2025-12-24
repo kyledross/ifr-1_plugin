@@ -12,20 +12,30 @@ def make_raw_literal(text: str) -> str:
     return f'R"{delim}({text}){delim}"'
 
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: embed_text.py <input_text> <output_header>")
+    if len(sys.argv) < 3:
+        print("Usage: embed_text.py <input_text_1> [input_text_2 ...] <output_header>")
         return 2
 
-    in_path = Path(sys.argv[1])
-    out_path = Path(sys.argv[2])
+    out_path = Path(sys.argv[-1])
+    in_paths = [Path(p) for p in sys.argv[1:-1]]
 
-    if not in_path.exists():
-        print(f"Input not found: {in_path}")
-        return 4
+    full_text = ""
+    for in_path in in_paths:
+        if not in_path.exists():
+            print(f"Input not found: {in_path}")
+            return 4
+        
+        content = in_path.read_text(encoding='utf-8')
+        if full_text:
+            if not full_text.endswith('\n\n'):
+                if full_text.endswith('\n'):
+                    full_text += '\n'
+                else:
+                    full_text += '\n\n'
+        full_text += content
 
-    text = in_path.read_text(encoding='utf-8')
-    size = len(text.encode('utf-8'))
-    raw = make_raw_literal(text)
+    size = len(full_text.encode('utf-8'))
+    raw = make_raw_literal(full_text)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, 'w', encoding='utf-8') as f:
