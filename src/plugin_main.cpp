@@ -1,3 +1,19 @@
+/*
+ *   Copyright 2025 Kyle D. Ross
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 #include <cstring>
 #include <memory>
 #include <string>
@@ -7,7 +23,6 @@
 #include "XPLMPlugin.h"
 #include "XPLMDisplay.h"
 #include "XPLMProcessing.h"
-#include "XPLMDataAccess.h"
 #include "XPLMMenus.h"
 
 #include "ConfigManager.h"
@@ -17,6 +32,7 @@
 #include "DeviceHandler.h"
 #include "XPlaneSDK.h"
 #include "ui/AboutWindow.h"
+#include "core/Logger.h"
 
 namespace fs = std::filesystem;
 
@@ -52,36 +68,65 @@ float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceL
 
     float now = gSDK->GetElapsedTime();
 
-    // 1. Aircraft detection
-    char path[512];
-    int bytes = XPLMGetDatab(static_cast<XPLMDataRef>(gAcfPathRef), path, 0, sizeof(path) - 1);
-    if (bytes > 0) {
-        path[bytes] = '\0';
-        std::string currentPath(path);
-        if (currentPath != gCurrentAircraftPath) {
-            gSDK->Log(LogLevel::Info, ("Aircraft changed to " + currentPath).c_str());
-            gCurrentAircraftPath = currentPath;
-            gDeviceHandler->ClearLEDs();
-            gCurrentConfig = gConfigManager->GetConfigForAircraft(currentPath);
+    // 1. Aircraft detection every 20 frames (or if first time)
+    static int lastDetectionCounter = -1;
+    if (lastDetectionCounter == -1 || inCounter >= lastDetectionCounter + 20 || inCounter < lastDetectionCounter) {
+        lastDetectionCounter = inCounter;
 
-            // Update log level based on config
-            if (gCurrentConfig.value("debug", false)) {
-                gSDK->SetLogLevel(LogLevel::Verbose);
-            } else {
-                gSDK->SetLogLevel(LogLevel::Info);
-            }
+        if (!gAcfPathRef) {
+            gAcfPathRef = gSDK->FindDataRef("sim/aircraft/view/acf_relative_path");
+        }
 
-            if (gCurrentConfig.empty()) {
-                gSDK->Log(LogLevel::Info, "No configuration found for this aircraft.");
+        if (gAcfPathRef) {
+            char path[512];
+            int bytes = gSDK->GetDatab(gAcfPathRef, path, 0, sizeof(path) - 1);
+            if (bytes > 0) {
+                path[bytes] = '\0';
+                std::string currentPath(path);
+                if (currentPath != gCurrentAircraftPath) {
+                    IFR1_LOG_INFO(*gSDK, "Aircraft changed to {}", currentPath);
+                    gCurrentAircraftPath = currentPath;
+                    gDeviceHandler->ClearLEDs();
+                    gCurrentConfig = gConfigManager->GetConfigForAircraft(currentPath, *gSDK);
+
+                    if (!gCurrentConfig.empty() && !gCurrentConfig.contains("output")) {
+                        IFR1_LOG_ERROR(*gSDK, "Loaded config '{}' is missing 'output' section!",
+                                       gCurrentConfig.value("name", "unknown"));
+                    }
+
+                    // Update log level based on config
+                    if (gCurrentConfig.value("debug", false)) {
+                        gSDK->SetLogLevel(LogLevel::Verbose);
+                    } else {
+                        gSDK->SetLogLevel(LogLevel::Info);
+                    }
+
+                    if (gCurrentConfig.empty()) {
+                        IFR1_LOG_INFO(*gSDK, "No configuration found for this aircraft.");
+                    } else {
+                        std::string configName = gCurrentConfig.value("name", "Unknown");
+                        if (gCurrentConfig.value("fallback", false)) {
+                            IFR1_LOG_INFO(*gSDK, "Using fallback configuration: {}", configName);
+                        } else {
+                            IFR1_LOG_INFO(*gSDK, "Configuration loaded: {}", configName);
+                        }
+                    }
+                }
             } else {
-                std::string configName = gCurrentConfig.value("name", "Unknown");
-                if (gCurrentConfig.value("fallback", false)) {
-                    gSDK->Log(LogLevel::Info, ("Using fallback configuration: " + configName).c_str());
-                } else {
-                    gSDK->Log(LogLevel::Info, ("Configuration loaded: " + configName).c_str());
+                if (!gCurrentAircraftPath.empty()) {
+                    IFR1_LOG_INFO(*gSDK, "No aircraft detected.");
+                    gCurrentAircraftPath.clear();
+                    gCurrentConfig = nlohmann::json();
+                    gDeviceHandler->ClearLEDs();
                 }
             }
+        } else {
+            IFR1_LOG_ERROR(*gSDK, "Could not find 'sim/aircraft/view/acf_relative_path' dataref.");
         }
+    }
+
+    if (gCurrentAircraftPath.empty()) {
+        return -1.0f;
     }
 
     // 2. Update hardware input
@@ -125,7 +170,7 @@ PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
     
     size_t loaded = 0;
     if (!configDir.empty()) {
-        loaded = gConfigManager->LoadConfigs(configDir.string());
+        loaded = gConfigManager->LoadConfigs(configDir.string(), *gSDK);
     }
     
     char msg[1024];
@@ -133,20 +178,20 @@ PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
         if (configDir.empty()) {
             std::snprintf(msg, sizeof(msg), "ERROR: Could not find 'configs' directory. Tried:\n  1. %s\n  2. %s\n", 
                          p1.string().c_str(), p2.string().c_str());
-            gSDK->Log(LogLevel::Error, msg);
+            IFR1_LOG_ERROR(*gSDK, "{}", msg);
         } else {
             std::snprintf(msg, sizeof(msg), "WARNING: No configuration files found in %s\n", configDir.string().c_str());
-            gSDK->Log(LogLevel::Info, msg);
+            IFR1_LOG_INFO(*gSDK, "{}", msg);
         }
     } else {
         std::snprintf(msg, sizeof(msg), "Loaded %zu configurations from %s\n", loaded, configDir.string().c_str());
-        gSDK->Log(LogLevel::Info, msg);
+        IFR1_LOG_INFO(*gSDK, "{}", msg);
     }
 
     // Create Plugins menu: "IFR-1" -> "About..."
     if (XPLMMenuID pluginsMenu = XPLMFindPluginsMenu()) {
-        gSubMenuIndex = XPLMAppendMenuItem(pluginsMenu, "IFR-1 Flex", nullptr, 0);
-        gSubMenu = XPLMCreateMenu("IFR-1 Flex", pluginsMenu, gSubMenuIndex, MenuHandler, nullptr);
+        gSubMenuIndex = XPLMAppendMenuItem(pluginsMenu, "IFR-1 Controller", nullptr, 0);
+        gSubMenu = XPLMCreateMenu("IFR-1 Controller", pluginsMenu, gSubMenuIndex, MenuHandler, nullptr);
         if (gSubMenu) {
             XPLMAppendMenuItem(gSubMenu, "About...", reinterpret_cast<void*>(1), 0);
         }
@@ -180,13 +225,15 @@ PLUGIN_API void XPluginStop(void) {
 PLUGIN_API void XPluginDisable(void) {
     if (gDeviceHandler) {
         gDeviceHandler->ClearLEDs();
+        gDeviceHandler.reset();
     }
+    if (gHIDManager) {
+        gHIDManager.reset();
+    }
+
     if (gFlightLoop) {
         XPLMDestroyFlightLoop(gFlightLoop);
         gFlightLoop = nullptr;
-    }
-    if (gHIDManager) {
-        gHIDManager->Disconnect();
     }
 
     // Ensure any modal is closed when disabling
@@ -194,7 +241,13 @@ PLUGIN_API void XPluginDisable(void) {
 }
 
 PLUGIN_API int XPluginEnable(void) {
-    gAcfPathRef = XPLMFindDataRef("sim/aircraft/view/acf_relative_path");
+    if (!gHIDManager) {
+        gHIDManager = std::make_unique<HIDManager>();
+    }
+    if (!gDeviceHandler) {
+        gDeviceHandler = std::make_unique<DeviceHandler>(*gHIDManager, *gEventProcessor, *gOutputProcessor, *gSDK);
+    }
+
     gCurrentAircraftPath.clear();
     
     if (gDeviceHandler) {

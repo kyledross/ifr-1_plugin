@@ -13,1094 +13,1211 @@
     "com1": {
       "inner-knob-button": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_com12"
+          "description": "Toggles between COM1 and COM2 tuning on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_com12"
+            }
+          ]
         }
       },
       "swap": {
         "short-press": {
-          "type": "command",
-          "value": "sim/radios/com1_standy_flip"
+          "description": "Swaps the active and standby frequencies for COM1.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/com1_standy_flip"
+            }
+          ]
         },
         "long-press": {
-          "type": "dataref-set",
-          "value": "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833",
-          "adjustment": 121500
+          "description": "Sets the COM1 standby frequency to the emergency frequency 121.500 MHz.",
+          "actions": [
+            {
+              "type": "dataref-set",
+              "value": "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833",
+              "adjustment": 121500
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com1_coarse_up"
+          "description": "Increases the COM1 standby frequency in coarse (1 MHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com1_coarse_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com1_coarse_down"
+          "description": "Decreases the COM1 standby frequency in coarse (1 MHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com1_coarse_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com1_fine_up"
+          "description": "Increases the COM1 standby frequency in fine (25 kHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com1_fine_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com1_fine_down"
-        }
-      },
-      "ap": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/servos_toggle"
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/heading"
-        }
-      },
-      "nav": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/NAV"
-        }
-      },
-      "apr": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/approach"
-        }
-      },
-      "alt": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_hold"
-        },
-        "long-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_flc"
-        }
-      },
-      "vs": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/vertical_speed"
+          "description": "Decreases the COM1 standby frequency in fine (25 kHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com1_fine_down"
+            }
+          ]
         }
       }
     },
     "com2": {
       "inner-knob-button": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_com12"
+          "description": "Toggles between COM1 and COM2 tuning on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_com12"
+            }
+          ]
         }
       },
       "swap": {
         "short-press": {
-          "type": "command",
-          "value": "sim/radios/com2_standy_flip"
+          "description": "Swaps the active and standby frequencies for COM2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/com2_standy_flip"
+            }
+          ]
         },
         "long-press": {
-          "type": "dataref-set",
-          "value": "sim/cockpit2/radios/actuators/com2_standby_frequency_hz_833",
-          "adjustment": 121500
+          "description": "Sets the COM2 standby frequency to the emergency frequency 121.500 MHz.",
+          "actions": [
+            {
+              "type": "dataref-set",
+              "value": "sim/cockpit2/radios/actuators/com2_standby_frequency_hz_833",
+              "adjustment": 121500
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com2_coarse_up"
+          "description": "Increases the COM2 standby frequency in coarse (1 MHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com2_coarse_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com2_coarse_down"
+          "description": "Decreases the COM2 standby frequency in coarse (1 MHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com2_coarse_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com2_fine_up"
+          "description": "Increases the COM2 standby frequency in fine (25 kHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com2_fine_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com2_fine_down"
-        }
-      },
-      "ap": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/servos_toggle"
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/heading"
-        }
-      },
-      "nav": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/NAV"
-        }
-      },
-      "apr": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/approach"
-        }
-      },
-      "alt": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_hold"
-        },
-        "long-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_flc"
-        }
-      },
-      "vs": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/vertical_speed"
+          "description": "Decreases the COM2 standby frequency in fine (25 kHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com2_fine_down"
+            }
+          ]
         }
       }
     },
     "nav1": {
       "inner-knob-button": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_nav12"
+          "description": "Toggles between NAV1 and NAV2 tuning on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_nav12"
+            }
+          ]
         }
       },
       "swap": {
         "short-press": {
-          "type": "command",
-          "value": "sim/radios/nav1_standy_flip"
+          "description": "Swaps the active and standby frequencies for NAV1.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/nav1_standy_flip"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav1_coarse_up"
+          "description": "Increases the NAV1 standby frequency in coarse (1 MHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav1_coarse_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav1_coarse_down"
+          "description": "Decreases the NAV1 standby frequency in coarse (1 MHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav1_coarse_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav1_fine_up"
+          "description": "Increases the NAV1 standby frequency in fine (50 kHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav1_fine_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav1_fine_down"
-        }
-      },
-      "ap": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/servos_toggle"
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/heading"
-        }
-      },
-      "nav": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/NAV"
-        }
-      },
-      "apr": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/approach"
-        }
-      },
-      "alt": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_hold"
-        },
-        "long-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_flc"
-        }
-      },
-      "vs": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/vertical_speed"
+          "description": "Decreases the NAV1 standby frequency in fine (50 kHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav1_fine_down"
+            }
+          ]
         }
       }
     },
     "nav2": {
       "inner-knob-button": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_nav12"
+          "description": "Toggles between NAV1 and NAV2 tuning on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_nav12"
+            }
+          ]
         }
       },
       "swap": {
         "short-press": {
-          "type": "command",
-          "value": "sim/radios/nav2_standy_flip"
+          "description": "Swaps the active and standby frequencies for NAV2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/nav2_standy_flip"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav2_coarse_up"
+          "description": "Increases the NAV2 standby frequency in coarse (1 MHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav2_coarse_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav2_coarse_down"
+          "description": "Decreases the NAV2 standby frequency in coarse (1 MHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav2_coarse_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav2_fine_up"
+          "description": "Increases the NAV2 standby frequency in fine (50 kHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav2_fine_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav2_fine_down"
-        }
-      },
-      "ap": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/servos_toggle"
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/heading"
-        }
-      },
-      "nav": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/NAV"
-        }
-      },
-      "apr": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/approach"
-        }
-      },
-      "alt": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_hold"
-        },
-        "long-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_flc"
-        }
-      },
-      "vs": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/vertical_speed"
+          "description": "Decreases the NAV2 standby frequency in fine (50 kHz) increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav2_fine_down"
+            }
+          ]
         }
       }
     },
     "hdg": {
       "inner-knob-button": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_hdg_sync"
+          "description": "Synchronizes the heading bug to the current aircraft heading.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_hdg_sync"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/heading_mag",
-          "adjustment": 10,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Increases the autopilot heading bug in 10-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit/autopilot/heading_mag",
+              "adjustment": 10,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/heading_mag",
-          "adjustment": -10,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Decreases the autopilot heading bug in 10-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit/autopilot/heading_mag",
+              "adjustment": -10,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/heading_mag",
-          "adjustment": 1,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Increases the autopilot heading bug in 1-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit/autopilot/heading_mag",
+              "adjustment": 1,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/heading_mag",
-          "adjustment": -1,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
-        }
-      },
-      "ap": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/servos_toggle"
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/heading"
-        }
-      },
-      "nav": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/NAV"
-        }
-      },
-      "apr": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/approach"
-        }
-      },
-      "alt": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_hold"
-        },
-        "long-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_flc"
-        }
-      },
-      "vs": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/vertical_speed"
+          "description": "Decreases the autopilot heading bug in 1-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit/autopilot/heading_mag",
+              "adjustment": -1,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         }
       }
     },
     "baro": {
       "inner-knob-button": {
         "short-press": {
-          "type": "command",
-          "value": "sim/instruments/barometer_2992"
+          "description": "Sets the altimeter barometer to the standard 29.92 inHg.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/instruments/barometer_2992"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
-          "adjustment": 0.01
+          "description": "Increases the altimeter barometer setting by 0.01 inHg.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
+              "adjustment": 0.01
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
-          "adjustment": -0.01
+          "description": "Decreases the altimeter barometer setting by 0.01 inHg.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
+              "adjustment": -0.01
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
-          "adjustment": 0.01
+          "description": "Increases the altimeter barometer setting by 0.01 inHg.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
+              "adjustment": 0.01
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
-          "adjustment": -0.01
-        }
-      },
-      "ap": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/servos_toggle"
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/heading"
-        }
-      },
-      "nav": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/NAV"
-        }
-      },
-      "apr": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/approach"
-        }
-      },
-      "alt": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_hold"
-        },
-        "long-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_flc"
-        }
-      },
-      "vs": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/vertical_speed"
+          "description": "Decreases the altimeter barometer setting by 0.01 inHg.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
+              "adjustment": -0.01
+            }
+          ]
         }
       }
     },
     "crs1": {
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
-          "adjustment": -10,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV1 OBS course in 10-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
+              "adjustment": -10,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
-          "adjustment": 10,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV1 OBS course in 10-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
+              "adjustment": 10,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
-          "adjustment": -1,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV1 OBS course in 1-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
+              "adjustment": -1,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
-          "adjustment": 1,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
-        }
-      },
-      "ap": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/servos_toggle"
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/heading"
-        }
-      },
-      "nav": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/NAV"
-        }
-      },
-      "apr": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/approach"
-        }
-      },
-      "alt": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_hold"
-        },
-        "long-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_flc"
-        }
-      },
-      "vs": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/vertical_speed"
+          "description": "Adjusts the NAV1 OBS course in 1-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
+              "adjustment": 1,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         }
       }
     },
     "crs2": {
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
-          "adjustment": -10,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV2 OBS course in 10-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
+              "adjustment": -10,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
-          "adjustment": 10,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV2 OBS course in 10-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
+              "adjustment": 10,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
-          "adjustment": -1,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV2 OBS course in 1-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
+              "adjustment": -1,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
-          "adjustment": 1,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
-        }
-      },
-      "ap": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/servos_toggle"
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/heading"
-        }
-      },
-      "nav": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/NAV"
-        }
-      },
-      "apr": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/approach"
-        }
-      },
-      "alt": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_hold"
-        },
-        "long-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_flc"
-        }
-      },
-      "vs": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/vertical_speed"
+          "description": "Adjusts the NAV2 OBS course in 1-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
+              "adjustment": 1,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         }
       }
     },
     "fms1": {
       "direct-to": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_direct"
+          "description": "Activates the Direct-To function on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_direct"
+            }
+          ]
         }
       },
       "menu": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_menu"
+          "description": "Opens the menu on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_menu"
+            }
+          ]
         }
       },
       "clr": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_clr"
+          "description": "Clears entries or closes the active window on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_clr"
+            }
+          ]
         }
       },
       "ent": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_ent"
+          "description": "Confirms selections or entries on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_ent"
+            }
+          ]
         }
       },
-      "ap": {
+      "cdi": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_cdi"
+          "description": "Cycles through the CDI navigation sources on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_cdi"
+            }
+          ]
         }
       },
-      "hdg": {
+      "obs": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_obs"
+          "description": "Toggles OBS mode on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_obs"
+            }
+          ]
         }
       },
-      "nav": {
+      "msg": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_softkey12"
+          "description": "Presses the 12th softkey on the G1000 PFD, typically used to view messages.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_softkey12"
+            }
+          ]
         }
       },
-      "apr": {
+      "fpl": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_fpl"
+          "description": "Opens the Flight Plan page on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_fpl"
+            }
+          ]
         }
       },
-      "alt": {
+      "vnav": {
         "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/vnav"
+          "description": "Toggles the autopilot vertical navigation (VNAV) mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/vnav"
+            }
+          ]
         }
       },
-      "vs": {
+      "proc": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_proc"
+          "description": "Opens the Procedures page on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_proc"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_fms_outer_up"
+          "description": "Cycles forward through page groups on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_fms_outer_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_fms_outer_down"
+          "description": "Cycles backward through page groups on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_fms_outer_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_fms_inner_up"
+          "description": "Cycles forward through pages within a group on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_fms_inner_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_fms_inner_down"
+          "description": "Cycles backward through pages within a group on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_fms_inner_down"
+            }
+          ]
         }
       },
       "inner-knob-button": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_cursor"
+          "description": "Toggles the FMS cursor on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_cursor"
+            }
+          ]
         }
       }
     },
     "fms2": {
       "direct-to": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_direct"
+          "description": "Activates the Direct-To function on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_direct"
+            }
+          ]
         }
       },
       "menu": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_menu"
+          "description": "Opens the menu on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_menu"
+            }
+          ]
         }
       },
       "clr": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_clr"
+          "description": "Clears entries or closes the active window on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_clr"
+            }
+          ]
         }
       },
       "ent": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_ent"
+          "description": "Confirms selections or entries on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_ent"
+            }
+          ]
         }
       },
-      "ap": {
+      "cdi": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_cdi"
+          "description": "Cycles through the CDI navigation sources on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_cdi"
+            }
+          ]
         }
       },
-      "hdg": {
+      "obs": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_obs"
+          "description": "Toggles OBS mode on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_obs"
+            }
+          ]
         }
       },
-      "nav": {
+      "msg": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_msg"
+          "description": "Opens the message window on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_msg"
+            }
+          ]
         }
       },
-      "apr": {
+      "fpl": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_fpl"
+          "description": "Opens the Flight Plan page on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_fpl"
+            }
+          ]
         }
       },
-      "alt": {
+      "vnav": {
         "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/vnav"
+          "description": "Toggles the autopilot vertical navigation (VNAV) mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/vnav"
+            }
+          ]
         }
       },
-      "vs": {
+      "proc": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_proc"
+          "description": "Opens the Procedures page on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_proc"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_fms_outer_up"
+          "description": "Cycles forward through page groups on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_fms_outer_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_fms_outer_down"
+          "description": "Cycles backward through page groups on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_fms_outer_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_fms_inner_up"
+          "description": "Cycles forward through pages within a group on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_fms_inner_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_fms_inner_down"
+          "description": "Cycles backward through pages within a group on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_fms_inner_down"
+            }
+          ]
         }
       },
       "inner-knob-button": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_cursor"
+          "description": "Toggles the FMS cursor on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_cursor"
+            }
+          ]
         }
       }
     },
     "fms1-alt": {
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_range_down"
+          "description": "Zooms in the map on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_range_down"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_range_up"
+          "description": "Zooms out the map on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_range_up"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_range_down"
+          "description": "Zooms in the map on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_range_down"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_range_up"
+          "description": "Zooms out the map on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_range_up"
+            }
+          ]
         }
       }
     },
     "fms2-alt": {
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_range_down"
+          "description": "Zooms in the map on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_range_down"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_range_up"
+          "description": "Zooms out the map on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_range_up"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_range_down"
+          "description": "Zooms in the map on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_range_down"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/GPS/g1000n3_range_up"
+          "description": "Zooms out the map on the G1000 PFD 2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n3_range_up"
+            }
+          ]
         }
       }
     },
     "ap": {
       "ap": {
         "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/servos_toggle"
+          "description": "Toggles the autopilot servos on or off.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/servos_toggle"
+            }
+          ]
         }
       },
       "hdg": {
         "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/heading"
+          "description": "Toggles the autopilot heading hold mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/heading"
+            }
+          ]
         }
       },
       "nav": {
         "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/NAV"
+          "description": "Toggles the autopilot navigation mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/NAV"
+            }
+          ]
         }
       },
       "apr": {
         "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/approach"
+          "description": "Toggles the autopilot approach mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/approach"
+            }
+          ]
         }
       },
       "alt": {
         "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_hold"
+          "description": "Toggles the autopilot altitude hold mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/altitude_hold"
+            }
+          ]
         },
         "long-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_flc"
+          "description": "Toggles the flight level change mode on the G1000 PFD.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g1000n1_flc"
+            }
+          ]
         }
       },
       "vs": {
         "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/vertical_speed"
+          "description": "Toggles the autopilot vertical speed mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/vertical_speed"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_up"
+          "description": "Increases the autopilot pre-selected altitude.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/altitude_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_down"
+          "description": "Decreases the autopilot pre-selected altitude.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/altitude_down"
+            }
+          ]
         }
       },
       "inner-knob": {
-        "rotate-clockwise": [
-          {
-            "condition": {
-              "dataref": "sim/cockpit2/autopilot/altitude_mode",
-              "min": 5,
-              "max": 5
+        "rotate-clockwise": {
+          "description": "Increases the autopilot target airspeed while in flight level change (FLC) mode. Increases the autopilot target vertical speed.",
+          "actions": [
+            {
+              "condition": {
+                "dataref": "sim/cockpit2/autopilot/altitude_mode",
+                "min": 5,
+                "max": 5
+              },
+              "type": "command",
+              "value": "sim/autopilot/airspeed_up"
             },
-            "type": "command",
-            "value": "sim/autopilot/airspeed_up"
-          },
-          {
-            "type": "command",
-            "value": "sim/autopilot/vertical_speed_up"
-          }
-        ],
-        "rotate-counterclockwise": [
-          {
-            "condition": {
-              "dataref": "sim/cockpit2/autopilot/altitude_mode",
-              "min": 5,
-              "max": 5
+            {
+              "type": "command",
+              "value": "sim/autopilot/vertical_speed_up"
+            }
+          ]
+        },
+        "rotate-counterclockwise": {
+          "description": "Decreases the autopilot target airspeed while in flight level change (FLC) mode. Decreases the autopilot target vertical speed.",
+          "actions": [
+            {
+              "condition": {
+                "dataref": "sim/cockpit2/autopilot/altitude_mode",
+                "min": 5,
+                "max": 5
+              },
+              "type": "command",
+              "value": "sim/autopilot/airspeed_down"
             },
-            "type": "command",
-            "value": "sim/autopilot/airspeed_down"
-          },
-          {
-            "type": "command",
-            "value": "sim/autopilot/vertical_speed_down"
-          }
-        ]
+            {
+              "type": "command",
+              "value": "sim/autopilot/vertical_speed_down"
+            }
+          ]
+        }
       }
     },
     "ap-alt": {
       "outer-knob": {
-        "rotate-clockwise": [
-          {
-            "type": "dataref-adjust",
-            "value": "sim/cockpit2/switches/generic_lights_switch[6]",
-            "adjustment": 0.025,
-            "min": 0,
-            "max": 1,
-            "limit-type": "clamp",
-            "continue-to-next-action": true
-          },
-          {
-            "type": "command",
-            "value": "sim/instruments/panel_bright_up"
-          }
-        ],
-        "rotate-counterclockwise": [
-          {
-            "type": "dataref-adjust",
-            "value": "sim/cockpit2/switches/generic_lights_switch[6]",
-            "adjustment": -0.025,
-            "min": 0,
-            "max": 1,
-            "limit-type": "clamp",
-            "continue-to-next-action": true
-          },
-          {
-            "type": "command",
-            "value": "sim/instruments/panel_bright_down"
-          }
-        ]
+        "rotate-clockwise": {
+          "description": "Increases the instrument panel lighting brightness.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/switches/generic_lights_switch[6]",
+              "adjustment": 0.025,
+              "min": 0,
+              "max": 1,
+              "limit-type": "clamp",
+              "continue-to-next-action": true
+            },
+            {
+              "type": "command",
+              "value": "sim/instruments/panel_bright_up"
+            }
+          ]
+        },
+        "rotate-counterclockwise": {
+          "description": "Decreases the instrument panel lighting brightness.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/switches/generic_lights_switch[6]",
+              "adjustment": -0.025,
+              "min": 0,
+              "max": 1,
+              "limit-type": "clamp",
+              "continue-to-next-action": true
+            },
+            {
+              "type": "command",
+              "value": "sim/instruments/panel_bright_down"
+            }
+          ]
+        }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/instruments/instrument_bright_up",
-          "send-count": 3
+          "description": "Increases the instrument lighting brightness.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/instruments/instrument_bright_up",
+              "send-count": 3
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/instruments/instrument_bright_down",
-          "send-count": 3
+          "description": "Decreases the instrument lighting brightness.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/instruments/instrument_bright_down",
+              "send-count": 3
+            }
+          ]
         }
       }
     },
     "xpdr": {
       "inner-knob-button": {
         "short-press": {
-          "type": "command",
-          "value": "sim/transponder/transponder_ident"
+          "description": "Activates the transponder IDENT function.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_ident"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/transponder/transponder_12_up"
+          "description": "Increases the first two digits of the transponder code.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_12_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/transponder/transponder_12_down"
+          "description": "Decreases the first two digits of the transponder code.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_12_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/transponder/transponder_34_up"
+          "description": "Increases the last two digits of the transponder code.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_34_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/transponder/transponder_34_down"
-        }
-      },
-      "ap": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/servos_toggle"
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/heading"
-        }
-      },
-      "nav": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/NAV"
-        }
-      },
-      "apr": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/approach"
-        }
-      },
-      "alt": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_hold"
-        },
-        "long-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_flc"
-        }
-      },
-      "vs": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/vertical_speed"
+          "description": "Decreases the last two digits of the transponder code.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_34_down"
+            }
+          ]
         }
       }
     },
     "xpdr-mode": {
       "inner-knob-button": {
         "short-press": {
-          "type": "command",
-          "value": "sim/transponder/transponder_ident"
+          "description": "Activates the transponder IDENT function.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_ident"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/transponder/transponder_up"
+          "description": "Cycles forward through transponder modes (STBY, ON, ALT).",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/transponder/transponder_dn"
-        }
-      },
-      "ap": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/servos_toggle"
-        }
-      },
-      "hdg": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/heading"
-        }
-      },
-      "nav": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/NAV"
-        }
-      },
-      "apr": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/approach"
-        }
-      },
-      "alt": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_hold"
-        },
-        "long-press": {
-          "type": "command",
-          "value": "sim/GPS/g1000n1_flc"
-        }
-      },
-      "vs": {
-        "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/vertical_speed"
+          "description": "Cycles backward through transponder modes (STBY, ON, ALT).",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_dn"
+            }
+          ]
         }
       }
     }

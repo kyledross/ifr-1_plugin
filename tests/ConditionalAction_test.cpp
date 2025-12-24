@@ -49,17 +49,19 @@ TEST(ConditionalActionTest, ProcessEvent_FirstMatchingConditionWins) {
             {"ap", {
                 {"inner-knob", {
                     {"rotate-clockwise", {
-                        {
-                            {"conditions", {{{"dataref", "sim/cockpit2/autopilot/altitude_mode"}, {"min", 5}, {"max", 5}}}},
-                            {"type", "dataref-adjust"},
-                            {"value", "sim/cockpit/autopilot/airspeed_select"},
-                            {"adjustment", 1.0}
-                        },
-                        {
-                            {"type", "dataref-adjust"},
-                            {"value", "sim/cockpit/autopilot/vertical_velocity"},
-                            {"adjustment", 100.0}
-                        }
+                        {"actions", {
+                            {
+                                {"conditions", {{{"dataref", "sim/cockpit2/autopilot/altitude_mode"}, {"min", 5}, {"max", 5}}}},
+                                {"type", "dataref-adjust"},
+                                {"value", "sim/cockpit/autopilot/airspeed_select"},
+                                {"adjustment", 1.0}
+                            },
+                            {
+                                {"type", "dataref-adjust"},
+                                {"value", "sim/cockpit/autopilot/vertical_velocity"},
+                                {"adjustment", 100.0}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -101,10 +103,14 @@ TEST(ConditionalActionTest, ProcessEvent_SingleActionWithCondition) {
             {"ap", {
                 {"inner-knob", {
                     {"rotate-clockwise", {
-                        {"conditions", {{{"dataref", "sim/cockpit2/autopilot/altitude_mode"}, {"min", 5}, {"max", 5}}}},
-                        {"type", "dataref-adjust"},
-                        {"value", "sim/cockpit/autopilot/airspeed_select"},
-                        {"adjustment", 1.0}
+                        {"actions", {
+                            {
+                                {"conditions", {{{"dataref", "sim/cockpit2/autopilot/altitude_mode"}, {"min", 5}, {"max", 5}}}},
+                                {"type", "dataref-adjust"},
+                                {"value", "sim/cockpit/autopilot/airspeed_select"},
+                                {"adjustment", 1.0}
+                            }
+                        }}
                     }}
                 }}
             }}

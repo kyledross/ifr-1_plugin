@@ -1,3 +1,19 @@
+/*
+ *   Copyright 2025 Kyle D. Ross
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 #include "XPlaneSDK.h"
 #include "XPLMDataAccess.h"
 #include "XPLMUtilities.h"
@@ -10,11 +26,12 @@
 #include <map>
 #include <cstring>
 #include <filesystem>
+#include <format>
 
 struct SoundBuffer {
     std::vector<char> data;
-    int frequency;
-    int channels;
+    int frequency{};
+    int channels{};
 };
 
 class XPlaneSDK : public IXPlaneSDK {
@@ -106,7 +123,7 @@ public:
         m_logLevel = level;
     }
 
-    LogLevel GetLogLevel() const override {
+    [[nodiscard]] LogLevel GetLogLevel() const override {
         return m_logLevel;
     }
 
@@ -117,7 +134,7 @@ public:
     std::string GetSystemPath() override {
         char path[512];
         XPLMGetSystemPath(path);
-        return std::string(path);
+        return std::string{path};
     }
 
     bool FileExists(const std::string& path) override {
@@ -131,7 +148,7 @@ public:
             if (LoadWav(path, buffer)) {
                 it = m_sounds.emplace(path, std::move(buffer)).first;
             } else {
-                Log(LogLevel::Error, ("Failed to load sound: " + path).c_str());
+                Log(LogLevel::Error, std::format("Failed to load sound: {}", path).c_str());
                 return;
             }
         }
@@ -154,7 +171,7 @@ private:
     LogLevel m_logLevel = LogLevel::Info;
     std::map<std::string, SoundBuffer> m_sounds;
 
-    bool LoadWav(const std::string& path, SoundBuffer& buffer) {
+    static bool LoadWav(const std::string& path, SoundBuffer& buffer) {
         std::ifstream file(path, std::ios::binary);
         if (!file) return false;
 

@@ -31,10 +31,8 @@ FetchContent_Declare(
 # 2.1 hidapi configuration
 set(HIDAPI_BUILD_HIDTEST OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-if(UNIX AND NOT APPLE)
-    set(HIDAPI_WITH_LIBUSB OFF CACHE BOOL "" FORCE)
-    set(HIDAPI_WITH_HIDRAW ON CACHE BOOL "" FORCE)
-endif()
+set(HIDAPI_WITH_LIBUSB OFF CACHE BOOL "" FORCE)
+set(HIDAPI_WITH_HIDRAW ON CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(googletest json hidapi)
 
@@ -72,8 +70,9 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/src
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/embed_text.py
             ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE
+            ${CMAKE_CURRENT_SOURCE_DIR}/NOTICE
             ${EMBEDDED_LICENSE_HEADER}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/tools/embed_text.py
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/NOTICE ${CMAKE_CURRENT_SOURCE_DIR}/tools/embed_text.py
     VERBATIM
 )
 
@@ -88,6 +87,9 @@ add_library(ifr1flex_core STATIC
         src/core/OutputProcessor.cpp
         src/core/DeviceHandler.cpp
         src/core/ConditionEvaluator.cpp
+        src/core/ThreadSafeQueue.h
+        src/core/IHardwareManager.h
+        src/core/IFR1Protocol.h
 )
 target_include_directories(ifr1flex_core PUBLIC 
     src/core
@@ -104,6 +106,8 @@ target_link_libraries(ifr1flex_core PUBLIC
 add_library(ifr1flex SHARED 
     src/plugin_main.cpp
     src/ui/AboutWindow.cpp
+    src/ui/AboutWindow.h
+    src/ui/GLTextureHandle.h
 )
 add_dependencies(ifr1flex embed_resources)
 target_include_directories(ifr1flex PRIVATE 
@@ -130,8 +134,11 @@ add_executable(ifr1flex_tests
         tests/OutputProcessor_test.cpp
         tests/DeviceHandler_test.cpp
         tests/ConditionalAction_test.cpp
+        tests/ConfigValidation_test.cpp
+        tests/ThreadSafeQueue_test.cpp
 )
 target_include_directories(ifr1flex_tests PRIVATE tests)
+target_compile_definitions(ifr1flex_tests PRIVATE TEST_CONFIG_DIR="${CMAKE_CURRENT_SOURCE_DIR}/configs")
 target_link_libraries(ifr1flex_tests PRIVATE
         ifr1flex_core
         gtest_main

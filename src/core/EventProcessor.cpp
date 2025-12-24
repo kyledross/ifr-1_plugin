@@ -1,4 +1,21 @@
+/*
+ *   Copyright 2025 Kyle D. Ross
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 #include "EventProcessor.h"
+#include "Logger.h"
 #include <cmath>
 #include <regex>
 
@@ -30,11 +47,12 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
         config["modes"][mode].contains(control) && 
         config["modes"][mode][control].contains(action)) {
         
-        m_sdk.Log(LogLevel::Verbose, ("Event - mode: " + mode + ", control: " + control + ", action: " + action).c_str());
+        IFR1_LOG_VERBOSE(m_sdk, "Event - mode: {}, control: {}, action: {}", mode, control, action);
 
-        const auto& actionData = config["modes"][mode][control][action];
-        if (actionData.is_array()) {
-            for (const auto& actionConfig : actionData) {
+        const auto& eventConfig = config["modes"][mode][control][action];
+        
+        auto processActions = [&](const nlohmann::json& actions) {
+            for (const auto& actionConfig : actions) {
                 if (m_evaluator.EvaluateConditions(actionConfig, m_sdk.GetLogLevel() >= LogLevel::Verbose)) {
                     ExecuteAction(actionConfig);
                     if (!ShouldEvaluateNext(actionConfig)) {
@@ -42,10 +60,12 @@ void EventProcessor::ProcessEvent(const nlohmann::json& config,
                     }
                 }
             }
+        };
+
+        if (eventConfig.is_object() && eventConfig.contains("actions") && eventConfig["actions"].is_array()) {
+            processActions(eventConfig["actions"]);
         } else {
-            if (m_evaluator.EvaluateConditions(actionData, m_sdk.GetLogLevel() >= LogLevel::Verbose)) {
-                ExecuteAction(actionData);
-            }
+            IFR1_LOG_ERROR(m_sdk, "Event {}/{} in mode {} missing required 'actions' array", control, action, mode);
         }
     }
 }
@@ -61,26 +81,26 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
             if (times < 0) times = -times;
             
             if (times > 0) {
-                m_sdk.Log(LogLevel::Verbose, ("Queueing command: " + value + " (" + std::to_string(times) + " times)").c_str());
+                IFR1_LOG_VERBOSE(m_sdk, "Queueing command: {} ({} times)", value, times);
                 for (int i = 0; i < times; ++i) {
                     if (m_commandQueue.size() < 10) {
                         m_commandQueue.push(cmdRef);
                     } else {
-                        m_sdk.Log(LogLevel::Verbose, "Command queue full, discarding command");
+                        IFR1_LOG_VERBOSE(m_sdk, "Command queue full, discarding command");
                     }
                 }
             } else {
-                m_sdk.Log(LogLevel::Verbose, ("Skipping command: " + value + " (send-count is 0)").c_str());
+                IFR1_LOG_VERBOSE(m_sdk, "Skipping command: {} (send-count is 0)", value);
             }
         } else {
-            m_sdk.Log(LogLevel::Error, ("Command not found: " + value).c_str());
+            IFR1_LOG_ERROR(m_sdk, "Command not found: {}", value);
         }
     } else if (type == "dataref-set") {
         auto info = ParseDataRef(value);
         if (void* drRef = m_sdk.FindDataRef(info.name.c_str())) {
             if (actionConfig.contains("adjustment")) {
                 float adj = actionConfig["adjustment"].get<float>();
-                m_sdk.Log(LogLevel::Verbose, ("Setting dataref: " + value + " to " + std::to_string(adj)).c_str());
+                IFR1_LOG_VERBOSE(m_sdk, "Setting dataref: {} to {}", value, adj);
                 int types = m_sdk.GetDataRefTypes(drRef);
                 if (info.index != -1) {
                     if (types & static_cast<int>(DataRefType::IntArray)) {
@@ -97,7 +117,7 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
                 }
             }
         } else {
-            m_sdk.Log(LogLevel::Error, ("DataRef not found: " + value).c_str());
+            IFR1_LOG_ERROR(m_sdk, "DataRef not found: {}", value);
         }
     } else if (type == "dataref-adjust") {
         auto info = ParseDataRef(value);
@@ -140,7 +160,7 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
                 }
             }
             
-            m_sdk.Log(LogLevel::Verbose, ("Adjusting dataref: " + value + " (current: " + std::to_string(current) + ", adj: " + std::to_string(adj) + ") -> " + std::to_string(next)).c_str());
+            IFR1_LOG_VERBOSE(m_sdk, "Adjusting dataref: {} (current: {}, adj: {}) -> {}", value, current, adj, next);
 
             if (info.index != -1) {
                 if (isInt) {
@@ -156,12 +176,12 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
                 }
             }
         } else {
-            m_sdk.Log(LogLevel::Error, ("DataRef not found: " + value).c_str());
+            IFR1_LOG_ERROR(m_sdk, "DataRef not found: {}", value);
         }
     }
 }
 
-bool EventProcessor::ShouldEvaluateNext(const nlohmann::json& actionConfig) const
+bool EventProcessor::ShouldEvaluateNext(const nlohmann::json& actionConfig)
 {
     // Check at action level
     if (actionConfig.value("continue-to-next-action", false)) return true;

@@ -1,14 +1,35 @@
+/*
+ *   Copyright 2025 Kyle D. Ross
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 #pragma once
 #include "IHardwareManager.h"
 #include "IFR1Protocol.h"
 #include "EventProcessor.h"
 #include "OutputProcessor.h"
 #include "XPlaneSDK.h"
+#include "ThreadSafeQueue.h"
 #include <array>
+#include <thread>
+#include <atomic>
+#include <vector>
 
 class DeviceHandler {
 public:
-    DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk);
+    DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk, bool startThread = true);
+    ~DeviceHandler();
 
     /**
      * @brief Polls the device and processes any new data.
@@ -29,23 +50,39 @@ public:
      */
     void ClearLEDs();
 
+    /**
+     * @brief Performs one iteration of the hardware communication logic.
+     * Used by the worker thread or manually in tests.
+     */
+    void ProcessHardware();
+
 private:
-    void ProcessReport(const uint8_t* data, const nlohmann::json& config, float currentTime);
+    void ProcessReport(const IFR1::HardwareEvent& event, const nlohmann::json& config, float currentTime);
     static std::string GetModeString(IFR1::Mode mode, bool shifted);
-    static std::string GetControlString(IFR1::Button button);
+    static std::string GetControlString(IFR1::Button button, IFR1::Mode mode);
     void HandleKnobs(const IFR1::HardwareEvent& event, const nlohmann::json& config) const;
     void HandleButtons(const IFR1::HardwareEvent& event, const nlohmann::json& config, float currentTime);
     
+    void WorkerThread();
+    static IFR1::HardwareEvent ParseReport(const uint8_t* data);
 
     IHardwareManager& m_hw;
     EventProcessor& m_eventProc;
     OutputProcessor& m_outputProc;
     IXPlaneSDK& m_sdk;
 
+    // Threading
+    std::thread m_thread;
+    std::atomic<bool> m_running{false};
+    ThreadSafeQueue<IFR1::HardwareEvent> m_inputQueue;
+    ThreadSafeQueue<uint8_t> m_outputQueue;
+    std::atomic<bool> m_isConnected{false};
+
     // State
     IFR1::Mode m_currentMode = IFR1::Mode::COM1;
     bool m_shifted = false;
     uint8_t m_lastLedBits = 0;
+    bool m_lastConnectedState = false;
     
     // Button state tracking
     struct ButtonState {
@@ -54,6 +91,7 @@ private:
         bool longPressDetected = false;
     };
     std::array<ButtonState, 12> m_buttonStates;
+    std::vector<int> m_heldButtons;
     
     // Last raw report to detect changes
     std::array<uint8_t, IFR1::HID_REPORT_SIZE> m_lastReport{};

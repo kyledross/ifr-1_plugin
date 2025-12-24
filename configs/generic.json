@@ -5,452 +5,771 @@
     "com1": {
       "swap": {
         "short-press": {
-          "type": "command",
-          "value": "sim/radios/com1_standy_flip"
+          "description": "Swaps the active and standby frequencies for COM1.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/com1_standy_flip"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com1_coarse_up"
+          "description": "Increases the COM1 standby frequency in coarse increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com1_coarse_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com1_coarse_down"
+          "description": "Decreases the COM1 standby frequency in coarse increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com1_coarse_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com1_fine_up"
+          "description": "Increases the COM1 standby frequency in fine increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com1_fine_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com1_fine_down"
+          "description": "Decreases the COM1 standby frequency in fine increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com1_fine_down"
+            }
+          ]
         }
-      },
-      "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
-      "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },
-      "nav": { "short-press": { "type": "command", "value": "sim/autopilot/NAV" } },
-      "apr": { "short-press": { "type": "command", "value": "sim/autopilot/approach" } },
-      "alt": { "short-press": { "type": "command", "value": "sim/autopilot/altitude_hold" } },
-      "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } }
+      }
     },
     "com2": {
       "swap": {
         "short-press": {
-          "type": "command",
-          "value": "sim/radios/com2_standy_flip"
+          "description": "Swaps the active and standby frequencies for COM2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/com2_standy_flip"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com2_coarse_up"
+          "description": "Increases the COM2 standby frequency in coarse increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com2_coarse_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com2_coarse_down"
+          "description": "Decreases the COM2 standby frequency in coarse increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com2_coarse_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com2_fine_up"
+          "description": "Increases the COM2 standby frequency in fine increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com2_fine_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_com2_fine_down"
+          "description": "Decreases the COM2 standby frequency in fine increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_com2_fine_down"
+            }
+          ]
         }
-      },
-      "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
-      "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },
-      "nav": { "short-press": { "type": "command", "value": "sim/autopilot/NAV" } },
-      "apr": { "short-press": { "type": "command", "value": "sim/autopilot/approach" } },
-      "alt": { "short-press": { "type": "command", "value": "sim/autopilot/altitude_hold" } },
-      "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } }
+      }
     },
     "nav1": {
       "swap": {
         "short-press": {
-          "type": "command",
-          "value": "sim/radios/nav1_standy_flip"
+          "description": "Swaps the active and standby frequencies for NAV1.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/nav1_standy_flip"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav1_coarse_up"
+          "description": "Increases the NAV1 standby frequency in coarse increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav1_coarse_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav1_coarse_down"
+          "description": "Decreases the NAV1 standby frequency in coarse increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav1_coarse_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav1_fine_up"
+          "description": "Increases the NAV1 standby frequency in fine increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav1_fine_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav1_fine_down"
+          "description": "Decreases the NAV1 standby frequency in fine increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav1_fine_down"
+            }
+          ]
         }
-      },
-      "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
-      "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },
-      "nav": { "short-press": { "type": "command", "value": "sim/autopilot/NAV" } },
-      "apr": { "short-press": { "type": "command", "value": "sim/autopilot/approach" } },
-      "alt": { "short-press": { "type": "command", "value": "sim/autopilot/altitude_hold" } },
-      "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } }
+      }
     },
     "nav2": {
       "swap": {
         "short-press": {
-          "type": "command",
-          "value": "sim/radios/nav2_standy_flip"
+          "description": "Swaps the active and standby frequencies for NAV2.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/nav2_standy_flip"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav2_coarse_up"
+          "description": "Increases the NAV2 standby frequency in coarse increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav2_coarse_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav2_coarse_down"
+          "description": "Decreases the NAV2 standby frequency in coarse increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav2_coarse_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav2_fine_up"
+          "description": "Increases the NAV2 standby frequency in fine increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav2_fine_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/radios/stby_nav2_fine_down"
+          "description": "Decreases the NAV2 standby frequency in fine increments.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/radios/stby_nav2_fine_down"
+            }
+          ]
         }
-      },
-      "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
-      "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },
-      "nav": { "short-press": { "type": "command", "value": "sim/autopilot/NAV" } },
-      "apr": { "short-press": { "type": "command", "value": "sim/autopilot/approach" } },
-      "alt": { "short-press": { "type": "command", "value": "sim/autopilot/altitude_hold" } },
-      "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } }
+      }
     },
     "ap": {
       "swap": {
         "short-press": {
-          "type": "command",
-          "value": "sim/autopilot/flight_level_change"
+          "description": "Toggles the autopilot flight level change (FLC) mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/flight_level_change"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_up"
+          "description": "Increases the autopilot pre-selected altitude.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/altitude_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/autopilot/altitude_down"
+          "description": "Decreases the autopilot pre-selected altitude.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/altitude_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/autopilot/vertical_speed_up"
+          "description": "Increases the autopilot target vertical speed.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/vertical_speed_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/autopilot/vertical_speed_down"
+          "description": "Decreases the autopilot target vertical speed.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/vertical_speed_down"
+            }
+          ]
         }
       },
-      "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
-      "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },
-      "nav": { "short-press": { "type": "command", "value": "sim/autopilot/NAV" } },
-      "apr": { "short-press": { "type": "command", "value": "sim/autopilot/approach" } },
-      "alt": { "short-press": { "type": "command", "value": "sim/autopilot/altitude_hold" } },
-      "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } }
+      "ap": {
+        "short-press": {
+          "description": "Toggles the autopilot servos on or off.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/servos_toggle"
+            }
+          ]
+        }
+      },
+      "hdg": {
+        "short-press": {
+          "description": "Toggles the autopilot heading hold mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/heading"
+            }
+          ]
+        }
+      },
+      "nav": {
+        "short-press": {
+          "description": "Toggles the autopilot navigation mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/NAV"
+            }
+          ]
+        }
+      },
+      "apr": {
+        "short-press": {
+          "description": "Toggles the autopilot approach mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/approach"
+            }
+          ]
+        }
+      },
+      "alt": {
+        "short-press": {
+          "description": "Toggles the autopilot altitude hold mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/altitude_hold"
+            }
+          ]
+        }
+      },
+      "vs": {
+        "short-press": {
+          "description": "Toggles the autopilot vertical speed mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/vertical_speed"
+            }
+          ]
+        }
+      }
     },
     "ap-alt": {
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/instruments/panel_bright_up"
+          "description": "Increases the panel lighting brightness.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/instruments/panel_bright_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/instruments/panel_bright_down"
+          "description": "Decreases the panel lighting brightness.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/instruments/panel_bright_down"
+            }
+          ]
         }
       },
       "inner-knob": {
-        "rotate-clockwise": { "type": "command", "value": "sim/instruments/instrument_bright_up" },
-        "rotate-counterclockwise": { "type": "command", "value": "sim/instruments/instrument_bright_down" }
+        "rotate-clockwise": {
+          "description": "Increases the instrument lighting brightness.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/instruments/instrument_bright_up"
+            }
+          ]
+        },
+        "rotate-counterclockwise": {
+          "description": "Decreases the instrument lighting brightness.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/instruments/instrument_bright_down"
+            }
+          ]
+        }
       }
     },
     "xpdr": {
       "inner-knob-button": {
         "short-press": {
-          "type": "command",
-          "value": "sim/transponder/transponder_ident"
+          "description": "Activates the transponder IDENT function.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_ident"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/transponder/transponder_12_up"
+          "description": "Increases the first two digits of the transponder code.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_12_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/transponder/transponder_12_down"
+          "description": "Decreases the first two digits of the transponder code.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_12_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/transponder/transponder_34_up"
+          "description": "Increases the last two digits of the transponder code.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_34_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/transponder/transponder_34_down"
+          "description": "Decreases the last two digits of the transponder code.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_34_down"
+            }
+          ]
         }
-      },
-      "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
-      "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },
-      "nav": { "short-press": { "type": "command", "value": "sim/autopilot/NAV" } },
-      "apr": { "short-press": { "type": "command", "value": "sim/autopilot/approach" } },
-      "alt": { "short-press": { "type": "command", "value": "sim/autopilot/altitude_hold" } },
-      "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } }
+      }
     },
     "hdg": {
       "inner-knob-button": {
         "short-press": {
-          "type": "command",
-          "value": "sim/instruments/heading_sync"
+          "description": "Synchronizes the heading bug to the current aircraft heading.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/instruments/heading_sync"
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/heading_mag",
-          "adjustment": 10,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Increases the autopilot heading bug in 10-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit/autopilot/heading_mag",
+              "adjustment": 10,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/heading_mag",
-          "adjustment": -10,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Decreases the autopilot heading bug in 10-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit/autopilot/heading_mag",
+              "adjustment": -10,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/heading_mag",
-          "adjustment": 1,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Increases the autopilot heading bug in 1-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit/autopilot/heading_mag",
+              "adjustment": 1,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit/autopilot/heading_mag",
-          "adjustment": -1,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Decreases the autopilot heading bug in 1-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit/autopilot/heading_mag",
+              "adjustment": -1,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         }
-      },
-      "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
-      "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },
-      "nav": { "short-press": { "type": "command", "value": "sim/autopilot/NAV" } },
-      "apr": { "short-press": { "type": "command", "value": "sim/autopilot/approach" } },
-      "alt": { "short-press": { "type": "command", "value": "sim/autopilot/altitude_hold" } },
-      "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } }
+      }
     },
     "baro": {
       "inner-knob-button": {
         "short-press": {
-          "type": "dataref-set",
-          "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
-          "adjustment": 29.92
+          "description": "Sets the altimeter barometer to the standard 29.92 inHg.",
+          "actions": [
+            {
+              "type": "dataref-set",
+              "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
+              "adjustment": 29.92
+            }
+          ]
         }
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/instruments/barometer_up"
+          "description": "Increases the altimeter barometer setting.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/instruments/barometer_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/instruments/barometer_down"
+          "description": "Decreases the altimeter barometer setting.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/instruments/barometer_down"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/instruments/barometer_up"
+          "description": "Increases the altimeter barometer setting.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/instruments/barometer_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/instruments/barometer_down"
+          "description": "Decreases the altimeter barometer setting.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/instruments/barometer_down"
+            }
+          ]
         }
-      },
-      "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
-      "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },
-      "nav": { "short-press": { "type": "command", "value": "sim/autopilot/NAV" } },
-      "apr": { "short-press": { "type": "command", "value": "sim/autopilot/approach" } },
-      "alt": { "short-press": { "type": "command", "value": "sim/autopilot/altitude_hold" } },
-      "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } }
+      }
     },
     "crs1": {
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
-          "adjustment": 10,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV1 OBS course in 10-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
+              "adjustment": 10,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
-          "adjustment": -10,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV1 OBS course in 10-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
+              "adjustment": -10,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
-          "adjustment": 1,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV1 OBS course in 1-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
+              "adjustment": 1,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
-          "adjustment": -1,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV1 OBS course in 1-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot",
+              "adjustment": -1,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         }
-      },
-      "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
-      "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },
-      "nav": { "short-press": { "type": "command", "value": "sim/autopilot/NAV" } },
-      "apr": { "short-press": { "type": "command", "value": "sim/autopilot/approach" } },
-      "alt": { "short-press": { "type": "command", "value": "sim/autopilot/altitude_hold" } },
-      "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } }
+      }
     },
     "crs2": {
       "outer-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
-          "adjustment": 10,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV2 OBS course in 10-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
+              "adjustment": 10,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
-          "adjustment": -10,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV2 OBS course in 10-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
+              "adjustment": -10,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
-          "adjustment": 1,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV2 OBS course in 1-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
+              "adjustment": 1,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "dataref-adjust",
-          "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
-          "adjustment": -1,
-          "min": 0,
-          "max": 359,
-          "limit-type": "wrap"
+          "description": "Adjusts the NAV2 OBS course in 1-degree increments.",
+          "actions": [
+            {
+              "type": "dataref-adjust",
+              "value": "sim/cockpit2/radios/actuators/nav2_obs_deg_mag_copilot",
+              "adjustment": -1,
+              "min": 0,
+              "max": 359,
+              "limit-type": "wrap"
+            }
+          ]
         }
-      },
-      "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
-      "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },
-      "nav": { "short-press": { "type": "command", "value": "sim/autopilot/NAV" } },
-      "apr": { "short-press": { "type": "command", "value": "sim/autopilot/approach" } },
-      "alt": { "short-press": { "type": "command", "value": "sim/autopilot/altitude_hold" } },
-      "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } }
+      }
     },
     "xpdr-mode": {
       "inner-knob-button": {
         "short-press": {
-          "type": "command",
-          "value": "sim/transponder/transponder_ident"
+          "description": "Activates the transponder IDENT function.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_ident"
+            }
+          ]
         }
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "type": "command",
-          "value": "sim/transponder/transponder_up"
+          "description": "Cycles forward through transponder modes (STBY, ON, ALT).",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_up"
+            }
+          ]
         },
         "rotate-counterclockwise": {
-          "type": "command",
-          "value": "sim/transponder/transponder_dn"
+          "description": "Cycles backward through transponder modes (STBY, ON, ALT).",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/transponder/transponder_dn"
+            }
+          ]
         }
-      },
-      "ap": { "short-press": { "type": "command", "value": "sim/autopilot/servos_toggle" } },
-      "hdg": { "short-press": { "type": "command", "value": "sim/autopilot/heading" } },
-      "nav": { "short-press": { "type": "command", "value": "sim/autopilot/NAV" } },
-      "apr": { "short-press": { "type": "command", "value": "sim/autopilot/approach" } },
-      "alt": { "short-press": { "type": "command", "value": "sim/autopilot/altitude_hold" } },
-      "vs": { "short-press": { "type": "command", "value": "sim/autopilot/vertical_speed" } }
+      }
     }
   },
   "output": {
     "ap": {
       "conditions": [
-        { "dataref": "sim/cockpit/autopilot/autopilot_mode", "min": 2, "max": 2, "mode": "solid" }
+        {
+          "dataref": "sim/cockpit/autopilot/autopilot_mode",
+          "min": 2,
+          "max": 2,
+          "mode": "solid"
+        }
       ]
     },
     "hdg": {
       "conditions": [
-        { "dataref": "sim/cockpit/autopilot/autopilot_state", "bit":  1, "mode": "solid" }
+        {
+          "dataref": "sim/cockpit/autopilot/autopilot_state",
+          "bit": 1,
+          "mode": "solid"
+        }
       ]
     },
     "nav": {
       "conditions": [
-        { "dataref": "sim/cockpit/autopilot/autopilot_state", "bit":  9, "mode": "solid" }
+        {
+          "dataref": "sim/cockpit/autopilot/autopilot_state",
+          "bit": 9,
+          "mode": "solid"
+        }
       ]
     },
     "apr": {
       "conditions": [
-        { "dataref": "sim/cockpit2/autopilot/approach_status", "min": 1, "max": 1, "mode": "blink" },
-        { "dataref": "sim/cockpit2/autopilot/approach_status", "min": 2, "max": 2, "mode": "solid" }
+        {
+          "dataref": "sim/cockpit2/autopilot/approach_status",
+          "min": 1,
+          "max": 1,
+          "mode": "blink"
+        },
+        {
+          "dataref": "sim/cockpit2/autopilot/approach_status",
+          "min": 2,
+          "max": 2,
+          "mode": "solid"
+        }
       ]
     },
     "alt": {
       "conditions": [
-        { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 6, "max": 6, "mode": "solid" },
-        { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 5, "max": 5, "mode": "blink" }
+        {
+          "dataref": "sim/cockpit2/autopilot/altitude_mode",
+          "min": 6,
+          "max": 6,
+          "mode": "solid"
+        },
+        {
+          "dataref": "sim/cockpit2/autopilot/altitude_mode",
+          "min": 5,
+          "max": 5,
+          "mode": "blink"
+        }
       ]
     },
     "vs": {
       "conditions": [
-        { "dataref": "sim/cockpit2/autopilot/altitude_mode", "min": 4, "max": 4, "mode": "solid" }
+        {
+          "dataref": "sim/cockpit2/autopilot/altitude_mode",
+          "min": 4,
+          "max": 4,
+          "mode": "solid"
+        }
       ]
     }
   }

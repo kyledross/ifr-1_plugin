@@ -1,4 +1,21 @@
+/*
+ *   Copyright 2025 Kyle D. Ross
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 #include "ConditionEvaluator.h"
+#include "Logger.h"
 #include <string>
 #include <regex>
 
@@ -25,7 +42,7 @@ bool ConditionEvaluator::EvaluateCondition(const nlohmann::json& condition, bool
     auto info = ParseDataRef(rawDrName);
     void* drRef = m_sdk.FindDataRef(info.name.c_str());
     if (!drRef) {
-        m_sdk.Log(LogLevel::Verbose, ("Condition failed - DataRef not found: " + info.name).c_str());
+        IFR1_LOG_VERBOSE(m_sdk, "Condition failed - DataRef not found: {}", info.name);
         return false;
     }
 
@@ -46,27 +63,23 @@ bool ConditionEvaluator::EvaluateCondition(const nlohmann::json& condition, bool
     }
 
     bool result = false;
-    std::string testDesc;
 
     if (condition.contains("bit")) {
         int bit = condition["bit"].get<int>();
         result = (static_cast<int>(val) & (1 << bit)) != 0;
-        if (verbose) {
-            testDesc = "bit " + std::to_string(bit) + " set";
-        }
     } else if (condition.contains("min") && condition.contains("max")) {
         double minVal = condition["min"].get<double>();
         double maxVal = condition["max"].get<double>();
         result = (val >= minVal && val <= maxVal);
-        if (verbose) {
-            testDesc = "range [" + std::to_string(minVal) + ", " + std::to_string(maxVal) + "]";
-        }
     }
 
-    if (verbose) {
-        std::string msg = "Testing " + rawDrName + " (value: " + std::to_string(val) + ") against " + testDesc + " -> " + (result ? "TRUE" : "FALSE");
-        m_sdk.Log(LogLevel::Verbose, msg.c_str());
-    }
+    IFR1_LOG_VERBOSE_IF(m_sdk, verbose, "Testing {} (value: {}) against {} -> {}", rawDrName, val,
+        [&] {
+            if (condition.contains("bit")) return std::format("bit {} set", condition["bit"].get<int>());
+            if (condition.contains("min") && condition.contains("max")) return std::format("range [{}, {}]", condition["min"].get<double>(), condition["max"].get<double>());
+            return std::string("unknown test");
+        }(),
+        result ? "TRUE" : "FALSE");
 
     return result;
 }
@@ -74,17 +87,18 @@ bool ConditionEvaluator::EvaluateCondition(const nlohmann::json& condition, bool
 bool ConditionEvaluator::EvaluateConditions(const nlohmann::json& actionConfig, bool verbose) const {
     // If there is no "conditions" or "condition" key, it's always true (default action)
     if (!actionConfig.contains("conditions") && !actionConfig.contains("condition")) {
-        m_sdk.Log(LogLevel::Verbose, "No conditions for this action, assuming TRUE");
+        IFR1_LOG_VERBOSE(m_sdk, "No conditions for this action, assuming TRUE");
         return true;
     }
 
     if (actionConfig.contains("conditions")) {
         const auto& conditions = actionConfig["conditions"];
         if (conditions.is_array()) {
-            for (const auto& condition : conditions) {
-                if (!EvaluateCondition(condition, verbose)) return false;
-            }
-            return true;
+            return std::ranges::all_of(conditions,
+                                       [this, verbose](const auto& condition)
+                                       {
+                                           return EvaluateCondition(condition, verbose);
+                                       });
         } else {
             return EvaluateCondition(conditions, verbose);
         }

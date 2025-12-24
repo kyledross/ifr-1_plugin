@@ -1,4 +1,4 @@
-# IFR-1 Flex Flight Controller Plugin for X-Plane 12 on Linux
+# IFR-1 Flight Controller Plugin for X-Plane 12 on Linux
 Copyright 2025 Kyle D. Ross
 See LICENSE for details.
 
@@ -8,9 +8,9 @@ This software is not affiliated with, endorsed by, or supported by Octavi GmbH o
 
 ## What is this?
 
-**IFR-1 Flex** is a native X-Plane plugin that integrates the Octavi IFR-1 hardware controller with X-Plane 12 on Linux. 
+**IFR-1 Flight Controller Plugin** is a native X-Plane plugin that integrates the Octavi IFR-1 hardware controller with X-Plane 12 on Linux. 
 
-Unlike other plugins, IFR-1 Flex is designed for maximum flexibility. It uses a JSON-based configuration system that allows you to map hardware events (knob rotations, button presses) to any X-Plane command or dataref. This means you can easily customize the controller for any aircraft, even those with complex custom systems, without writing any code.
+Unlike other plugins, IFR-1 Flight Controller Plugin is designed for maximum flexibility. It uses a JSON-based configuration system that allows you to map hardware events (knob rotations, button presses) to any X-Plane command or dataref. This means you can easily customize the controller for any aircraft, even those with complex custom systems, without writing any code.
 
 ### Why not Windows?
 There are already well-established plugins for Windows that provide similar functionality. See the IFR-1's webpage at https://www.octavi.net/ for more information.

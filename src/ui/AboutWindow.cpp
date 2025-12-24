@@ -1,6 +1,23 @@
+/*
+ *   Copyright 2025 Kyle D. Ross
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 // AboutWindow.cpp - Implementation of the plugin's About dialog
 
 #include "ui/AboutWindow.h"
+#include "ui/GLTextureHandle.h"
 
 #include "XPLMDisplay.h"
 #include "XPLMGraphics.h"
@@ -16,24 +33,7 @@
 #include "resources_embedded.h"
 #include "license_embedded.h"
 
-// OpenGL for texture creation/draw
-#if defined(_WIN32)
-  #include <GL/gl.h>
-#elif defined(__APPLE__)
-  #include <OpenGL/gl.h>
-#else
-  #include <GL/gl.h>
-#endif
-
-#if defined(_WIN32)
-  #include <windows.h>
-  #include <shellapi.h>
-#elif defined(__APPLE__)
-  #include <TargetConditionals.h>
-  #include <unistd.h>
-#else
-  #include <unistd.h>
-#endif
+#include <unistd.h>
 
 namespace ui::about
 {
@@ -43,7 +43,7 @@ namespace ui::about
   static bool g_aboutMonitorRegistered = false;
 
   // QR image/texture state
-  static GLuint g_qrTexture = 0;
+  static GLTextureHandle g_qrTexture;
   static int g_qrImgW = 0;
   static int g_qrImgH = 0;
   static bool g_qrTextureLoaded = false;
@@ -133,7 +133,7 @@ namespace ui::about
     constexpr int w = (int)::g_qr_w;
     constexpr int h = (int)::g_qr_h;
 
-    glGenTextures(1, &g_qrTexture);
+    g_qrTexture.Gen();
     glBindTexture(GL_TEXTURE_2D, g_qrTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -147,33 +147,17 @@ namespace ui::about
   }
 
   static void DestroyQRTexture() {
-    if (g_qrTexture != 0) {
-      glDeleteTextures(1, &g_qrTexture);
-      g_qrTexture = 0;
-    }
+    g_qrTexture.Reset();
     g_qrTextureLoaded = false;
     g_qrImgW = g_qrImgH = 0;
   }
 
-  // ReSharper disable once CppDFAConstantParameter
-  static void OpenURLCrossPlatform(const char* url) {
-#if defined(_WIN32)
-    ShellExecuteA(nullptr, "open", url, nullptr, nullptr, SW_SHOWNORMAL);
-#elif defined(__APPLE__)
-    // macOS: use the 'open' command
-    pid_t pid = fork();
-    if (pid == 0) {
-      execlp("open", "open", url, (char*)nullptr);
-      _exit(0);
-    }
-#else
-    // Linux: try xdg-open
+  static void OpenURL(const char* url) {
     pid_t pid = fork();
     if (pid == 0) {
       execlp("xdg-open", "xdg-open", url, static_cast<char*>(nullptr));
       _exit(0);
     }
-#endif
   }
 
   // Forward declarations for window callbacks
@@ -250,7 +234,7 @@ namespace ui::about
     XPLMGetFontDimensions(xplmFont_Basic, &char_w, &line_h, nullptr);
 
     int title_y = t - 26; // tighten top padding a bit
-    XPLMDrawString(white, l + 20, title_y, const_cast<char *>("IFR-1 Flight Controller Flexible Plugin"),
+    XPLMDrawString(white, l + 20, title_y, const_cast<char *>("IFR-1 Flight Controller Plugin"),
                    nullptr, xplmFont_Basic);
 
     // Body text
@@ -450,7 +434,7 @@ namespace ui::about
     if (inMouse == xplm_MouseDown) {
       // If click is inside QR code, open URL
       if (x >= g_qrLeft && x <= g_qrRight && y >= g_qrBottom && y <= g_qrTop) {
-        OpenURLCrossPlatform("https://buymeacoffee.com/kyledross");
+        OpenURL("https://buymeacoffee.com/kyledross");
         return 1;
       }
 

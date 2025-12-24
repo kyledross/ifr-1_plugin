@@ -1,6 +1,20 @@
 #!/bin/bash
 #
-# Setup script for IFR-1 Flex Plugin
+#   Copyright 2025 Kyle D. Ross
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+# Setup script for IFR-1 Flight Controller Plugin
 #
 
 # Color definitions
@@ -55,9 +69,9 @@ USER_HOME=$(eval echo "~$ORIGINAL_USER")
 
 # Welcome message
 echo -e "${BLUE}=============================================${NC}"
-echo -e "${BLUE} IFR-1 Flex Plugin Setup            ${NC}"
+echo -e "${BLUE} IFR-1 Flight Controller Plugin Setup            ${NC}"
 echo -e "${BLUE}                                            ${NC}"
-echo -e "${BLUE} This will setup the IFR-1 Flex     ${NC}"
+echo -e "${BLUE} This will setup the IFR-1 Flight Controller    ${NC}"
 echo -e "${BLUE} plugin for use in X-Plane 12 in Linux.    ${NC}"
 echo -e "${BLUE}=============================================${NC}"
 
@@ -194,7 +208,7 @@ PLUGIN_DIR="$PLUGIN_BASE_DIR/lin_x64"
 CONFIGS_TARGET_DIR="$PLUGIN_BASE_DIR/configs"
 TARGET_PLUGIN="$PLUGIN_DIR/ifr1flex.xpl"
 
-info "Installing IFR-1 Flex Plugin to X-Plane..."
+info "Installing IFR-1 Flight Controller Plugin to X-Plane..."
 
 # Create the plugin directory
 if mkdir -p "$PLUGIN_DIR"; then
@@ -235,7 +249,7 @@ else
     warning "Failed to set plugin binary as executable. X-Plane may not load it."
 fi
 
-success "IFR-1 Flex Plugin successfully installed to X-Plane."
+success "IFR-1 Flight Controller Plugin successfully installed to X-Plane."
 
 # Set up udev rules
 UDEV_RULE_FILE="/etc/udev/rules.d/99-ifr1.rules"
@@ -294,7 +308,7 @@ fi
 
 # Final success message
 echo -e "${GREEN}==================================================${NC}"
-echo -e "${GREEN} IFR-1 Flex Plugin Setup Complete    ${NC}"
+echo -e "${GREEN} IFR-1 Flight Controller Plugin Setup Complete    ${NC}"
 echo -e "${GREEN}==================================================${NC}"
 
 if [ "$XPLANE_RUNNING" = true ]; then

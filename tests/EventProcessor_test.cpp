@@ -52,8 +52,12 @@ TEST(EventProcessorTest, ProcessEvent_CallsCommandOnce) {
             {"com1", {
                 {"swap", {
                     {"short-press", {
-                        {"type", "command"},
-                        {"value", "sim/radios/com1_standy_flip"}
+                        {"actions", {
+                            {
+                                {"type", "command"},
+                                {"value", "sim/radios/com1_standy_flip"}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -78,9 +82,13 @@ TEST(EventProcessorTest, ProcessEvent_CallsSetDataf) {
             {"com1", {
                 {"swap", {
                     {"long-press", {
-                        {"type", "dataref-set"},
-                        {"value", "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833"},
-                        {"adjustment", 121500}
+                        {"actions", {
+                            {
+                                {"type", "dataref-set"},
+                                {"value", "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833"},
+                                {"adjustment", 121500}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -105,12 +113,16 @@ TEST(EventProcessorTest, ProcessEvent_CallsDatarefAdjustWrap) {
             {"hdg", {
                 {"inner-knob", {
                     {"rotate-clockwise", {
-                        {"type", "dataref-adjust"},
-                        {"value", "sim/cockpit/autopilot/heading_mag"},
-                        {"adjustment", 1.0},
-                        {"min", 0.0},
-                        {"max", 359.0},
-                        {"limit-type", "wrap"}
+                        {"actions", {
+                            {
+                                {"type", "dataref-adjust"},
+                                {"value", "sim/cockpit/autopilot/heading_mag"},
+                                {"adjustment", 1.0},
+                                {"min", 0.0},
+                                {"max", 359.0},
+                                {"limit-type", "wrap"}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -136,12 +148,16 @@ TEST(EventProcessorTest, ProcessEvent_CallsDatarefAdjustClamp) {
             {"ap", {
                 {"outer-knob", {
                     {"rotate-counterclockwise", {
-                        {"type", "dataref-adjust"},
-                        {"value", "sim/cockpit/autopilot/altitude"},
-                        {"adjustment", -100.0},
-                        {"min", 0.0},
-                        {"max", 40000.0},
-                        {"limit-type", "clamp"}
+                        {"actions", {
+                            {
+                                {"type", "dataref-adjust"},
+                                {"value", "sim/cockpit/autopilot/altitude"},
+                                {"adjustment", -100.0},
+                                {"min", 0.0},
+                                {"max", 40000.0},
+                                {"limit-type", "clamp"}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -167,17 +183,21 @@ TEST(EventProcessorTest, ProcessEvent_AdjustsIntDataref) {
             {"xpdr", {
                 {"inner-knob", {
                     {"rotate-clockwise", {
-                        {"type", "dataref-adjust"},
-                        {"value", "sim/transponder/transponder_code"},
-                        {"adjustment", 1.0},
-                        {"min", 0.0},
-                        {"max", 7777.0}
+                        {"actions", {
+                            {
+                                {"type", "dataref-adjust"},
+                                {"value", "sim/transponder/transponder_code"},
+                                {"adjustment", 1.0},
+                                {"min", 0.0},
+                                {"max", 7777.0}
+                            }
+                        }}
                     }}
                 }}
             }}
         }}
     };
-    
+
     void* dummyDr = reinterpret_cast<void*>(0x1234);
     EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/transponder/transponder_code")))
         .WillOnce(Return(dummyDr));
@@ -197,8 +217,12 @@ TEST(EventProcessorTest, ProcessEvent_LogsAtVerboseLevel) {
             {"com1", {
                 {"swap", {
                     {"short-press", {
-                        {"type", "command"},
-                        {"value", "sim/radios/com1_standy_flip"}
+                        {"actions", {
+                            {
+                                {"type", "command"},
+                                {"value", "sim/radios/com1_standy_flip"}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -211,7 +235,7 @@ TEST(EventProcessorTest, ProcessEvent_LogsAtVerboseLevel) {
     EXPECT_CALL(mockSdk, CommandOnce(dummyCmd));
     
     // GetLogLevel should be called to check if verbose logging is enabled for conditions
-    EXPECT_CALL(mockSdk, GetLogLevel()).WillRepeatedly(Return(LogLevel::Info));
+    EXPECT_CALL(mockSdk, GetLogLevel()).WillRepeatedly(Return(LogLevel::Verbose));
 
     // Log should be called with Verbose level for the event and action
     EXPECT_CALL(mockSdk, Log(LogLevel::Verbose, ::testing::_)).WillRepeatedly(Return());
@@ -231,15 +255,17 @@ TEST(EventProcessorTest, ProcessEvent_ExecutesMultipleActionsWhenRequested) {
             {"com1", {
                 {"swap", {
                     {"short-press", {
-                        {
-                            {"condition", {{"dataref", "sim/test/dr1"}, {"min", 1}, {"max", 1}, {"continue-to-next-action", true}}},
-                            {"type", "command"},
-                            {"value", "sim/test/cmd1"}
-                        },
-                        {
-                            {"type", "command"},
-                            {"value", "sim/test/cmd2"}
-                        }
+                        {"actions", {
+                            {
+                                {"condition", {{"dataref", "sim/test/dr1"}, {"min", 1}, {"max", 1}, {"continue-to-next-action", true}}},
+                                {"type", "command"},
+                                {"value", "sim/test/cmd1"}
+                            },
+                            {
+                                {"type", "command"},
+                                {"value", "sim/test/cmd2"}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -274,15 +300,17 @@ TEST(EventProcessorTest, ProcessEvent_StopsAtFirstMatchByDefaultForArray) {
             {"com1", {
                 {"swap", {
                     {"short-press", {
-                        {
-                            {"condition", {{"dataref", "sim/test/dr1"}, {"min", 1}, {"max", 1}}},
-                            {"type", "command"},
-                            {"value", "sim/test/cmd1"}
-                        },
-                        {
-                            {"type", "command"},
-                            {"value", "sim/test/cmd2"}
-                        }
+                        {"actions", {
+                            {
+                                {"condition", {{"dataref", "sim/test/dr1"}, {"min", 1}, {"max", 1}}},
+                                {"type", "command"},
+                                {"value", "sim/test/cmd1"}
+                            },
+                            {
+                                {"type", "command"},
+                                {"value", "sim/test/cmd2"}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -323,9 +351,13 @@ TEST(EventProcessorTest, DataRefAdjust_ArrayFloat) {
             {"com1", {
                 {"knob_inner", {
                     {"rotate_cw", {
-                        {"type", "dataref-adjust"},
-                        {"value", drName},
-                        {"adjustment", 0.1}
+                        {"actions", {
+                            {
+                                {"type", "dataref-adjust"},
+                                {"value", drName},
+                                {"adjustment", 0.1}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -352,9 +384,13 @@ TEST(EventProcessorTest, DataRefAdjust_ArrayInt) {
             {"com1", {
                 {"knob_inner", {
                     {"rotate_cw", {
-                        {"type", "dataref-adjust"},
-                        {"value", drName},
-                        {"adjustment", 1}
+                        {"actions", {
+                            {
+                                {"type", "dataref-adjust"},
+                                {"value", drName},
+                                {"adjustment", 1}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -380,9 +416,13 @@ TEST(EventProcessorTest, DataRefSet_ArrayFloat) {
             {"com1", {
                 {"knob_inner", {
                     {"button_press", {
-                        {"type", "dataref-set"},
-                        {"value", drName},
-                        {"adjustment", 0.8}
+                        {"actions", {
+                            {
+                                {"type", "dataref-set"},
+                                {"value", drName},
+                                {"adjustment", 0.8}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -401,8 +441,12 @@ TEST(EventProcessorTest, Command_SendCount_DefaultSendsOnce) {
             {"com1", {
                 {"button", {
                     {"press", {
-                        {"type", "command"},
-                        {"value", "sim/operation/screenshot"}
+                        {"actions", {
+                            {
+                                {"type", "command"},
+                                {"value", "sim/operation/screenshot"}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -426,9 +470,13 @@ TEST(EventProcessorTest, Command_SendCount_Multiple) {
             {"com1", {
                 {"button", {
                     {"press", {
-                        {"type", "command"},
-                        {"value", "sim/operation/screenshot"},
-                        {"send-count", 3}
+                        {"actions", {
+                            {
+                                {"type", "command"},
+                                {"value", "sim/operation/screenshot"},
+                                {"send-count", 3}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -454,9 +502,13 @@ TEST(EventProcessorTest, Command_SendCount_Zero) {
             {"com1", {
                 {"button", {
                     {"press", {
-                        {"type", "command"},
-                        {"value", "sim/operation/screenshot"},
-                        {"send-count", 0}
+                        {"actions", {
+                            {
+                                {"type", "command"},
+                                {"value", "sim/operation/screenshot"},
+                                {"send-count", 0}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -480,9 +532,13 @@ TEST(EventProcessorTest, Command_SendCount_Negative) {
             {"com1", {
                 {"button", {
                     {"press", {
-                        {"type", "command"},
-                        {"value", "sim/operation/screenshot"},
-                        {"send-count", -2}
+                        {"actions", {
+                            {
+                                {"type", "command"},
+                                {"value", "sim/operation/screenshot"},
+                                {"send-count", -2}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -507,9 +563,13 @@ TEST(EventProcessorTest, CommandQueueLimit_EnforcedAtTen) {
             {"com1", {
                 {"button", {
                     {"press", {
-                        {"type", "command"},
-                        {"value", "sim/test/cmd"},
-                        {"send-count", 15}
+                        {"actions", {
+                            {
+                                {"type", "command"},
+                                {"value", "sim/test/cmd"},
+                                {"send-count", 15}
+                            }
+                        }}
                     }}
                 }}
             }}
@@ -518,6 +578,7 @@ TEST(EventProcessorTest, CommandQueueLimit_EnforcedAtTen) {
 
     void* cmdRef = reinterpret_cast<void*>(0x123);
     EXPECT_CALL(mockSdk, FindCommand(StrEq("sim/test/cmd"))).WillOnce(Return(cmdRef));
+    EXPECT_CALL(mockSdk, GetLogLevel()).WillRepeatedly(Return(LogLevel::Verbose));
     
     // Allow other log calls
     EXPECT_CALL(mockSdk, Log(::testing::_, ::testing::_)).WillRepeatedly(::testing::Return());
@@ -534,4 +595,43 @@ TEST(EventProcessorTest, CommandQueueLimit_EnforcedAtTen) {
     for (int i = 0; i < 15; ++i) {
         processor.ProcessQueue();
     }
+}
+
+TEST(EventProcessorTest, ProcessEvent_HandlesObjectWithActionsArray) {
+    using ::testing::StrEq;
+    using ::testing::Return;
+    
+    MockXPlaneSDK sdk;
+    EventProcessor processor(sdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                {"inner-knob", {
+                    {"rotate-clockwise", {
+                        {"description", "Test event description"},
+                        {"actions", {
+                            {{"type", "command"}, {"value", "cmd1"}, {"continue-to-next-action", true}},
+                            {{"type", "command"}, {"value", "cmd2"}}
+                        }}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* cmd1 = reinterpret_cast<void*>(0x1);
+    void* cmd2 = reinterpret_cast<void*>(0x2);
+
+    EXPECT_CALL(sdk, FindCommand(StrEq("cmd1"))).WillOnce(Return(cmd1));
+    EXPECT_CALL(sdk, FindCommand(StrEq("cmd2"))).WillOnce(Return(cmd2));
+    EXPECT_CALL(sdk, GetLogLevel()).WillRepeatedly(Return(LogLevel::Info));
+    EXPECT_CALL(sdk, Log(::testing::_, ::testing::_)).WillRepeatedly(Return());
+
+    processor.ProcessEvent(config, "com1", "inner-knob", "rotate-clockwise");
+    
+    EXPECT_CALL(sdk, CommandOnce(cmd1));
+    processor.ProcessQueue();
+    EXPECT_CALL(sdk, CommandOnce(cmd2));
+    processor.ProcessQueue();
 }
