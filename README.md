@@ -16,7 +16,7 @@ Unlike other plugins, IFR-1 Flight Controller Plugin is designed for maximum fle
 There are already well-established plugins for Windows that provide similar functionality. See the IFR-1's webpage at https://www.octavi.net/ for more information.
 
 ## Your support is appreciated
-Writing good quality software takes time and tools. The source code for this is openly available for anyone. If you find this plugin helpful, please consider supporting the project at https://buymeacoffee.com/kyledross. Any contribution to help defray costs is greatly appreciated.
+Writing good quality software takes time and tools.  If you find this plugin helpful, please consider supporting the project at https://buymeacoffee.com/kyledross. Any contribution to help defray costs is greatly appreciated.
 
 ## Features
 
