@@ -71,7 +71,7 @@ USER_HOME=$(eval echo "~$ORIGINAL_USER")
 echo -e "${BLUE}=============================================${NC}"
 echo -e "${BLUE} IFR-1 Flight Controller Plugin Setup            ${NC}"
 echo -e "${BLUE}                                            ${NC}"
-echo -e "${BLUE} This will setup the IIFR-1 Flight Controller    ${NC}"
+echo -e "${BLUE} This will setup the IFR-1 Flight Controller    ${NC}"
 echo -e "${BLUE} plugin for use in X-Plane 12 in Linux.    ${NC}"
 echo -e "${BLUE}=============================================${NC}"
 
