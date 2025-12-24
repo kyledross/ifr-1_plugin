@@ -190,8 +190,8 @@ PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
 
     // Create Plugins menu: "IFR-1" -> "About..."
     if (XPLMMenuID pluginsMenu = XPLMFindPluginsMenu()) {
-        gSubMenuIndex = XPLMAppendMenuItem(pluginsMenu, "IFR-1 Flex", nullptr, 0);
-        gSubMenu = XPLMCreateMenu("IFR-1 Flex", pluginsMenu, gSubMenuIndex, MenuHandler, nullptr);
+        gSubMenuIndex = XPLMAppendMenuItem(pluginsMenu, "IFR-1 Controller", nullptr, 0);
+        gSubMenu = XPLMCreateMenu("IFR-1 Controller", pluginsMenu, gSubMenuIndex, MenuHandler, nullptr);
         if (gSubMenu) {
             XPLMAppendMenuItem(gSubMenu, "About...", reinterpret_cast<void*>(1), 0);
         }
