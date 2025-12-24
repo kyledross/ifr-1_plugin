@@ -17,15 +17,7 @@
 #include "resources_embedded.h"
 #include "license_embedded.h"
 
-#if defined(_WIN32)
-  #include <windows.h>
-  #include <shellapi.h>
-#elif defined(__APPLE__)
-  #include <TargetConditionals.h>
-  #include <unistd.h>
-#else
-  #include <unistd.h>
-#endif
+#include <unistd.h>
 
 namespace ui::about
 {
@@ -144,25 +136,12 @@ namespace ui::about
     g_qrImgW = g_qrImgH = 0;
   }
 
-  // ReSharper disable once CppDFAConstantParameter
-  static void OpenURLCrossPlatform(const char* url) {
-#if defined(_WIN32)
-    ShellExecuteA(nullptr, "open", url, nullptr, nullptr, SW_SHOWNORMAL);
-#elif defined(__APPLE__)
-    // macOS: use the 'open' command
-    pid_t pid = fork();
-    if (pid == 0) {
-      execlp("open", "open", url, (char*)nullptr);
-      _exit(0);
-    }
-#else
-    // Linux: try xdg-open
+  static void OpenURL(const char* url) {
     pid_t pid = fork();
     if (pid == 0) {
       execlp("xdg-open", "xdg-open", url, static_cast<char*>(nullptr));
       _exit(0);
     }
-#endif
   }
 
   // Forward declarations for window callbacks
@@ -439,7 +418,7 @@ namespace ui::about
     if (inMouse == xplm_MouseDown) {
       // If click is inside QR code, open URL
       if (x >= g_qrLeft && x <= g_qrRight && y >= g_qrBottom && y <= g_qrTop) {
-        OpenURLCrossPlatform("https://buymeacoffee.com/kyledross");
+        OpenURL("https://buymeacoffee.com/kyledross");
         return 1;
       }
 

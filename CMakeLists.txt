@@ -31,10 +31,8 @@ FetchContent_Declare(
 # 2.1 hidapi configuration
 set(HIDAPI_BUILD_HIDTEST OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-if(UNIX AND NOT APPLE)
-    set(HIDAPI_WITH_LIBUSB OFF CACHE BOOL "" FORCE)
-    set(HIDAPI_WITH_HIDRAW ON CACHE BOOL "" FORCE)
-endif()
+set(HIDAPI_WITH_LIBUSB OFF CACHE BOOL "" FORCE)
+set(HIDAPI_WITH_HIDRAW ON CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(googletest json hidapi)
 
