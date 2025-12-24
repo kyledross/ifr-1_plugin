@@ -239,7 +239,7 @@ namespace ui::about
     XPLMGetFontDimensions(xplmFont_Basic, &char_w, &line_h, nullptr);
 
     int title_y = t - 26; // tighten top padding a bit
-    XPLMDrawString(white, l + 20, title_y, const_cast<char *>("IFR-1 Flight Controller Flexible Plugin"),
+    XPLMDrawString(white, l + 20, title_y, const_cast<char *>("IFR-1 Flight Controller Plugin"),
                    nullptr, xplmFont_Basic);
 
     // Body text
