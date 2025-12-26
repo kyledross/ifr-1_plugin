@@ -68,7 +68,6 @@ After the installation is finished, connect your IFR-1 device and launch X-Plane
 To update to a newer version, simply download the new release and run the `install.sh` script again. It will replace the existing plugin and update the default configurations.
 
 ## Aircraft Support
-
 The plugin comes with pre-configured support for several aircraft:
 
 - **General Aviation (G1000)**: Optimized for aircraft like the Cessna 172 G1000 and Cirrus SR22.
@@ -79,14 +78,13 @@ The plugin comes with pre-configured support for several aircraft:
 - **Schleicher ASK 21**: Glider-specific configuration.
 - **Generic Fallback**: A broad configuration that works with most standard X-Plane aircraft.
 
-## Quick Reference
-A quick-reference guide for the aircraft you are using can be found in the Plugins menu of X-Plane.
-
 ### Adding New Aircraft
 You can add support for any aircraft by creating a new JSON file in the `Resources/plugins/ifr1flex/configs/` directory. For detailed instructions on how to create these configurations, see the [Aircraft Configuration Guide](documentation/aircraft_configs.md).
 
-## Functionality
+### Quick Reference
+A quick-reference guide for the aircraft you are using can be found in the Plugins menu of X-Plane.
 
+## Functionality
 While the specific behavior of each button and knob is defined by the JSON configuration, most default configs follow a standard layout:
 
 - **Mode Selection**: Press mode buttons to choose the mode that you will be working with (COM1, NAV1, FMS1, etc.).
