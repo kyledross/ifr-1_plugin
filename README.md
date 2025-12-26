@@ -40,13 +40,13 @@ Writing good quality software takes time and tools.  If you find this plugin hel
 The easiest way to install the plugin is to use the provided installation script.
 
 ### 1. Download the Plugin
-Download the latest release from the [GitHub Releases](https://github.com/kyledross/ifr1flex/releases) page. Download the `ifr1flex_Linux_Install.tar.gz` (or similarly named) archive.
+Download the latest release from the [GitHub Releases](https://github.com/kyledross/ifr-1_plugin/releases) page. Download the `ifr-1_plugin_Linux_Install.tar.gz` (or similarly named) archive.
 
 ### 2. Unpack the Plugin
 Extract the downloaded archive to a temporary directory.
 
 ```bash
-tar -xzf ifr1flex_Linux_Install.tar.gz
+tar -xzf ifr-1_plugin_Linux_Install.tar.gz
 ```
 
 ### 3. Install the Plugin
@@ -104,7 +104,7 @@ While the specific behavior of each button and knob is defined by the JSON confi
 - Verify the plugin has been installed to `Resources/plugins/ifr1flex/lin_x64/ifr1flex.xpl`.
 
 ## Support
-This plugin is a hobby project. If you encounter an issue or have a feature request, please open an issue on the [GitHub Issues](https://github.com/kyledross/ifr1flex/issues) page.
+This plugin is a hobby project. If you encounter an issue or have a feature request, please open an issue on the [GitHub Issues](https://github.com/kyledross/ifr-1_plugin/issues) page.
 
 Contributions are welcome! If you create a great configuration for a new aircraft, please consider submitting a Pull Request.
 
