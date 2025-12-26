@@ -186,7 +186,7 @@ fi
 
 # Check if the plugin binary exists
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
-PLUGIN_BINARY="$SCRIPT_DIR/ifr-1_plugin.xpl"
+PLUGIN_BINARY="$SCRIPT_DIR/ifr1flex.xpl"
 
 if [ ! -f "$PLUGIN_BINARY" ]; then
     error_no_exit "Plugin binary not found at: $PLUGIN_BINARY"
@@ -203,10 +203,10 @@ fi
 success "Plugin binary verified."
 
 # Install the plugin
-PLUGIN_BASE_DIR="$XPLANE_ROOT/Resources/plugins/ifr-1_plugin"
+PLUGIN_BASE_DIR="$XPLANE_ROOT/Resources/plugins/ifr1flex"
 PLUGIN_DIR="$PLUGIN_BASE_DIR/lin_x64"
 CONFIGS_TARGET_DIR="$PLUGIN_BASE_DIR/configs"
-TARGET_PLUGIN="$PLUGIN_DIR/ifr-1_plugin.xpl"
+TARGET_PLUGIN="$PLUGIN_DIR/ifr1flex.xpl"
 
 info "Installing IFR-1 Flight Controller Plugin to X-Plane..."
 
