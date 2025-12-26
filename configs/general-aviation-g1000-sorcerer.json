@@ -1,10 +1,8 @@
 {
-  "name": "General Aviation (G1000)",
+  "name": "G1000 and TruTrak Sorcerer-equipped aircraft",
   "aircraft": [
-    "Cessna_172SP_G1000",
-    "Cirrus SR22",
-    "CirrusSF50",
-    "SF50"
+    "N844X",
+    "RV-10"
   ],
   "debug": true,
   "modes": {
@@ -961,11 +959,20 @@
       },
       "nav": {
         "short-press": {
-          "description": "Toggles the autopilot navigation mode.",
+          "description": "Toggles the autopilot NAV mode.",
           "actions": [
             {
               "type": "command",
               "value": "sim/autopilot/NAV"
+            }
+          ]
+        },
+        "long-press": {
+          "description": "Toggles the autopilot GPSS mode.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/autopilot/gpss"
             }
           ]
         }
@@ -1245,6 +1252,11 @@
         {
           "dataref": "sim/cockpit/autopilot/autopilot_state",
           "bit": 9,
+          "mode": "solid"
+        },
+        {
+          "dataref": "sim/cockpit/autopilot/autopilot_state",
+          "bit": 19,
           "mode": "solid"
         }
       ]
