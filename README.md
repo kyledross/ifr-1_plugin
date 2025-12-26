@@ -12,8 +12,8 @@ This software is not affiliated with, endorsed by, or supported by Octavi GmbH o
 
 Unlike other plugins, IFR-1 Flight Controller Plugin is designed for maximum flexibility. It uses a JSON-based configuration system that allows you to map hardware events (knob rotations, button presses) to any X-Plane command or dataref. This means you can easily customize the controller for any aircraft, even those with complex custom systems, without writing any code.
 
-### Why not Windows?
-There are already well-established plugins for Windows that provide similar functionality. See the IFR-1's webpage at https://www.octavi.net/ for more information.
+### Why not Windows or Mac?
+There are already well-established plugins for Windows that provide similar functionality. See the IFR-1's webpage at https://www.octavi.net/ for more information.  As for Mac, I simply don't have the hardware to test it on.  It _may_ work, but I can't guarantee it.
 
 ## Your support is appreciated
 Writing good quality software takes time and tools.  If you find this plugin helpful, please consider supporting the project at https://buymeacoffee.com/kyledross. Any contribution to help defray costs is greatly appreciated.
@@ -78,6 +78,9 @@ The plugin comes with pre-configured support for several aircraft:
 - **Piper Cub**: Simple controls for the classic Cub.
 - **Schleicher ASK 21**: Glider-specific configuration.
 - **Generic Fallback**: A broad configuration that works with most standard X-Plane aircraft.
+
+## Quick Reference
+A quick-reference guide for the aircraft you are using can be found in the Plugins menu of X-Plane.
 
 ### Adding New Aircraft
 You can add support for any aircraft by creating a new JSON file in the `Resources/plugins/ifr1flex/configs/` directory. For detailed instructions on how to create these configurations, see the [Aircraft Configuration Guide](documentation/aircraft_configs.md).

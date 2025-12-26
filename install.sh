@@ -230,6 +230,7 @@ CONFIGS_SRC_DIR="$SCRIPT_DIR/configs"
 if [ -d "$CONFIGS_SRC_DIR" ]; then
     info "Installing aircraft configurations..."
     if mkdir -p "$CONFIGS_TARGET_DIR"; then
+        rm -f "$CONFIGS_TARGET_DIR"/*.json
         if cp "$CONFIGS_SRC_DIR"/*.json "$CONFIGS_TARGET_DIR/"; then
             success "Configurations copied to: $CONFIGS_TARGET_DIR"
         else

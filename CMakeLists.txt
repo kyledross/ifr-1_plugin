@@ -107,6 +107,8 @@ add_library(ifr1flex SHARED
     src/plugin_main.cpp
     src/ui/AboutWindow.cpp
     src/ui/AboutWindow.h
+    src/ui/QuickReferenceWindow.cpp
+    src/ui/QuickReferenceWindow.h
     src/ui/GLTextureHandle.h
 )
 add_dependencies(ifr1flex embed_resources)

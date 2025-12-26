@@ -1145,7 +1145,14 @@
         {
           "dataref": "sim/cockpit/autopilot/autopilot_state",
           "bit": 9,
-          "mode": "solid"
+          "mode": "solid",
+          "description": "This indicates standard NAV mode is engaged."
+        },
+        {
+          "dataref": "sim/cockpit/autopilot/autopilot_state",
+          "bit": 19,
+          "mode": "solid",
+          "description": "This indicates NAV GPSS mode is engaged."
         }
       ]
     },
