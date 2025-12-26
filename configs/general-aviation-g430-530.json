@@ -543,38 +543,73 @@
       },
       "cdi": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g430n1_cdi"
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n1_cdi"
+            }
+          ]
         }
       },
       "obs": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g430n1_obs"
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n1_obs"
+            }
+          ]
         }
       },
       "msg": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g430n1_msg"
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n1_msg"
+            }
+          ]
         }
       },
       "fpl": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g430n1_fpl"
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n1_fpl"
+            }
+          ]
         }
       },
       "vnav": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g430n1_vnav"
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n1_vnav"
+            }
+          ]
         }
       },
       "proc": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g430n1_proc"
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n1_proc"
+            }
+          ]
+        }
+      },
+      "inner-knob-button": {
+        "short-press": {
+          "description": "Toggles the FMS cursor.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n1_cursor"
+            }
+          ]
         }
       }
     },
@@ -665,38 +700,73 @@
       },
       "cdi": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g430n2_cdi"
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n2_cdi"
+            }
+          ]
         }
       },
       "obs": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g430n2_obs"
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n2_obs"
+            }
+          ]
         }
       },
       "msg": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g430n2_msg"
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n2_msg"
+            }
+          ]
         }
       },
       "fpl": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g430n2_fpl"
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n2_fpl"
+            }
+          ]
         }
       },
       "vnav": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g430n2_vnav"
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n2_vnav"
+            }
+          ]
         }
       },
       "proc": {
         "short-press": {
-          "type": "command",
-          "value": "sim/GPS/g430n2_proc"
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n2_proc"
+            }
+          ]
+        }
+      },
+      "inner-knob-button": {
+        "short-press": {
+          "description": "Toggles the FMS cursor.",
+          "actions": [
+            {
+              "type": "command",
+              "value": "sim/GPS/g430n2_cursor"
+            }
+          ]
         }
       }
     },
