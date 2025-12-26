@@ -32,6 +32,7 @@
 #include "DeviceHandler.h"
 #include "XPlaneSDK.h"
 #include "ui/AboutWindow.h"
+#include "ui/QuickReferenceWindow.h"
 #include "core/Logger.h"
 
 namespace fs = std::filesystem;
@@ -59,6 +60,8 @@ static void MenuHandler(void* /*inMenuRef*/, void* inItemRef) {
     auto item = reinterpret_cast<intptr_t>(inItemRef);
     if (item == 1) {
         ui::about::Show();
+    } else if (item == 2) {
+        ui::quick_ref::Show(gCurrentConfig);
     }
 }
 
@@ -193,6 +196,8 @@ PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
         gSubMenuIndex = XPLMAppendMenuItem(pluginsMenu, "IFR-1 Controller", nullptr, 0);
         gSubMenu = XPLMCreateMenu("IFR-1 Controller", pluginsMenu, gSubMenuIndex, MenuHandler, nullptr);
         if (gSubMenu) {
+            XPLMAppendMenuItem(gSubMenu, "Quick Reference...", reinterpret_cast<void*>(2), 0);
+            XPLMAppendMenuSeparator(gSubMenu);
             XPLMAppendMenuItem(gSubMenu, "About...", reinterpret_cast<void*>(1), 0);
         }
     }
@@ -208,6 +213,7 @@ PLUGIN_API void XPluginStop(void) {
     
     // Destroy UI/menu if still present
     ui::about::Close();
+    ui::quick_ref::Close();
     if (gSubMenu) {
         XPLMDestroyMenu(gSubMenu);
         gSubMenu = nullptr;
@@ -238,6 +244,7 @@ PLUGIN_API void XPluginDisable(void) {
 
     // Ensure any modal is closed when disabling
     ui::about::Close();
+    ui::quick_ref::Close();
 }
 
 PLUGIN_API int XPluginEnable(void) {
