@@ -87,6 +87,8 @@ add_library(ifr1flex_core STATIC
         src/core/OutputProcessor.cpp
         src/core/DeviceHandler.cpp
         src/core/ModeDisplay.cpp
+        src/core/SettingsManager.cpp
+        src/core/SettingsManager.h
         src/core/ConditionEvaluator.cpp
         src/core/ThreadSafeQueue.h
         src/core/IHardwareManager.h
@@ -108,6 +110,8 @@ add_library(ifr1flex SHARED
     src/plugin_main.cpp
     src/ui/AboutWindow.cpp
     src/ui/AboutWindow.h
+    src/ui/SettingsWindow.cpp
+    src/ui/SettingsWindow.h
     src/ui/QuickReferenceWindow.cpp
     src/ui/QuickReferenceWindow.h
     src/ui/GLTextureHandle.h
@@ -137,6 +141,7 @@ add_executable(ifr1flex_tests
         tests/OutputProcessor_test.cpp
         tests/DeviceHandler_test.cpp
         tests/ModeDisplay_test.cpp
+        tests/SettingsManager_test.cpp
         tests/ConditionalAction_test.cpp
         tests/ConfigValidation_test.cpp
         tests/ThreadSafeQueue_test.cpp

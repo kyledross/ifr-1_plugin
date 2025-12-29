@@ -20,8 +20,8 @@
 #include <algorithm>
 #include <cctype>
 
-DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk, bool startThread)
-    : m_hw(hw), m_eventProc(eventProc), m_outputProc(outputProc), m_sdk(sdk), m_modeDisplay(sdk) {
+DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, SettingsManager& settings, IXPlaneSDK& sdk, bool startThread) 
+    : m_hw(hw), m_eventProc(eventProc), m_outputProc(outputProc), m_settings(settings), m_sdk(sdk), m_modeDisplay(sdk) {
     for (auto& state : m_buttonStates) {
         state.currentlyHeld = false;
         state.pressStartTime = 0.0f;
@@ -90,7 +90,7 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
 
     std::string currentModeStr = GetModeString(m_currentMode, m_shifted);
     if (currentModeStr != m_lastModeString) {
-        if (!currentModeStr.empty()) {
+        if (!currentModeStr.empty() && m_settings.GetBool("on-screen-mode-display")) {
             std::string displayStr = currentModeStr;
             for (auto& c : displayStr) c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
             m_modeDisplay.ShowMessage(displayStr, currentTime);

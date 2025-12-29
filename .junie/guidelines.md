@@ -23,6 +23,15 @@
 - **Modes and Shifted State**: Controls are organized by modes (COM1, NAV1, AP, etc.). A "shifted" state (toggled via long-press on the inner knob) allows for secondary mappings (e.g., HDG, BARO, CRS).
 - **LED Logic**: LEDs are driven by range-based or bit-mask tests defined in the JSON configuration, evaluated by `OutputProcessor`.
 
+## Settings System
+- **SettingsManager**: Manages plugin-wide settings. It loads and saves to `settings.json` located alongside the plugin binary.
+- **Storage Format**: Settings are stored as a JSON object with an `options` array. Each entry contains `option-name`, `option-description`, and `value` (as a string).
+- **Adding New Settings**:
+    - Default settings should be added to `SettingsManager::SetDefaultSettings()`.
+    - Use `SettingsManager::GetBool(name)` to retrieve boolean values.
+    - The `SettingsWindow` dynamically populates its list from the `SettingsManager`, so new settings will automatically appear in the UI.
+- **UI Lifecycle**: All UI windows (`AboutWindow`, `SettingsWindow`, `QuickReferenceWindow`) follow a pattern where they are created on demand and destroyed when closed (monitored via a flight loop callback to detect the user clicking the 'X' button).
+
 ## Project Structure
     - `src/core`: Contains the main logic and interfaces.
     - `src/plugin_main.cpp`: Entry point for the X-Plane plugin.

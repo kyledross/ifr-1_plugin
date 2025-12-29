@@ -92,6 +92,15 @@ While the specific behavior of each button and knob is defined by the JSON confi
 - **Autopilot Controls**: The buttons across the bottom and right are generally mapped to autopilot and FMS functions.
 - **LEDs**: The LEDs at the bottom show the status of the corresponding autopilot modes (e.g., AP engaged, ALT hold, etc.).
 
+## Settings
+The plugin includes a Settings menu where you can customize its behavior. You can access it via the X-Plane menu: **Plugins** -> **IFR-1 Controller** -> **Settings...**.
+
+The following options are currently available:
+
+- **Show mode changes on-screen**: When enabled, the plugin will display a brief message on the screen whenever you change the mode (e.g., switching from COM1 to HDG).
+
+Settings are saved automatically to a `settings.json` file located in the plugin's directory.
+
 ## Troubleshooting
 
 ### Device Not Found

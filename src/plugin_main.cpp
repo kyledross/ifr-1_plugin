@@ -31,7 +31,9 @@
 #include "HIDManager.h"
 #include "DeviceHandler.h"
 #include "XPlaneSDK.h"
+#include "core/SettingsManager.h"
 #include "ui/AboutWindow.h"
+#include "ui/SettingsWindow.h"
 #include "ui/QuickReferenceWindow.h"
 #include "core/Logger.h"
 
@@ -43,6 +45,7 @@ static std::unique_ptr<ConfigManager> gConfigManager;
 static std::unique_ptr<EventProcessor> gEventProcessor;
 static std::unique_ptr<OutputProcessor> gOutputProcessor;
 static std::unique_ptr<HIDManager> gHIDManager;
+static std::unique_ptr<SettingsManager> gSettingsManager;
 static std::unique_ptr<DeviceHandler> gDeviceHandler;
 
 static nlohmann::json gCurrentConfig;
@@ -62,6 +65,8 @@ static void MenuHandler(void* /*inMenuRef*/, void* inItemRef) {
         ui::about::Show();
     } else if (item == 2) {
         ui::quick_ref::Show(gCurrentConfig);
+    } else if (item == 3) {
+        ui::settings::Show(*gSettingsManager, *gSDK);
     }
 }
 
@@ -147,16 +152,20 @@ PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
     std::strcpy(outDesc, "Flexible IFR-1 interface.");
 
     gSDK = CreateXPlaneSDK();
-    gConfigManager = std::make_unique<ConfigManager>();
-    gEventProcessor = std::make_unique<EventProcessor>(*gSDK);
-    gOutputProcessor = std::make_unique<OutputProcessor>(*gSDK);
-    gHIDManager = std::make_unique<HIDManager>();
-    gDeviceHandler = std::make_unique<DeviceHandler>(*gHIDManager, *gEventProcessor, *gOutputProcessor, *gSDK);
 
     char pluginPath[512];
     XPLMGetPluginInfo(XPLMGetMyID(), nullptr, pluginPath, nullptr, nullptr);
     fs::path p(pluginPath);
-    
+
+    gSettingsManager = std::make_unique<SettingsManager>(p.parent_path() / "settings.json");
+    gSettingsManager->Load(*gSDK);
+
+    gConfigManager = std::make_unique<ConfigManager>();
+    gEventProcessor = std::make_unique<EventProcessor>(*gSDK);
+    gOutputProcessor = std::make_unique<OutputProcessor>(*gSDK);
+    gHIDManager = std::make_unique<HIDManager>();
+    gDeviceHandler = std::make_unique<DeviceHandler>(*gHIDManager, *gEventProcessor, *gOutputProcessor, *gSettingsManager, *gSDK);
+
     // Config directory discovery:
     // 1. Check parent folder of the plugin binary (e.g. plugins/ifr1flex/64/lin.xpl -> plugins/ifr1flex/configs)
     // 2. Check the plugin binary folder itself (e.g. plugins/ifr1flex/lin.xpl -> plugins/ifr1flex/configs)
@@ -196,6 +205,7 @@ PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
         gSubMenuIndex = XPLMAppendMenuItem(pluginsMenu, "IFR-1 Controller", nullptr, 0);
         gSubMenu = XPLMCreateMenu("IFR-1 Controller", pluginsMenu, gSubMenuIndex, MenuHandler, nullptr);
         if (gSubMenu) {
+            XPLMAppendMenuItem(gSubMenu, "Settings...", reinterpret_cast<void*>(3), 0);
             XPLMAppendMenuItem(gSubMenu, "Quick Reference...", reinterpret_cast<void*>(2), 0);
             XPLMAppendMenuSeparator(gSubMenu);
             XPLMAppendMenuItem(gSubMenu, "About...", reinterpret_cast<void*>(1), 0);
@@ -214,6 +224,7 @@ PLUGIN_API void XPluginStop(void) {
     // Destroy UI/menu if still present
     ui::about::Close();
     ui::quick_ref::Close();
+    ui::settings::Close();
     if (gSubMenu) {
         XPLMDestroyMenu(gSubMenu);
         gSubMenu = nullptr;
@@ -245,6 +256,7 @@ PLUGIN_API void XPluginDisable(void) {
     // Ensure any modal is closed when disabling
     ui::about::Close();
     ui::quick_ref::Close();
+    ui::settings::Close();
 }
 
 PLUGIN_API int XPluginEnable(void) {
@@ -252,7 +264,7 @@ PLUGIN_API int XPluginEnable(void) {
         gHIDManager = std::make_unique<HIDManager>();
     }
     if (!gDeviceHandler) {
-        gDeviceHandler = std::make_unique<DeviceHandler>(*gHIDManager, *gEventProcessor, *gOutputProcessor, *gSDK);
+        gDeviceHandler = std::make_unique<DeviceHandler>(*gHIDManager, *gEventProcessor, *gOutputProcessor, *gSettingsManager, *gSDK);
     }
 
     gCurrentAircraftPath.clear();

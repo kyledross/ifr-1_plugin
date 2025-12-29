@@ -22,6 +22,7 @@
 #include "XPlaneSDK.h"
 #include "ThreadSafeQueue.h"
 #include "ModeDisplay.h"
+#include "SettingsManager.h"
 #include <array>
 #include <thread>
 #include <atomic>
@@ -29,7 +30,7 @@
 
 class DeviceHandler {
 public:
-    DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk, bool startThread = true);
+    DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, SettingsManager& settings, IXPlaneSDK& sdk, bool startThread = true);
     ~DeviceHandler();
 
     /**
@@ -70,6 +71,7 @@ private:
     IHardwareManager& m_hw;
     EventProcessor& m_eventProc;
     OutputProcessor& m_outputProc;
+    SettingsManager& m_settings;
     IXPlaneSDK& m_sdk;
 
     // Threading

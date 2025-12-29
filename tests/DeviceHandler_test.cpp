@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "DeviceHandler.h"
+#include "SettingsManager.h"
 #include "IHardwareManager.h"
 #include "XPlaneSDK.h"
 #include "IFR1Protocol.h"
@@ -67,7 +68,8 @@ TEST(DeviceHandlerTest, Update_ConnectsWhenDisconnected) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     EXPECT_CALL(mockHw, IsConnected())
         .WillOnce(Return(false))
@@ -92,7 +94,8 @@ TEST(DeviceHandlerTest, Update_ProcessesKnobRotation) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -134,7 +137,8 @@ TEST(DeviceHandlerTest, Update_ProcessesShortPress) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -188,7 +192,8 @@ TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -288,7 +293,8 @@ TEST(DeviceHandlerTest, ClearLEDs_SendsZeroReportAndResetsState) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
     
@@ -309,7 +315,8 @@ TEST(DeviceHandlerTest, UpdateLEDs_PushesToQueueAndWrites) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
 
     nlohmann::json config = {
         {"output", {
@@ -361,7 +368,8 @@ TEST(DeviceHandlerTest, Update_OtherButtonLongPressDoesNotPlaySound) {
     
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -414,7 +422,8 @@ TEST(DeviceHandlerTest, Update_InnerKnobLongPressPlaysSound) {
     
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -449,13 +458,13 @@ TEST(DeviceHandlerTest, Update_InnerKnobLongPressDoesNotPlaySoundIfFileNotFound)
     MockXPlaneSDK mockSdk;
     
     EXPECT_CALL(mockSdk, GetSystemPath()).WillRepeatedly(Return("/xplane/"));
-    // Explicitly say the file does NOT exist
     EXPECT_CALL(mockSdk, FileExists(::testing::StrEq("/xplane/Resources/sounds/systems/click.wav")))
         .WillOnce(Return(false));
     
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -490,7 +499,8 @@ TEST(DeviceHandlerTest, Update_UsesNewButtonNamesInFMSMode) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
