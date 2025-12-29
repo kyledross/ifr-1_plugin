@@ -60,12 +60,12 @@ void ModeDisplay::Update(float currentTime) {
         m_opacity = 0.0f;
     } else {
         float elapsed = currentTime - m_startTime;
-        if (elapsed < 0.5f) {
-            m_opacity = elapsed / 0.5f;
-        } else if (elapsed < 2.5f) {
+        if (elapsed < 0.25f) {
+            m_opacity = elapsed / 0.25f;
+        } else if (elapsed < 2.25f) {
             m_opacity = 1.0f;
-        } else if (elapsed < 3.5f) {
-            m_opacity = 1.0f - (elapsed - 2.5f) / 1.0f;
+        } else if (elapsed < 3.25f) {
+            m_opacity = 1.0f - (elapsed - 2.25f) / 1.0f;
         } else {
             m_opacity = 0.0f;
             m_startTime = -1.0f;

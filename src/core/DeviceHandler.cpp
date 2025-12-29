@@ -90,7 +90,7 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
 
     std::string currentModeStr = GetModeString(m_currentMode, m_shifted);
     if (currentModeStr != m_lastModeString) {
-        if (!m_lastModeString.empty()) {
+        if (!currentModeStr.empty()) {
             std::string displayStr = currentModeStr;
             for (auto& c : displayStr) c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
             m_modeDisplay.ShowMessage(displayStr, currentTime);

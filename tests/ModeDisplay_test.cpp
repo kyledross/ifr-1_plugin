@@ -80,8 +80,8 @@ TEST(ModeDisplayTest, AnimationSequence) {
 
     display.ShowMessage("TEST", 0.0f);
 
-    // Fade in halfway (0.25s / 0.5s = 0.5 opacity)
-    display.Update(0.25f);
+    // Fade in halfway (0.125s / 0.25s = 0.5 opacity)
+    display.Update(0.125f);
     EXPECT_CALL(sdk, DrawRectangle(_, _, _, _, _)).Times(1);
     EXPECT_CALL(sdk, DrawRectangleOutline(_, _, _, _, _)).Times(1);
     EXPECT_CALL(sdk, DrawString(_, _, _, _)).Times(1);
@@ -94,15 +94,15 @@ TEST(ModeDisplayTest, AnimationSequence) {
     EXPECT_CALL(sdk, DrawString(_, _, _, _)).Times(1);
     capturedParams.drawCallback((void*)0x1234, capturedParams.refcon);
 
-    // Fade out halfway (3.0s is 0.5s into 1s fade out)
-    display.Update(3.0f);
+    // Fade out halfway (2.75s is 0.5s into 1s fade out which starts at 2.25s)
+    display.Update(2.75f);
     EXPECT_CALL(sdk, DrawRectangle(_, _, _, _, _)).Times(1);
     EXPECT_CALL(sdk, DrawRectangleOutline(_, _, _, _, _)).Times(1);
     EXPECT_CALL(sdk, DrawString(_, _, _, _)).Times(1);
     capturedParams.drawCallback((void*)0x1234, capturedParams.refcon);
 
     // Done
-    display.Update(4.0f);
+    display.Update(3.5f);
     EXPECT_CALL(sdk, DrawRectangle(_, _, _, _, _)).Times(0);
     EXPECT_CALL(sdk, DrawString(_, _, _, _)).Times(0);
     capturedParams.drawCallback((void*)0x1234, capturedParams.refcon);
@@ -113,8 +113,8 @@ TEST(ModeDisplayTest, RestartsOnNewMessage) {
     ModeDisplay display(sdk);
 
     display.ShowMessage("FIRST", 0.0f);
-    display.Update(0.5f); // Fully visible
+    display.Update(0.3f); // Fully visible
 
     display.ShowMessage("SECOND", 0.6f);
-    display.Update(0.7f); // 0.1s into new fade in (opacity 0.2)
+    display.Update(0.7f); // 0.1s into new fade in (opacity 0.4)
 }
