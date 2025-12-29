@@ -19,6 +19,9 @@
 #include "XPLMUtilities.h"
 #include "XPLMProcessing.h"
 #include "XPLMSound.h"
+#include "XPLMGraphics.h"
+#include "XPLMDisplay.h"
+#include <GL/gl.h>
 #include <memory>
 #include <string>
 #include <fstream>
@@ -165,6 +168,95 @@ public:
             nullptr, // callback
             nullptr  // refcon
         );
+    }
+
+    void DrawString(const float color[4], int x, int y, const char* string) override {
+        XPLMSetGraphicsState(0, 0, 0, 0, 1, 0, 0);
+        
+        bool useAdditive = (color[3] < 1.0f);
+        if (useAdditive) {
+            // XPLMDrawString often resets alpha to 1.0. 
+            // We use additive blending with pre-multiplied RGB to simulate transparency on dark backgrounds.
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        }
+
+        float drawColor[3] = { color[0] * color[3], color[1] * color[3], color[2] * color[3] };
+        XPLMDrawString(drawColor, x, y, const_cast<char*>(string), nullptr, xplmFont_Proportional);
+
+        if (useAdditive) {
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
+    }
+
+    void DrawRectangle(const float color[4], int l, int t, int r, int b) override {
+        XPLMSetGraphicsState(0, 0, 0, 0, 1, 0, 0);
+        glColor4f(color[0], color[1], color[2], color[3]);
+        glBegin(GL_QUADS);
+        glVertex2i(l, t);
+        glVertex2i(r, t);
+        glVertex2i(r, b);
+        glVertex2i(l, b);
+        glEnd();
+    }
+
+    void DrawRectangleOutline(const float color[4], int l, int t, int r, int b) override {
+        XPLMSetGraphicsState(0, 0, 0, 0, 1, 0, 0);
+        glColor4f(color[0], color[1], color[2], color[3]);
+        glBegin(GL_LINE_LOOP);
+        glVertex2i(l, t);
+        glVertex2i(r, t);
+        glVertex2i(r, b);
+        glVertex2i(l, b);
+        glEnd();
+    }
+
+    int MeasureString(const char* string) override {
+        return static_cast<int>(XPLMMeasureString(xplmFont_Proportional, string, static_cast<int>(std::strlen(string))));
+    }
+
+    int GetFontHeight() override {
+        int h;
+        XPLMGetFontDimensions(xplmFont_Proportional, nullptr, &h, nullptr);
+        return h;
+    }
+
+    void GetScreenSize(int* outWidth, int* outHeight) override {
+        int l, t, r, b;
+        XPLMGetScreenBoundsGlobal(&l, &t, &r, &b);
+        if (outWidth) *outWidth = r - l;
+        if (outHeight) *outHeight = t - b;
+    }
+
+    void* CreateWindowEx(const WindowCreateParams& params) override {
+        XPLMCreateWindow_t xparams{};
+        xparams.structSize = sizeof(xparams);
+        xparams.left = params.left;
+        xparams.top = params.top;
+        xparams.right = params.right;
+        xparams.bottom = params.bottom;
+        xparams.visible = params.visible;
+        xparams.drawWindowFunc = reinterpret_cast<XPLMDrawWindow_f>(params.drawCallback);
+        xparams.refcon = params.refcon;
+        xparams.layer = xplm_WindowLayerFloatingWindows;
+        xparams.decorateAsFloatingWindow = xplm_WindowDecorationNone;
+
+        return XPLMCreateWindowEx(&xparams);
+    }
+
+    void DestroyWindow(void* windowId) override {
+        XPLMDestroyWindow(static_cast<XPLMWindowID>(windowId));
+    }
+
+    void SetWindowVisible(void* windowId, int visible) override {
+        XPLMSetWindowIsVisible(static_cast<XPLMWindowID>(windowId), visible);
+    }
+
+    void SetWindowGeometry(void* windowId, int left, int top, int right, int bottom) override {
+        XPLMSetWindowGeometry(static_cast<XPLMWindowID>(windowId), left, top, right, bottom);
+    }
+
+    void GetWindowGeometry(void* windowId, int* outLeft, int* outTop, int* outRight, int* outBottom) override {
+        XPLMGetWindowGeometry(static_cast<XPLMWindowID>(windowId), outLeft, outTop, outRight, outBottom);
     }
 
 private:

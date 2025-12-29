@@ -86,6 +86,7 @@ add_library(ifr1flex_core STATIC
         src/core/HIDManager.cpp
         src/core/OutputProcessor.cpp
         src/core/DeviceHandler.cpp
+        src/core/ModeDisplay.cpp
         src/core/ConditionEvaluator.cpp
         src/core/ThreadSafeQueue.h
         src/core/IHardwareManager.h
@@ -135,6 +136,7 @@ add_executable(ifr1flex_tests
         tests/EventProcessor_test.cpp
         tests/OutputProcessor_test.cpp
         tests/DeviceHandler_test.cpp
+        tests/ModeDisplay_test.cpp
         tests/ConditionalAction_test.cpp
         tests/ConfigValidation_test.cpp
         tests/ThreadSafeQueue_test.cpp

@@ -17,9 +17,11 @@
 #include "DeviceHandler.h"
 #include "Logger.h"
 #include <iostream>
+#include <algorithm>
+#include <cctype>
 
 DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, IXPlaneSDK& sdk, bool startThread)
-    : m_hw(hw), m_eventProc(eventProc), m_outputProc(outputProc), m_sdk(sdk) {
+    : m_hw(hw), m_eventProc(eventProc), m_outputProc(outputProc), m_sdk(sdk), m_modeDisplay(sdk) {
     for (auto& state : m_buttonStates) {
         state.currentlyHeld = false;
         state.pressStartTime = 0.0f;
@@ -55,7 +57,10 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
     }
     m_lastConnectedState = currentlyConnected;
 
-    if (!currentlyConnected) return;
+    if (!currentlyConnected) {
+        m_lastModeString.clear();
+        return;
+    }
 
     // Process all available reports from the queue
     while (auto event = m_inputQueue.Pop()) {
@@ -83,6 +88,17 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
         }
     }
 
+    std::string currentModeStr = GetModeString(m_currentMode, m_shifted);
+    if (currentModeStr != m_lastModeString) {
+        if (!m_lastModeString.empty()) {
+            std::string displayStr = currentModeStr;
+            for (auto& c : displayStr) c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+            m_modeDisplay.ShowMessage(displayStr, currentTime);
+        }
+        m_lastModeString = currentModeStr;
+    }
+
+    m_modeDisplay.Update(currentTime);
     m_eventProc.ProcessQueue();
 }
 

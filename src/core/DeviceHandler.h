@@ -21,6 +21,7 @@
 #include "OutputProcessor.h"
 #include "XPlaneSDK.h"
 #include "ThreadSafeQueue.h"
+#include "ModeDisplay.h"
 #include <array>
 #include <thread>
 #include <atomic>
@@ -98,4 +99,7 @@ private:
 
     std::string m_clickSoundPath;
     bool m_clickSoundExists = false;
+
+    ModeDisplay m_modeDisplay;
+    std::string m_lastModeString;
 };

@@ -44,6 +44,17 @@ public:
     MOCK_METHOD(std::string, GetSystemPath, (), (override));
     MOCK_METHOD(bool, FileExists, (const std::string& path), (override));
     MOCK_METHOD(void, PlaySound, (const std::string& path), (override));
+    MOCK_METHOD(void, DrawString, (const float color[4], int x, int y, const char* string), (override));
+    MOCK_METHOD(void, DrawRectangle, (const float color[4], int l, int t, int r, int b), (override));
+    MOCK_METHOD(void, DrawRectangleOutline, (const float color[4], int l, int t, int r, int b), (override));
+    MOCK_METHOD(int, MeasureString, (const char* string), (override));
+    MOCK_METHOD(int, GetFontHeight, (), (override));
+    MOCK_METHOD(void, GetScreenSize, (int* outWidth, int* outHeight), (override));
+    MOCK_METHOD(void*, CreateWindowEx, (const WindowCreateParams& params), (override));
+    MOCK_METHOD(void, DestroyWindow, (void* windowId), (override));
+    MOCK_METHOD(void, SetWindowVisible, (void* windowId, int visible), (override));
+    MOCK_METHOD(void, SetWindowGeometry, (void* windowId, int left, int top, int right, int bottom), (override));
+    MOCK_METHOD(void, GetWindowGeometry, (void* windowId, int* outLeft, int* outTop, int* outRight, int* outBottom), (override));
 };
 
 using ::testing::Return;
