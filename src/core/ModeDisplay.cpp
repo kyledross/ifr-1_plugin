@@ -19,8 +19,8 @@
 
 ModeDisplay::ModeDisplay(IXPlaneSDK& sdk) : m_sdk(sdk) {
     IXPlaneSDK::WindowCreateParams params{};
-    params.left = 40;
-    params.bottom = 40;
+    params.left = 20;
+    params.bottom = 20;
     params.right = 200;
     params.top = 80;
     params.visible = 0;
@@ -49,8 +49,8 @@ void ModeDisplay::ShowMessage(const std::string& message, float currentTime) {
         int boxW = textW + paddingX * 2;
         int boxH = textH + paddingY * 2;
 
-        int l = 50;
-        int b = 50;
+        int l = 20;
+        int b = 20;
         m_sdk.SetWindowGeometry(m_windowId, l, b + boxH, l + boxW, b);
     }
 }
