@@ -97,7 +97,7 @@ The plugin includes a Settings menu where you can customize its behavior. You ca
 
 The following options are currently available:
 
-- **Show mode changes on-screen**: When enabled, the plugin will display a brief message on the screen whenever you change the mode (e.g., switching from COM1 to HDG).
+- **Show mode changes on-screen**: When enabled, the plugin will display a brief message in the lower-left corner of the screen whenever you change the mode (e.g., switching from COM1 to HDG).  This is helpful if you have an IFR-1 with older firmware that does not support blinking mode buttons.
 
 Settings are saved automatically to a `settings.json` file located in the plugin's directory.
 
