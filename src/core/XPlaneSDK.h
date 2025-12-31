@@ -70,6 +70,27 @@ public:
 
     // Sound
     virtual void PlaySound(const std::string& path) = 0;
+
+    // Drawing
+    virtual void DrawString(const float color[4], int x, int y, const char* string) = 0;
+    virtual void DrawRectangle(const float color[4], int l, int t, int r, int b) = 0;
+    virtual void DrawRectangleOutline(const float color[4], int l, int t, int r, int b) = 0;
+    virtual int MeasureString(const char* string) = 0;
+    virtual int GetFontHeight() = 0;
+    virtual void GetScreenSize(int* outWidth, int* outHeight) = 0;
+
+    // Windowing
+    struct WindowCreateParams {
+        int left, top, right, bottom;
+        int visible;
+        void (*drawCallback)(void* windowId, void* refcon);
+        void* refcon;
+    };
+    virtual void* CreateWindowEx(const WindowCreateParams& params) = 0;
+    virtual void DestroyWindow(void* windowId) = 0;
+    virtual void SetWindowVisible(void* windowId, int visible) = 0;
+    virtual void SetWindowGeometry(void* windowId, int left, int top, int right, int bottom) = 0;
+    virtual void GetWindowGeometry(void* windowId, int* outLeft, int* outTop, int* outRight, int* outBottom) = 0;
 };
 
 #include <memory>

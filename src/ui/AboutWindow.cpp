@@ -168,7 +168,11 @@ namespace ui::about
   static float AboutWindowMonitorCB(float, float, int, void *);
 
   void Show() {
-    if (g_aboutWindow) return;
+    if (g_aboutWindow) {
+      XPLMSetWindowIsVisible(g_aboutWindow, 1);
+      XPLMBringWindowToFront(g_aboutWindow);
+      return;
+    }
     g_isDraggingScrollbar = false;
 
     int l, t, r, b;

@@ -207,6 +207,7 @@ namespace ui::quick_ref
             // Re-build content in case config changed
             BuildRawContent(config);
             g_wrapWidthCached = -1; // Force re-wrap
+            XPLMSetWindowIsVisible(g_window, 1);
             XPLMBringWindowToFront(g_window);
             return;
         }

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "DeviceHandler.h"
+#include "SettingsManager.h"
 #include "IHardwareManager.h"
 #include "XPlaneSDK.h"
 #include "IFR1Protocol.h"
@@ -44,6 +45,17 @@ public:
     MOCK_METHOD(std::string, GetSystemPath, (), (override));
     MOCK_METHOD(bool, FileExists, (const std::string& path), (override));
     MOCK_METHOD(void, PlaySound, (const std::string& path), (override));
+    MOCK_METHOD(void, DrawString, (const float color[4], int x, int y, const char* string), (override));
+    MOCK_METHOD(void, DrawRectangle, (const float color[4], int l, int t, int r, int b), (override));
+    MOCK_METHOD(void, DrawRectangleOutline, (const float color[4], int l, int t, int r, int b), (override));
+    MOCK_METHOD(int, MeasureString, (const char* string), (override));
+    MOCK_METHOD(int, GetFontHeight, (), (override));
+    MOCK_METHOD(void, GetScreenSize, (int* outWidth, int* outHeight), (override));
+    MOCK_METHOD(void*, CreateWindowEx, (const WindowCreateParams& params), (override));
+    MOCK_METHOD(void, DestroyWindow, (void* windowId), (override));
+    MOCK_METHOD(void, SetWindowVisible, (void* windowId, int visible), (override));
+    MOCK_METHOD(void, SetWindowGeometry, (void* windowId, int left, int top, int right, int bottom), (override));
+    MOCK_METHOD(void, GetWindowGeometry, (void* windowId, int* outLeft, int* outTop, int* outRight, int* outBottom), (override));
 };
 
 using ::testing::Return;
@@ -56,7 +68,8 @@ TEST(DeviceHandlerTest, Update_ConnectsWhenDisconnected) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     EXPECT_CALL(mockHw, IsConnected())
         .WillOnce(Return(false))
@@ -81,7 +94,8 @@ TEST(DeviceHandlerTest, Update_ProcessesKnobRotation) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -123,7 +137,8 @@ TEST(DeviceHandlerTest, Update_ProcessesShortPress) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -177,7 +192,8 @@ TEST(DeviceHandlerTest, Update_ResetsShiftedOnModeChange) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -277,7 +293,8 @@ TEST(DeviceHandlerTest, ClearLEDs_SendsZeroReportAndResetsState) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(Return(true));
     
@@ -298,7 +315,8 @@ TEST(DeviceHandlerTest, UpdateLEDs_PushesToQueueAndWrites) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
 
     nlohmann::json config = {
         {"output", {
@@ -350,7 +368,8 @@ TEST(DeviceHandlerTest, Update_OtherButtonLongPressDoesNotPlaySound) {
     
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -403,7 +422,8 @@ TEST(DeviceHandlerTest, Update_InnerKnobLongPressPlaysSound) {
     
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -438,13 +458,13 @@ TEST(DeviceHandlerTest, Update_InnerKnobLongPressDoesNotPlaySoundIfFileNotFound)
     MockXPlaneSDK mockSdk;
     
     EXPECT_CALL(mockSdk, GetSystemPath()).WillRepeatedly(Return("/xplane/"));
-    // Explicitly say the file does NOT exist
     EXPECT_CALL(mockSdk, FileExists(::testing::StrEq("/xplane/Resources/sounds/systems/click.wav")))
         .WillOnce(Return(false));
     
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
@@ -479,7 +499,8 @@ TEST(DeviceHandlerTest, Update_UsesNewButtonNamesInFMSMode) {
     MockXPlaneSDK mockSdk;
     EventProcessor eventProc(mockSdk);
     OutputProcessor outputProc(mockSdk);
-    DeviceHandler handler(mockHw, eventProc, outputProc, mockSdk, false);
+    SettingsManager settings("test_settings.json");
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
     
     nlohmann::json config = {
         {"modes", {
