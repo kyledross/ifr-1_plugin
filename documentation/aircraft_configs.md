@@ -41,16 +41,16 @@ The IFR-1 controller has 8 primary modes, selected by pressing one of the 8 mode
 
 The plugin uses different identifiers for these states in the JSON:
 
-| Selector Position | Primary Mode Identifier | Shifted Mode Identifier |
-| :--- | :--- | :--- |
-| **COM 1** | `com1` | `hdg` |
-| **COM 2** | `com2` | `baro` |
-| **NAV 1** | `nav1` | `crs1` |
-| **NAV 2** | `nav2` | `crs2` |
-| **FMS 1** | `fms1` | `fms1-alt` |
-| **FMS 2** | `fms2` | `fms2-alt` |
-| **AP** | `ap` | `ap-alt` |
-| **XPDR** | `xpdr` | `xpdr-mode` |
+| Active Mode Button | Primary Mode Identifier | Shifted Mode Identifier |
+|:-------------------| :--- | :--- |
+| **COM 1**          | `com1` | `hdg` |
+| **COM 2**          | `com2` | `baro` |
+| **NAV 1**          | `nav1` | `crs1` |
+| **NAV 2**          | `nav2` | `crs2` |
+| **FMS 1**          | `fms1` | `fms1-alt` |
+| **FMS 2**          | `fms2` | `fms2-alt` |
+| **AP**             | `ap` | `ap-alt` |
+| **XPDR**           | `xpdr` | `xpdr-mode` |
 
 ---
 
@@ -62,7 +62,7 @@ Within each mode, you map **Controls** to **Actions** based on **Event Types**. 
 - **Knobs**: `outer-knob`, `inner-knob`
 - **Knob Button**: `inner-knob-button`
 - **Right Buttons**: `direct-to`, `menu`, `clr`, `ent`
-- **Center Buttons**: `swap`
+- **Left Button**: `swap`
 - **Bottom Buttons**: `ap`, `hdg`, `nav`, `apr`, `alt`, `vs`
 
 ### Event Types
