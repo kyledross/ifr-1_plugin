@@ -30,7 +30,7 @@ Writing good quality software takes time and tools.  If you find this plugin hel
 ## Requirements
 
 ### Software
-- X-Plane 12.x on Linux
+- X-Plane 12.x on Linux (tested on X-Plane 12.3 running on Fedora 13, Ubuntu 24.04 LTS, and Debian 13)
 
 ### Hardware
 - Octavi IFR-1 USB controller
