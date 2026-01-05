@@ -30,8 +30,8 @@ DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, Ou
     m_clickSoundPath = m_sdk.GetSystemPath() + "Resources/sounds/systems/click.wav";
     m_clickSoundExists = m_sdk.FileExists(m_clickSoundPath);
 
+    m_running = true;
     if (startThread) {
-        m_running = true;
         m_thread = std::thread(&DeviceHandler::WorkerThread, this);
     }
 }
@@ -277,7 +277,8 @@ void DeviceHandler::ProcessHardware() {
     bool currentlyConnected = m_hw.IsConnected();
     if (!currentlyConnected) {
         m_isConnected = false;
-        if (!m_hw.Connect(IFR1::VENDOR_ID, IFR1::PRODUCT_ID)) {
+        // Don't try to connect if we are shutting down
+        if (!m_running || !m_hw.Connect(IFR1::VENDOR_ID, IFR1::PRODUCT_ID)) {
             return;
         }
         m_isConnected = true;
@@ -316,7 +317,7 @@ void DeviceHandler::ProcessHardware() {
 }
 
 void DeviceHandler::WorkerThread() {
-    while (m_running || !m_outputQueue.IsEmpty()) {
+    while (m_running || (m_isConnected && !m_outputQueue.IsEmpty())) {
         bool wasConnected = m_isConnected;
         ProcessHardware();
         
