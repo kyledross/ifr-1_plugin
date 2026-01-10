@@ -121,6 +121,7 @@ void DeviceHandler::UpdateLEDs(const nlohmann::json& config, float currentTime) 
 
 void DeviceHandler::ClearLEDs() {
     m_shifted = false;
+    m_currentMode = IFR1::Mode::COM1;
     m_lastLedBits = 0;
     m_outputQueue.Push(0);
     m_heldButtons.clear();
@@ -285,6 +286,7 @@ void DeviceHandler::ProcessHardware() {
         // Clear queues on fresh connection to avoid stale reports/updates
         m_inputQueue.Clear();
         m_outputQueue.Clear();
+        m_lastReport.fill(0);
     } else {
         m_isConnected = true;
     }
