@@ -47,7 +47,7 @@ namespace ui::settings {
         int l, t, r, b;
         XPLMGetScreenBoundsGlobal(&l, &t, &r, &b);
         int width = 450;
-        int height = 300;
+        int height = 100;
         int left = (l + r - width) / 2;
         int top = (t + b + height) / 2;
 
@@ -101,7 +101,7 @@ namespace ui::settings {
         XPLMGetFontDimensions(xplmFont_Basic, &char_w, &line_h, nullptr);
 
         int x = l + 20;
-        int y = t - 50;
+        int y = t - 30;
 
         if (!g_settingsManager) return;
 
@@ -161,7 +161,7 @@ namespace ui::settings {
         XPLMGetWindowGeometry(inWindowID, &l, &t, &r, &b);
 
         int cur_x = l + 20;
-        int cur_y = t - 50;
+        int cur_y = t - 30;
 
         if (!g_settingsManager) return 1;
 
