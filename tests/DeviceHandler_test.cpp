@@ -1,10 +1,13 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <fstream>
 #include "DeviceHandler.h"
 #include "SettingsManager.h"
 #include "IHardwareManager.h"
 #include "XPlaneSDK.h"
 #include "IFR1Protocol.h"
+
+namespace {
 
 class MockHardwareManager : public IHardwareManager {
 public:
@@ -87,6 +90,69 @@ TEST(DeviceHandlerTest, Update_ConnectsWhenDisconnected) {
     handler.ProcessHardware(); // Connects
     handler.Update(config, 0.0f); // Detects connection, calls ClearLEDs (pushes to output queue)
     handler.ProcessHardware(); // Pops from output queue and writes to hardware
+}
+
+TEST(DeviceHandlerTest, Update_UsesModeDescriptionForDisplay) {
+    MockHardwareManager mockHw;
+    ::testing::NiceMock<MockXPlaneSDK> mockSdk;
+    EventProcessor eventProc(mockSdk);
+    OutputProcessor outputProc(mockSdk);
+    
+    SettingsManager settings("test_mode_desc_settings.json");
+    settings.SetBool("on-screen-mode-display", true);
+    
+    EXPECT_CALL(mockSdk, CreateWindowEx(::testing::_)).WillOnce(::testing::Return(reinterpret_cast<void*>(0x1234)));
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
+    
+    EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(::testing::Return(true));
+    EXPECT_CALL(mockHw, Read(::testing::_, ::testing::_, ::testing::_)).WillRepeatedly(::testing::Return(0));
+    handler.ProcessHardware(); // Sets m_isConnected to true
+    
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                {"description", "Communication Radio 1"}
+            }}
+        }}
+    };
+    
+    // We expect MeasureString to be called with the UPPERCASE description
+    EXPECT_CALL(mockSdk, MeasureString(::testing::StrEq("COMMUNICATION RADIO 1")))
+        .WillOnce(::testing::Return(100));
+    
+    // Trigger a mode change to com1 (default is com1, and m_lastModeString was cleared in Update when not connected)
+    handler.Update(config, 1.0f);
+}
+
+TEST(DeviceHandlerTest, Update_UsesModeNameIfDescriptionMissing) {
+    MockHardwareManager mockHw;
+    ::testing::NiceMock<MockXPlaneSDK> mockSdk;
+    EventProcessor eventProc(mockSdk);
+    OutputProcessor outputProc(mockSdk);
+    
+    SettingsManager settings("test_mode_name_settings.json");
+    settings.SetBool("on-screen-mode-display", true);
+    
+    EXPECT_CALL(mockSdk, CreateWindowEx(::testing::_)).WillOnce(::testing::Return(reinterpret_cast<void*>(0x1234)));
+    DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
+    
+    EXPECT_CALL(mockHw, IsConnected()).WillRepeatedly(::testing::Return(true));
+    EXPECT_CALL(mockHw, Read(::testing::_, ::testing::_, ::testing::_)).WillRepeatedly(::testing::Return(0));
+    handler.ProcessHardware(); // Sets m_isConnected to true
+    
+    nlohmann::json config = {
+        {"modes", {
+            {"com1", {
+                // No description
+            }}
+        }}
+    };
+    
+    // We expect MeasureString to be called with the UPPERCASE mode name
+    EXPECT_CALL(mockSdk, MeasureString(::testing::StrEq("COM1")))
+        .WillOnce(::testing::Return(40));
+    
+    handler.Update(config, 1.0f);
 }
 
 TEST(DeviceHandlerTest, Update_ProcessesKnobRotation) {
@@ -555,4 +621,5 @@ TEST(DeviceHandlerTest, Update_UsesNewButtonNamesInFMSMode) {
     testButton(3, IFR1::BitPosition::APR, "fpl_cmd");
     testButton(3, IFR1::BitPosition::ALT, "vnav_cmd");
     testButton(3, IFR1::BitPosition::VS, "proc_cmd");
+}
 }

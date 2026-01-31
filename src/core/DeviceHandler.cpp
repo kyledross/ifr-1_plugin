@@ -17,7 +17,6 @@
 #include "DeviceHandler.h"
 #include "Logger.h"
 #include <iostream>
-#include <algorithm>
 #include <cctype>
 
 DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, SettingsManager& settings, IXPlaneSDK& sdk, bool startThread) 
@@ -92,6 +91,11 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
     if (currentModeStr != m_lastModeString) {
         if (!currentModeStr.empty() && m_settings.GetBool("on-screen-mode-display")) {
             std::string displayStr = currentModeStr;
+            if (config.contains("modes") && config["modes"].contains(currentModeStr) && 
+                config["modes"][currentModeStr].contains("description") && config["modes"][currentModeStr]["description"].is_string()) {
+                displayStr = config["modes"][currentModeStr]["description"].get<std::string>();
+            }
+            
             for (auto& c : displayStr) c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
             m_modeDisplay.ShowMessage(displayStr, currentTime);
         }

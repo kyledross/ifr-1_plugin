@@ -607,6 +607,7 @@
       }
     },
     "ap-alt": {
+      "description": "Lighting Controls",
       "outer-knob": {
         "rotate-clockwise": {
           "description": "Increases the instrument panel lighting brightness.",

@@ -853,6 +853,7 @@
       }
     },
     "fms1-alt": {
+      "description": "FMS1 Zoom",
       "outer-knob": {
         "rotate-clockwise": {
           "description": "Zooms in the map on the G1000 PFD.",
@@ -895,6 +896,7 @@
       }
     },
     "fms2-alt": {
+      "description": "FMS2 Zoom",
       "outer-knob": {
         "rotate-clockwise": {
           "description": "Zooms in the map on the G1000 PFD 2.",
@@ -1072,6 +1074,7 @@
       }
     },
     "ap-alt": {
+      "description": "Lighting Controls",
       "outer-knob": {
         "rotate-clockwise": {
           "description": "Increases the instrument panel lighting brightness.",
