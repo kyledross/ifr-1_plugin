@@ -19,6 +19,8 @@
 #include "ModeDisplay.h"
 #include "XPlaneSDK.h"
 
+namespace {
+
 class MockXPlaneSDK : public IXPlaneSDK {
 public:
     MOCK_METHOD(void*, FindDataRef, (const char* name), (override));
@@ -63,10 +65,10 @@ using ::testing::NiceMock;
 TEST(ModeDisplayTest, AnimationSequence) {
     NiceMock<MockXPlaneSDK> sdk;
     
-    IXPlaneSDK::WindowCreateParams capturedParams;
+    IXPlaneSDK::WindowCreateParams capturedParams{};
     EXPECT_CALL(sdk, CreateWindowEx(_)).WillOnce([&](const IXPlaneSDK::WindowCreateParams& params){
         capturedParams = params;
-        return (void*)0x1234;
+        return reinterpret_cast<void*>(0x1234);
     });
 
     EXPECT_CALL(sdk, MeasureString(_)).WillRepeatedly(Return(100));
@@ -85,27 +87,27 @@ TEST(ModeDisplayTest, AnimationSequence) {
     EXPECT_CALL(sdk, DrawRectangle(_, _, _, _, _)).Times(1);
     EXPECT_CALL(sdk, DrawRectangleOutline(_, _, _, _, _)).Times(1);
     EXPECT_CALL(sdk, DrawString(_, _, _, _)).Times(1);
-    capturedParams.drawCallback((void*)0x1234, capturedParams.refcon);
+    capturedParams.drawCallback(reinterpret_cast<void*>(0x1234), capturedParams.refcon);
 
     // Stay (1.0s)
     display.Update(1.0f);
     EXPECT_CALL(sdk, DrawRectangle(_, _, _, _, _)).Times(1);
     EXPECT_CALL(sdk, DrawRectangleOutline(_, _, _, _, _)).Times(1);
     EXPECT_CALL(sdk, DrawString(_, _, _, _)).Times(1);
-    capturedParams.drawCallback((void*)0x1234, capturedParams.refcon);
+    capturedParams.drawCallback(reinterpret_cast<void*>(0x1234), capturedParams.refcon);
 
     // Fade out halfway (2.75s is 0.5s into 1s fade out which starts at 2.25s)
     display.Update(2.75f);
     EXPECT_CALL(sdk, DrawRectangle(_, _, _, _, _)).Times(1);
     EXPECT_CALL(sdk, DrawRectangleOutline(_, _, _, _, _)).Times(1);
     EXPECT_CALL(sdk, DrawString(_, _, _, _)).Times(1);
-    capturedParams.drawCallback((void*)0x1234, capturedParams.refcon);
+    capturedParams.drawCallback(reinterpret_cast<void*>(0x1234), capturedParams.refcon);
 
     // Done
     display.Update(3.5f);
     EXPECT_CALL(sdk, DrawRectangle(_, _, _, _, _)).Times(0);
     EXPECT_CALL(sdk, DrawString(_, _, _, _)).Times(0);
-    capturedParams.drawCallback((void*)0x1234, capturedParams.refcon);
+    capturedParams.drawCallback(reinterpret_cast<void*>(0x1234), capturedParams.refcon);
 }
 
 TEST(ModeDisplayTest, RestartsOnNewMessage) {
@@ -117,4 +119,5 @@ TEST(ModeDisplayTest, RestartsOnNewMessage) {
 
     display.ShowMessage("SECOND", 0.6f);
     display.Update(0.7f); // 0.1s into new fade in (opacity 0.4)
+}
 }

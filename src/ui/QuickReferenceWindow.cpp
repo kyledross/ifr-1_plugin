@@ -98,6 +98,13 @@ namespace ui::quick_ref
             std::string modeHeader = "[";
             modeHeader += modeTitle;
             modeHeader += "]";
+
+            if (modeJson.contains("description") && modeJson["description"].is_string()) {
+                modeHeader += " (";
+                modeHeader += modeJson["description"].get<std::string>();
+                modeHeader += ")";
+            }
+
             g_rawLines.push_back(std::move(modeHeader));
 
             std::string shiftInstr = GetShiftInstruction(modeName);
