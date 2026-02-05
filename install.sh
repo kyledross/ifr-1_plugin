@@ -128,6 +128,47 @@ else
     fi
 fi
 
+# Check for libOpenGL.so.0
+info "Checking for libOpenGL.so.0..."
+if ! ldconfig -p | grep -q "libOpenGL.so.0"; then
+    warning "libOpenGL.so.0 not found."
+
+    OS_ID=""
+    OS_NAME=""
+    if [ -f /etc/os-release ]; then
+        OS_ID=$(. /etc/os-release && echo "$ID")
+        OS_NAME=$(. /etc/os-release && echo "$NAME")
+    fi
+
+    case "$OS_ID" in
+        ubuntu|debian|pop|mint)
+            info "To install libOpenGL.so.0 on $OS_NAME, run:"
+            echo "    sudo apt update && sudo apt install libopengl0"
+            ;;
+        fedora|rhel|centos)
+            info "To install libOpenGL.so.0 on $OS_NAME, run:"
+            echo "    sudo dnf install libglvnd-opengl"
+            ;;
+        *)
+            info "Please install the package providing libOpenGL.so.0 for your distribution."
+            ;;
+    esac
+
+    echo ""
+    read -r -p "Have you installed the dependency? (y/n): " dep_installed
+    if [[ ! "$dep_installed" =~ ^[Yy]$ ]]; then
+        error "libOpenGL.so.0 is required for the plugin to load in X-Plane."
+    fi
+
+    # Re-verify
+    if ! ldconfig -p | grep -q "libOpenGL.so.0"; then
+        error "libOpenGL.so.0 still not found. Please ensure it is installed and try again."
+    fi
+    success "libOpenGL.so.0 verified."
+else
+    success "libOpenGL.so.0 found."
+fi
+
 # Find X-Plane installation
 XPLANE_INSTALL_FILE="$USER_HOME/.x-plane/x-plane_install_12.txt"
 
@@ -196,11 +237,14 @@ fi
 success "Found plugin binary: $PLUGIN_BINARY"
 
 # Verify plugin binary
-info "Verifying plugin binary..."
-if ! ldd "$PLUGIN_BINARY" > /dev/null 2>&1; then
-    error "Plugin binary has broken dependencies or is incompatible with this system."
+info "Verifying plugin binary dependencies..."
+LDD_OUTPUT=$(ldd "$PLUGIN_BINARY" 2>/dev/null) || error "Failed to run ldd on $PLUGIN_BINARY"
+if echo "$LDD_OUTPUT" | grep -q "not found"; then
+    error_no_exit "Plugin binary has missing dependencies:"
+    echo "$LDD_OUTPUT" | grep "not found"
+    error "Please install missing dependencies and try again."
 fi
-success "Plugin binary verified."
+success "Plugin binary dependencies verified."
 
 # Install the plugin
 PLUGIN_BASE_DIR="$XPLANE_ROOT/Resources/plugins/ifr1flex"
