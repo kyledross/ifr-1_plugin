@@ -77,6 +77,8 @@ docker run --rm \
     -v "$SCRIPT_DIR:/source:ro" \
     -v "$SCRIPT_DIR/docker-build:/build" \
     -v "$SCRIPT_DIR/docker-output:/output" \
+    -e HOST_UID=$(id -u) \
+    -e HOST_GID=$(id -g) \
     "$IMAGE_NAME" \
     bash -c '
         set -e
@@ -99,6 +101,9 @@ docker run --rm \
         cp -v /source/LICENSE /output/LICENSE
         cp -v /source/NOTICE /output/NOTICE
         cp -rv /source/configs /output/configs
+        echo ""
+        echo "Fixing ownership of output files..."
+        chown -R $HOST_UID:$HOST_GID /output
         echo ""
         echo "Build complete!"
         echo ""
