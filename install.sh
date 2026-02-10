@@ -48,6 +48,16 @@ error_no_exit() {
 error() {
     echo -e "${RED}[ERROR]${NC} $1"
     cleanup
+    
+    echo
+    info "Press Enter to exit."
+    # Prefer stdin when attached to a terminal; fall back to /dev/tty if available.
+    if [ -t 0 ]; then
+        read -r _ || true
+    elif [ -e /dev/tty ]; then
+        read -r _ < /dev/tty || true
+    fi
+    
     exit 1
 }
 
@@ -365,7 +375,7 @@ fi
 
 # Keep the window open for users running the script graphically
 echo
-info "Press Enter to finish the install."
+info "Press Enter to finish."
 
 # Prefer stdin when attached to a terminal; fall back to /dev/tty if available.
 if [ -t 0 ]; then
