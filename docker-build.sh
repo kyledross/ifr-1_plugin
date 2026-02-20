@@ -74,9 +74,9 @@ echo ""
 # - Mount output directory for final plugin
 docker run --rm \
     --name "$CONTAINER_NAME" \
-    -v "$SCRIPT_DIR:/source:ro" \
-    -v "$SCRIPT_DIR/docker-build:/build" \
-    -v "$SCRIPT_DIR/docker-output:/output" \
+    -v "$SCRIPT_DIR:/source:ro,Z" \
+    -v "$SCRIPT_DIR/docker-build:/build:Z" \
+    -v "$SCRIPT_DIR/docker-output:/output:Z" \
     -e HOST_UID=$(id -u) \
     -e HOST_GID=$(id -g) \
     "$IMAGE_NAME" \
