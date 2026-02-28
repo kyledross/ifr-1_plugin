@@ -22,6 +22,21 @@
 
 class MockXPlaneSDKForSettings : public IXPlaneSDK {
 public:
+    MOCK_METHOD(void*, FindDataRef, (const char* name), (override));
+    MOCK_METHOD(int, GetDataRefTypes, (void* dataRef), (override));
+    MOCK_METHOD(int, GetDatai, (void* dataRef), (override));
+    MOCK_METHOD(void, SetDatai, (void* dataRef, int value), (override));
+    MOCK_METHOD(float, GetDataf, (void* dataRef), (override));
+    MOCK_METHOD(void, SetDataf, (void* dataRef, float value), (override));
+    MOCK_METHOD(int, GetDataiArray, (void* dataRef, int index), (override));
+    MOCK_METHOD(void, SetDataiArray, (void* dataRef, int value, int index), (override));
+    MOCK_METHOD(float, GetDatafArray, (void* dataRef, int index), (override));
+    MOCK_METHOD(void, SetDatafArray, (void* dataRef, float value, int index), (override));
+    MOCK_METHOD(int, GetDatab, (void* dataRef, void* outData, int offset, int maxLength), (override));
+    MOCK_METHOD(void*, FindCommand, (const char* name), (override));
+    MOCK_METHOD(void, CommandOnce, (void* commandRef), (override));
+    MOCK_METHOD(void, CommandBegin, (void* commandRef), (override));
+    MOCK_METHOD(void, CommandEnd, (void* commandRef), (override));
     MOCK_METHOD(void, Log, (LogLevel level, const char* string), (override));
     MOCK_METHOD(void, SetLogLevel, (LogLevel level), (override));
     MOCK_METHOD(LogLevel, GetLogLevel, (), (const, override));
@@ -40,21 +55,7 @@ public:
     MOCK_METHOD(void, SetWindowVisible, (void* windowId, int visible), (override));
     MOCK_METHOD(void, SetWindowGeometry, (void* windowId, int left, int top, int right, int bottom), (override));
     MOCK_METHOD(void, GetWindowGeometry, (void* windowId, int* outLeft, int* outTop, int* outRight, int* outBottom), (override));
-    MOCK_METHOD(void*, FindDataRef, (const char* name), (override));
-    MOCK_METHOD(int, GetDataRefTypes, (void* dataRef), (override));
-    MOCK_METHOD(int, GetDatai, (void* dataRef), (override));
-    MOCK_METHOD(void, SetDatai, (void* dataRef, int value), (override));
-    MOCK_METHOD(float, GetDataf, (void* dataRef), (override));
-    MOCK_METHOD(void, SetDataf, (void* dataRef, float value), (override));
-    MOCK_METHOD(int, GetDataiArray, (void* dataRef, int index), (override));
-    MOCK_METHOD(void, SetDataiArray, (void* dataRef, int value, int index), (override));
-    MOCK_METHOD(float, GetDatafArray, (void* dataRef, int index), (override));
-    MOCK_METHOD(void, SetDatafArray, (void* dataRef, float value, int index), (override));
-    MOCK_METHOD(int, GetDatab, (void* dataRef, void* outData, int offset, int maxLength), (override));
-    MOCK_METHOD(void*, FindCommand, (const char* name), (override));
-    MOCK_METHOD(void, CommandOnce, (void* commandRef), (override));
-    MOCK_METHOD(void, CommandBegin, (void* commandRef), (override));
-    MOCK_METHOD(void, CommandEnd, (void* commandRef), (override));
+    MOCK_METHOD(void, GetScreenBoundsGlobal, (int* outLeft, int* outTop, int* outRight, int* outBottom), (override));
 };
 
 TEST(SettingsManagerTest, LoadsDefaultsWhenFileNotFound) {
@@ -68,6 +69,7 @@ TEST(SettingsManagerTest, LoadsDefaultsWhenFileNotFound) {
     manager.Load(sdk);
     
     EXPECT_FALSE(manager.GetBool("on-screen-mode-display"));
+    EXPECT_EQ("lower-left", manager.GetString("osd-position"));
     EXPECT_TRUE(std::filesystem::exists(testPath));
     
     std::filesystem::remove(testPath);
@@ -83,6 +85,7 @@ TEST(SettingsManagerTest, SavesAndLoadsSettings) {
     {
         SettingsManager manager(testPath);
         manager.SetBool("on-screen-mode-display", true);
+        manager.SetString("osd-position", "upper-right");
         manager.Save(sdk);
     }
     
@@ -90,6 +93,7 @@ TEST(SettingsManagerTest, SavesAndLoadsSettings) {
         SettingsManager manager(testPath);
         manager.Load(sdk);
         EXPECT_TRUE(manager.GetBool("on-screen-mode-display"));
+        EXPECT_EQ("upper-right", manager.GetString("osd-position"));
     }
     
     std::filesystem::remove(testPath);
@@ -111,6 +115,21 @@ TEST(SettingsManagerTest, HandlesInvalidJson) {
     
     // Should still have defaults
     EXPECT_FALSE(manager.GetBool("on-screen-mode-display"));
+    EXPECT_EQ("lower-left", manager.GetString("osd-position"));
+    
+    std::filesystem::remove(testPath);
+}
+
+TEST(SettingsManagerTest, GetStringReturnsDefaultWhenNotFound) {
+    MockXPlaneSDKForSettings sdk;
+    std::filesystem::path testPath = "test_default_settings.json";
+    if (std::filesystem::exists(testPath)) std::filesystem::remove(testPath);
+    
+    EXPECT_CALL(sdk, Log(::testing::_, ::testing::_)).WillRepeatedly(::testing::Return());
+
+    SettingsManager manager(testPath);
+    EXPECT_EQ("default-value", manager.GetString("non-existent-key", "default-value"));
+    EXPECT_EQ("", manager.GetString("another-non-existent-key"));
     
     std::filesystem::remove(testPath);
 }

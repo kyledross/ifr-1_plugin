@@ -78,6 +78,7 @@ public:
     virtual int MeasureString(const char* string) = 0;
     virtual int GetFontHeight() = 0;
     virtual void GetScreenSize(int* outWidth, int* outHeight) = 0;
+    virtual void GetScreenBoundsGlobal(int* outLeft, int* outTop, int* outRight, int* outBottom) = 0;
 
     // Windowing
     struct WindowCreateParams {

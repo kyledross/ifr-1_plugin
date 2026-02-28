@@ -17,7 +17,8 @@
 #include "ModeDisplay.h"
 #include <algorithm>
 
-ModeDisplay::ModeDisplay(IXPlaneSDK& sdk) : m_sdk(sdk) {
+ModeDisplay::ModeDisplay(IXPlaneSDK& sdk, SettingsManager& settingsManager) 
+    : m_sdk(sdk), m_settingsManager(settingsManager) {
     IXPlaneSDK::WindowCreateParams params{};
     params.left = 20;
     params.bottom = 20;
@@ -40,22 +41,16 @@ void ModeDisplay::ShowMessage(const std::string& message, float currentTime) {
     m_startTime = currentTime;
     m_opacity = 0.0f;
 
-    if (m_windowId) {
-        int textW = m_sdk.MeasureString(m_message.c_str());
-        int textH = m_sdk.GetFontHeight();
-
-        int paddingX = 8;
-        int paddingY = 4;
-        int boxW = textW + paddingX * 2;
-        int boxH = textH + paddingY * 2;
-
-        int l = 20;
-        int b = 20;
-        m_sdk.SetWindowGeometry(m_windowId, l, b + boxH, l + boxW, b);
-    }
+    UpdatePosition();
 }
 
 void ModeDisplay::Update(float currentTime) {
+    std::string currentPosition = m_settingsManager.GetString("osd-position", "lower-left");
+    if (currentPosition != m_lastPosition) {
+        UpdatePosition();
+        m_lastPosition = currentPosition;
+    }
+
     if (m_startTime < 0) {
         m_opacity = 0.0f;
     } else {
@@ -112,4 +107,43 @@ void ModeDisplay::DrawWindow() {
 
     // Draw only once for better clarity (1:1 pixel mapping in window helps)
     m_sdk.DrawString(textColor, textX, textY, m_message.c_str());
+}
+
+void ModeDisplay::UpdatePosition() {
+    if (!m_windowId) return;
+
+    int textW = m_sdk.MeasureString(m_message.c_str());
+    int textH = m_sdk.GetFontHeight();
+
+    int paddingX = 8;
+    int paddingY = 4;
+    int boxW = textW + paddingX * 2;
+    int boxH = textH + paddingY * 2;
+
+    std::string position = m_settingsManager.GetString("osd-position", "lower-left");
+
+    int screenL, screenT, screenR, screenB;
+    m_sdk.GetScreenBoundsGlobal(&screenL, &screenT, &screenR, &screenB);
+
+    int margin = 20;
+    int l, b;
+
+    if (position == "lower-left") {
+        l = screenL + margin;
+        b = screenB + margin;
+    } else if (position == "lower-right") {
+        l = screenR - boxW - margin;
+        b = screenB + margin;
+    } else if (position == "upper-left") {
+        l = screenL + margin;
+        b = screenT - boxH - margin;
+    } else if (position == "upper-right") {
+        l = screenR - boxW - margin;
+        b = screenT - boxH - margin;
+    } else {
+        l = screenL + margin;
+        b = screenB + margin;
+    }
+
+    m_sdk.SetWindowGeometry(m_windowId, l, b + boxH, l + boxW, b);
 }

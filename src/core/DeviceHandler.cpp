@@ -20,7 +20,7 @@
 #include <cctype>
 
 DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, SettingsManager& settings, IXPlaneSDK& sdk, bool startThread) 
-    : m_hw(hw), m_eventProc(eventProc), m_outputProc(outputProc), m_settings(settings), m_sdk(sdk), m_modeDisplay(sdk) {
+    : m_hw(hw), m_eventProc(eventProc), m_outputProc(outputProc), m_settings(settings), m_sdk(sdk), m_modeDisplay(sdk, settings) {
     for (auto& state : m_buttonStates) {
         state.currentlyHeld = false;
         state.pressStartTime = 0.0f;

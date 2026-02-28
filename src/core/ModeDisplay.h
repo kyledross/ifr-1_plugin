@@ -16,11 +16,12 @@
 
 #pragma once
 #include "XPlaneSDK.h"
+#include "SettingsManager.h"
 #include <string>
 
 class ModeDisplay {
 public:
-    explicit ModeDisplay(IXPlaneSDK& sdk);
+    explicit ModeDisplay(IXPlaneSDK& sdk, SettingsManager& settingsManager);
     ~ModeDisplay();
     void ShowMessage(const std::string& message, float currentTime);
     void Update(float currentTime);
@@ -29,10 +30,13 @@ public:
 private:
     static void DrawCallback(void* windowId, void* refcon);
     void DrawWindow();
+    void UpdatePosition();
 
     IXPlaneSDK& m_sdk;
+    SettingsManager& m_settingsManager;
     void* m_windowId = nullptr;
     std::string m_message;
     float m_startTime = -1.0f;
     float m_opacity = 0.0f;
+    std::string m_lastPosition;
 };

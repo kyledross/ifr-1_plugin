@@ -49,6 +49,7 @@ public:
     MOCK_METHOD(void, SetWindowVisible, (void* windowId, int visible), (override));
     MOCK_METHOD(void, SetWindowGeometry, (void* windowId, int left, int top, int right, int bottom), (override));
     MOCK_METHOD(void, GetWindowGeometry, (void* windowId, int* outLeft, int* outTop, int* outRight, int* outBottom), (override));
+    MOCK_METHOD(void, GetScreenBoundsGlobal, (int* outLeft, int* outTop, int* outRight, int* outBottom), (override));
 };
 
 using ::testing::Return;

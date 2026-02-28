@@ -35,6 +35,9 @@ public:
     bool GetBool(const std::string& name, bool defaultValue = false) const;
     void SetBool(const std::string& name, bool value);
     
+    std::string GetString(const std::string& name, const std::string& defaultValue = "") const;
+    void SetString(const std::string& name, const std::string& value);
+    
     const std::vector<Setting>& GetSettings() const { return m_settings; }
 
 private:

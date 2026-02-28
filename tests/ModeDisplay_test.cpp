@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "ModeDisplay.h"
+#include "SettingsManager.h"
 #include "XPlaneSDK.h"
 
 namespace {
@@ -56,6 +57,7 @@ public:
     MOCK_METHOD(void, SetWindowVisible, (void* windowId, int visible), (override));
     MOCK_METHOD(void, SetWindowGeometry, (void* windowId, int left, int top, int right, int bottom), (override));
     MOCK_METHOD(void, GetWindowGeometry, (void* windowId, int* outLeft, int* outTop, int* outRight, int* outBottom), (override));
+    MOCK_METHOD(void, GetScreenBoundsGlobal, (int* outLeft, int* outTop, int* outRight, int* outBottom), (override));
 };
 
 using ::testing::_;
@@ -64,6 +66,7 @@ using ::testing::NiceMock;
 
 TEST(ModeDisplayTest, AnimationSequence) {
     NiceMock<MockXPlaneSDK> sdk;
+    SettingsManager settings("test_mode_display_settings.json");
     
     IXPlaneSDK::WindowCreateParams capturedParams{};
     EXPECT_CALL(sdk, CreateWindowEx(_)).WillOnce([&](const IXPlaneSDK::WindowCreateParams& params){
@@ -76,9 +79,12 @@ TEST(ModeDisplayTest, AnimationSequence) {
     EXPECT_CALL(sdk, GetWindowGeometry(_, _, _, _, _)).WillRepeatedly([](void*, int* l, int* t, int* r, int* b){
         *l = 0; *t = 50; *r = 150; *b = 0;
     });
+    EXPECT_CALL(sdk, GetScreenBoundsGlobal(_, _, _, _)).WillRepeatedly([](int* l, int* t, int* r, int* b){
+        *l = 0; *t = 1080; *r = 1920; *b = 0;
+    });
     EXPECT_CALL(sdk, DestroyWindow(_)).WillOnce(Return());
 
-    ModeDisplay display(sdk);
+    ModeDisplay display(sdk, settings);
 
     display.ShowMessage("TEST", 0.0f);
 
@@ -112,12 +118,13 @@ TEST(ModeDisplayTest, AnimationSequence) {
 
 TEST(ModeDisplayTest, RestartsOnNewMessage) {
     NiceMock<MockXPlaneSDK> sdk;
-    ModeDisplay display(sdk);
+    SettingsManager settings("test_mode_display_settings2.json");
+    ModeDisplay display(sdk, settings);
 
     display.ShowMessage("FIRST", 0.0f);
-    display.Update(0.3f); // Fully visible
+    display.Update(0.3f);
 
     display.ShowMessage("SECOND", 0.6f);
-    display.Update(0.7f); // 0.1s into new fade in (opacity 0.4)
+    display.Update(0.7f);
 }
 }

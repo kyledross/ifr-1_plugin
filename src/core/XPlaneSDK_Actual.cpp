@@ -227,6 +227,10 @@ public:
         if (outHeight) *outHeight = t - b;
     }
 
+    void GetScreenBoundsGlobal(int* outLeft, int* outTop, int* outRight, int* outBottom) override {
+        XPLMGetScreenBoundsGlobal(outLeft, outTop, outRight, outBottom);
+    }
+
     void* CreateWindowEx(const WindowCreateParams& params) override {
         XPLMCreateWindow_t xparams{};
         xparams.structSize = sizeof(xparams);

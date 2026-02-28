@@ -118,11 +118,39 @@ void SettingsManager::SetBool(const std::string& name, bool value) {
     }
 }
 
+std::string SettingsManager::GetString(const std::string& name, const std::string& defaultValue) const {
+    auto it = std::find_if(m_settings.begin(), m_settings.end(), [&](const Setting& s) {
+        return s.name == name;
+    });
+
+    if (it != m_settings.end()) {
+        return it->value;
+    }
+    return defaultValue;
+}
+
+void SettingsManager::SetString(const std::string& name, const std::string& value) {
+    auto it = std::find_if(m_settings.begin(), m_settings.end(), [&](const Setting& s) {
+        return s.name == name;
+    });
+
+    if (it != m_settings.end()) {
+        it->value = value;
+    } else {
+        m_settings.push_back({name, "", value});
+    }
+}
+
 void SettingsManager::SetDefaultSettings() {
     m_settings.clear();
     m_settings.push_back({
         "on-screen-mode-display",
         "Show mode changes on-screen",
         "false"
+    });
+    m_settings.push_back({
+        "osd-position",
+        "On-screen display position",
+        "lower-left"
     });
 }

@@ -59,6 +59,7 @@ public:
     MOCK_METHOD(void, SetWindowVisible, (void* windowId, int visible), (override));
     MOCK_METHOD(void, SetWindowGeometry, (void* windowId, int left, int top, int right, int bottom), (override));
     MOCK_METHOD(void, GetWindowGeometry, (void* windowId, int* outLeft, int* outTop, int* outRight, int* outBottom), (override));
+    MOCK_METHOD(void, GetScreenBoundsGlobal, (int* outLeft, int* outTop, int* outRight, int* outBottom), (override));
 };
 
 using ::testing::Return;
@@ -117,8 +118,13 @@ TEST(DeviceHandlerTest, Update_UsesModeDescriptionForDisplay) {
     };
     
     // We expect MeasureString to be called with the UPPERCASE description
+    // It's called twice: once in ShowMessage/UpdatePosition and once in Update when checking position
     EXPECT_CALL(mockSdk, MeasureString(::testing::StrEq("COMMUNICATION RADIO 1")))
-        .WillOnce(::testing::Return(100));
+        .WillRepeatedly(::testing::Return(100));
+    EXPECT_CALL(mockSdk, GetFontHeight())
+        .WillRepeatedly(::testing::Return(20));
+    EXPECT_CALL(mockSdk, GetScreenBoundsGlobal(::testing::_, ::testing::_, ::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return());
     
     // Trigger a mode change to com1 (default is com1, and m_lastModeString was cleared in Update when not connected)
     handler.Update(config, 1.0f);
@@ -149,8 +155,13 @@ TEST(DeviceHandlerTest, Update_UsesModeNameIfDescriptionMissing) {
     };
     
     // We expect MeasureString to be called with the UPPERCASE mode name
+    // It's called twice: once in ShowMessage/UpdatePosition and once in Update when checking position
     EXPECT_CALL(mockSdk, MeasureString(::testing::StrEq("COM1")))
-        .WillOnce(::testing::Return(40));
+        .WillRepeatedly(::testing::Return(40));
+    EXPECT_CALL(mockSdk, GetFontHeight())
+        .WillRepeatedly(::testing::Return(20));
+    EXPECT_CALL(mockSdk, GetScreenBoundsGlobal(::testing::_, ::testing::_, ::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return());
     
     handler.Update(config, 1.0f);
 }
