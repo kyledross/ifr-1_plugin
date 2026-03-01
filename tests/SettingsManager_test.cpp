@@ -68,8 +68,7 @@ TEST(SettingsManagerTest, LoadsDefaultsWhenFileNotFound) {
     SettingsManager manager(testPath);
     manager.Load(sdk);
     
-    EXPECT_FALSE(manager.GetBool("on-screen-mode-display"));
-    EXPECT_EQ("lower-left", manager.GetString("osd-position"));
+    EXPECT_EQ("disabled", manager.GetString("osd-position"));
     EXPECT_TRUE(std::filesystem::exists(testPath));
     
     std::filesystem::remove(testPath);
@@ -84,7 +83,6 @@ TEST(SettingsManagerTest, SavesAndLoadsSettings) {
 
     {
         SettingsManager manager(testPath);
-        manager.SetBool("on-screen-mode-display", true);
         manager.SetString("osd-position", "upper-right");
         manager.Save(sdk);
     }
@@ -92,7 +90,6 @@ TEST(SettingsManagerTest, SavesAndLoadsSettings) {
     {
         SettingsManager manager(testPath);
         manager.Load(sdk);
-        EXPECT_TRUE(manager.GetBool("on-screen-mode-display"));
         EXPECT_EQ("upper-right", manager.GetString("osd-position"));
     }
     
@@ -114,8 +111,7 @@ TEST(SettingsManagerTest, HandlesInvalidJson) {
     manager.Load(sdk);
     
     // Should still have defaults
-    EXPECT_FALSE(manager.GetBool("on-screen-mode-display"));
-    EXPECT_EQ("lower-left", manager.GetString("osd-position"));
+    EXPECT_EQ("disabled", manager.GetString("osd-position"));
     
     std::filesystem::remove(testPath);
 }

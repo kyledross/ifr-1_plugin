@@ -100,7 +100,7 @@ TEST(DeviceHandlerTest, Update_UsesModeDescriptionForDisplay) {
     OutputProcessor outputProc(mockSdk);
     
     SettingsManager settings("test_mode_desc_settings.json");
-    settings.SetBool("on-screen-mode-display", true);
+    settings.SetString("osd-position", "lower-left");
     
     EXPECT_CALL(mockSdk, CreateWindowEx(::testing::_)).WillOnce(::testing::Return(reinterpret_cast<void*>(0x1234)));
     DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);
@@ -137,7 +137,7 @@ TEST(DeviceHandlerTest, Update_UsesModeNameIfDescriptionMissing) {
     OutputProcessor outputProc(mockSdk);
     
     SettingsManager settings("test_mode_name_settings.json");
-    settings.SetBool("on-screen-mode-display", true);
+    settings.SetString("osd-position", "lower-left");
     
     EXPECT_CALL(mockSdk, CreateWindowEx(::testing::_)).WillOnce(::testing::Return(reinterpret_cast<void*>(0x1234)));
     DeviceHandler handler(mockHw, eventProc, outputProc, settings, mockSdk, false);

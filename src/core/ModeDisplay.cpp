@@ -45,13 +45,13 @@ void ModeDisplay::ShowMessage(const std::string& message, float currentTime) {
 }
 
 void ModeDisplay::Update(float currentTime) {
-    std::string currentPosition = m_settingsManager.GetString("osd-position", "lower-left");
+    std::string currentPosition = m_settingsManager.GetString("osd-position", "disabled");
     if (currentPosition != m_lastPosition) {
         UpdatePosition();
         m_lastPosition = currentPosition;
     }
 
-    if (m_startTime < 0) {
+    if (m_startTime < 0 || currentPosition == "disabled") {
         m_opacity = 0.0f;
     } else {
         float elapsed = currentTime - m_startTime;
@@ -120,7 +120,7 @@ void ModeDisplay::UpdatePosition() {
     int boxW = textW + paddingX * 2;
     int boxH = textH + paddingY * 2;
 
-    std::string position = m_settingsManager.GetString("osd-position", "lower-left");
+    std::string position = m_settingsManager.GetString("osd-position", "disabled");
 
     int screenL, screenT, screenR, screenB;
     m_sdk.GetScreenBoundsGlobal(&screenL, &screenT, &screenR, &screenB);

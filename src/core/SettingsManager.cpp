@@ -144,13 +144,8 @@ void SettingsManager::SetString(const std::string& name, const std::string& valu
 void SettingsManager::SetDefaultSettings() {
     m_settings.clear();
     m_settings.push_back({
-        "on-screen-mode-display",
-        "Show mode changes on-screen",
-        "false"
-    });
-    m_settings.push_back({
         "osd-position",
-        "On-screen display position",
-        "lower-left"
+        "On-screen mode indication",
+        "disabled"
     });
 }

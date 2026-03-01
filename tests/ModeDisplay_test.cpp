@@ -67,6 +67,7 @@ using ::testing::NiceMock;
 TEST(ModeDisplayTest, AnimationSequence) {
     NiceMock<MockXPlaneSDK> sdk;
     SettingsManager settings("test_mode_display_settings.json");
+    settings.SetString("osd-position", "lower-left");
     
     IXPlaneSDK::WindowCreateParams capturedParams{};
     EXPECT_CALL(sdk, CreateWindowEx(_)).WillOnce([&](const IXPlaneSDK::WindowCreateParams& params){
@@ -119,6 +120,7 @@ TEST(ModeDisplayTest, AnimationSequence) {
 TEST(ModeDisplayTest, RestartsOnNewMessage) {
     NiceMock<MockXPlaneSDK> sdk;
     SettingsManager settings("test_mode_display_settings2.json");
+    settings.SetString("osd-position", "lower-left");
     ModeDisplay display(sdk, settings);
 
     display.ShowMessage("FIRST", 0.0f);

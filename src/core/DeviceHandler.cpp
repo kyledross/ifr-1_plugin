@@ -89,7 +89,8 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
 
     std::string currentModeStr = GetModeString(m_currentMode, m_shifted);
     if (currentModeStr != m_lastModeString) {
-        if (!currentModeStr.empty() && m_settings.GetBool("on-screen-mode-display")) {
+        std::string osdPosition = m_settings.GetString("osd-position", "disabled");
+        if (!currentModeStr.empty() && osdPosition != "disabled") {
             std::string displayStr = currentModeStr;
             if (config.contains("modes") && config["modes"].contains(currentModeStr) && 
                 config["modes"][currentModeStr].contains("description") && config["modes"][currentModeStr]["description"].is_string()) {

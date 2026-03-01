@@ -31,6 +31,7 @@ namespace ui::settings {
     static int g_dropdownOpenIndex = -1;
     
     static const std::vector<std::string> g_osdPositions = {
+        "disabled",
         "lower-left",
         "lower-right",
         "upper-left",
@@ -54,8 +55,8 @@ namespace ui::settings {
 
         int l, t, r, b;
         XPLMGetScreenBoundsGlobal(&l, &t, &r, &b);
-        int width = 450;
-        int height = 165;
+        int width = 380;
+        int height = 150;
         int left = (l + r - width) / 2;
         int top = (t + b + height) / 2;
 
@@ -113,60 +114,16 @@ namespace ui::settings {
         XPLMGetFontDimensions(xplmFont_Basic, &char_w, &line_h, nullptr);
 
         int x = l + 20;
-        int y = t - 30;
+        int y = t - 25;
 
         if (!g_settingsManager) return;
 
         const auto& settings = g_settingsManager->GetSettings();
         int settingIndex = 0;
         for (const auto& s : settings) {
-            bool isBoolean = (s.value == "true" || s.value == "false");
             bool isOsdPosition = (s.name == "osd-position");
             
-            if (isBoolean) {
-                // Draw checkbox box
-                int box_size = 14;
-                int box_l = x;
-                int box_r = x + box_size;
-                int box_t = y;
-                int box_b = y - box_size;
-
-                XPLMSetGraphicsState(0, 0, 0, 0, 1, 0, 0);
-                
-                // Background
-                glColor4f(0.2f, 0.2f, 0.2f, 1.0f);
-                glBegin(GL_QUADS);
-                glVertex2i(box_l, box_t);
-                glVertex2i(box_r, box_t);
-                glVertex2i(box_r, box_b);
-                glVertex2i(box_l, box_b);
-                glEnd();
-
-                // Border
-                glColor4f(0.6f, 0.6f, 0.6f, 1.0f);
-                glBegin(GL_LINE_LOOP);
-                glVertex2i(box_l, box_t);
-                glVertex2i(box_r, box_t);
-                glVertex2i(box_r, box_b);
-                glVertex2i(box_l, box_b);
-                glEnd();
-
-                // Checkmark
-                if (s.value == "true") {
-                    glColor4f(0.2f, 0.8f, 0.2f, 1.0f);
-                    glLineWidth(2.0f);
-                    glBegin(GL_LINES);
-                    glVertex2i(box_l + 3, box_t - 7);
-                    glVertex2i(box_l + 6, box_b + 3);
-                    glVertex2i(box_l + 6, box_b + 3);
-                    glVertex2i(box_r - 2, box_t - 3);
-                    glEnd();
-                    glLineWidth(1.0f);
-                }
-
-                // Draw description
-                XPLMDrawString(col_white, x + box_size + 10, y - 11, const_cast<char*>(s.description.c_str()), nullptr, xplmFont_Basic);
-            } else if (isOsdPosition) {
+            if (isOsdPosition) {
                 // Draw description label
                 XPLMDrawString(col_white, x, y - 11, const_cast<char*>(s.description.c_str()), nullptr, xplmFont_Basic);
                 
@@ -262,33 +219,16 @@ namespace ui::settings {
         XPLMGetWindowGeometry(inWindowID, &l, &t, &r, &b);
 
         int cur_x = l + 20;
-        int cur_y = t - 30;
+        int cur_y = t - 25;
 
         if (!g_settingsManager) return 1;
 
         const auto& settings = g_settingsManager->GetSettings();
         int settingIndex = 0;
         for (const auto& s : settings) {
-            bool isBoolean = (s.value == "true" || s.value == "false");
             bool isOsdPosition = (s.name == "osd-position");
             
-            if (isBoolean) {
-                int box_size = 14;
-                int box_l = cur_x;
-                int box_t = cur_y;
-                int box_b = cur_y - box_size;
-
-                int char_w, line_h;
-                XPLMGetFontDimensions(xplmFont_Basic, &char_w, &line_h, nullptr);
-                int text_r = cur_x + box_size + 10 + (static_cast<int>(s.description.size()) * char_w);
-
-                if (x >= box_l && x <= text_r && y <= box_t && y >= box_b) {
-                    bool currentVal = (s.value == "true");
-                    g_settingsManager->SetBool(s.name, !currentVal);
-                    g_settingsManager->Save(*g_sdk);
-                    return 1;
-                }
-            } else if (isOsdPosition) {
+            if (isOsdPosition) {
                 int dropdown_w = 120;
                 int dropdown_h = 20;
                 int dropdown_l = cur_x + 185;
