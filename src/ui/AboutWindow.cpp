@@ -1,5 +1,5 @@
 /*
- *   Copyright 2025 Kyle D. Ross
+ *   Copyright 2026 Kyle D. Ross
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -243,7 +243,7 @@ namespace ui::about
 
     // Body text
     const char *line1 =
-      "Copyright 2025 Kyle D. Ross";
+      "Copyright 2026 Kyle D. Ross";
 
     const char *line2 =
       "This software is not affiliated with, endorsed by, or supported by Octavi GmbH or Laminar Research.  All trademarks are the property of their respective owners, and are used herein for reference only.";

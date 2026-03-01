@@ -1,5 +1,5 @@
 # IFR-1 Flight Controller Plugin for X-Plane 12 on Linux
-Copyright 2025 Kyle D. Ross
+Copyright 2026 Kyle D. Ross
 See LICENSE for details.
 
 ## Disclaimer
