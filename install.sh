@@ -111,16 +111,6 @@ EOF
 
 read -r -p "Press Enter to continue with the installation..." _
 
-# Prompt user to disconnect the device
-info "Please ensure the IFR-1 device is disconnected before proceeding."
-read -r -p "Is the device disconnected? (y/n): " device_disconnected
-
-if [[ ! "$device_disconnected" =~ ^[Yy]$ ]]; then
-    error "Please disconnect the device and run the script again."
-fi
-
-success "Device check passed."
-
 # Check glibc version
 info "Checking system dependencies..."
 REQUIRED_GLIBC="2.14"

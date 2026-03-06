@@ -137,6 +137,9 @@ namespace ui::quick_ref
                                 g_rawLines.push_back(std::move(line));
                             }
                         }
+                        if (eventHeaderAdded) {
+                            g_rawLines.emplace_back("");
+                        }
                     }
                 }
             }
