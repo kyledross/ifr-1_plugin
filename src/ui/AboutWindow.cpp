@@ -16,8 +16,8 @@
 
 // AboutWindow.cpp - Implementation of the plugin's About dialog
 
-#include "ui/AboutWindow.h"
-#include "ui/GLTextureHandle.h"
+#include "AboutWindow.h"
+#include "GLTextureHandle.h"
 
 #include "XPLMDisplay.h"
 #include "XPLMGraphics.h"

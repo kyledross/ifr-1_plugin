@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-#include "ui/SettingsWindow.h"
+#include "SettingsWindow.h"
 #include "XPLMDisplay.h"
 #include "XPLMGraphics.h"
 #include "XPLMProcessing.h"

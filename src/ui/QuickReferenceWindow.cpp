@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-#include "ui/QuickReferenceWindow.h"
+#include "QuickReferenceWindow.h"
 #include "XPLMDisplay.h"
 #include "XPLMGraphics.h"
 #include "XPLMProcessing.h"

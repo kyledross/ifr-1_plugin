@@ -3,7 +3,10 @@
 .output.txt
 /deploy.sh
 /build/
-
+.cache
+.idea
+./src/.idea
 /Testing/
 /WARP.md
 /AGENTS.md
+/compile_commands.json
