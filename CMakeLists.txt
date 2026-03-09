@@ -164,4 +164,3 @@ target_link_libraries(ifr1flex_tests PRIVATE
 add_test(NAME ifr1flex_tests COMMAND ifr1flex_tests)
 
 # 12. (Optional) Deploy to Simulator
-# install(TARGETS ifr1flex LIBRARY DESTINATION "/home/kyle/X-Plane 12/Resources/plugins/ifr1flex/lin_x64")
