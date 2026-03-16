@@ -41,11 +41,16 @@ public:
     void Update(const nlohmann::json& config, float currentTime);
 
     /**
+     * @brief Parses and caches the mode display descriptions from the config.
+     * @param config The full aircraft configuration JSON.
+     */
+    void ParseModeDescriptions(const nlohmann::json& config);
+
+    /**
      * @brief Updates the LEDs on the device.
-     * @param config The current aircraft configuration.
      * @param currentTime Current time in seconds.
      */
-    void UpdateLEDs(const nlohmann::json& config, float currentTime);
+    void UpdateLEDs(float currentTime);
 
     /**
      * @brief Turns off all LEDs and clears the flash bit.
@@ -73,6 +78,8 @@ private:
     OutputProcessor& m_outputProc;
     SettingsManager& m_settings;
     IXPlaneSDK& m_sdk;
+
+    std::unordered_map<std::string, std::string> m_modeDescriptions;
 
     // Threading
     std::thread m_thread;

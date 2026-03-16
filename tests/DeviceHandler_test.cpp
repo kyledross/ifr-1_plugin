@@ -127,6 +127,8 @@ TEST(DeviceHandlerTest, Update_UsesModeDescriptionForDisplay) {
         .WillRepeatedly(::testing::Return());
     
     // Trigger a mode change to com1 (default is com1, and m_lastModeString was cleared in Update when not connected)
+    handler.ParseModeDescriptions(config);
+    outputProc.ParseOutputConfig(config);
     handler.Update(config, 1.0f);
 }
 
@@ -163,6 +165,8 @@ TEST(DeviceHandlerTest, Update_UsesModeNameIfDescriptionMissing) {
     EXPECT_CALL(mockSdk, GetScreenBoundsGlobal(::testing::_, ::testing::_, ::testing::_, ::testing::_))
         .WillRepeatedly(::testing::Return());
     
+    handler.ParseModeDescriptions(config);
+    outputProc.ParseOutputConfig(config);
     handler.Update(config, 1.0f);
 }
 
@@ -425,7 +429,9 @@ TEST(DeviceHandlerTest, UpdateLEDs_PushesToQueueAndWrites) {
     EXPECT_CALL(mockSdk, GetDatai(_)).WillRepeatedly(Return(1));
     
     // UpdateLEDs should detect change and push to queue
-    handler.UpdateLEDs(config, 1.0f);
+    handler.ParseModeDescriptions(config);
+    outputProc.ParseOutputConfig(config);
+    handler.UpdateLEDs(1.0f);
     
     // ProcessHardware should pop and write
     EXPECT_CALL(mockHw, Write(::testing::Pointee(IFR1::HID_LED_REPORT_ID), 2))

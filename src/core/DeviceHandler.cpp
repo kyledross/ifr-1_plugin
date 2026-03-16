@@ -92,9 +92,10 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
         std::string osdPosition = m_settings.GetString("osd-position", "disabled");
         if (!currentModeStr.empty() && osdPosition != "disabled") {
             std::string displayStr = currentModeStr;
-            if (config.contains("modes") && config["modes"].contains(currentModeStr) && 
-                config["modes"][currentModeStr].contains("description") && config["modes"][currentModeStr]["description"].is_string()) {
-                displayStr = config["modes"][currentModeStr]["description"].get<std::string>();
+            
+            auto it = m_modeDescriptions.find(currentModeStr);
+            if (it != m_modeDescriptions.end()) {
+                displayStr = it->second;
             }
             
             for (auto& c : displayStr) c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
@@ -107,10 +108,21 @@ void DeviceHandler::Update(const nlohmann::json& config, float currentTime) {
     m_eventProc.ProcessQueue();
 }
 
-void DeviceHandler::UpdateLEDs(const nlohmann::json& config, float currentTime) {
+void DeviceHandler::ParseModeDescriptions(const nlohmann::json& config) {
+    m_modeDescriptions.clear();
+    if (config.contains("modes")) {
+        for (auto it = config["modes"].begin(); it != config["modes"].end(); ++it) {
+            if (it.value().contains("description") && it.value()["description"].is_string()) {
+                m_modeDescriptions[it.key()] = it.value()["description"].get<std::string>();
+            }
+        }
+    }
+}
+
+void DeviceHandler::UpdateLEDs(float currentTime) {
     if (!m_isConnected) return;
 
-    uint8_t ledBits = m_outputProc.EvaluateLEDs(config, currentTime);
+    uint8_t ledBits = m_outputProc.EvaluateLEDs(currentTime);
     
     // Add mode flash bit if shifted
     if (m_shifted) {
