@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Make script executable
         run: chmod +x docker-build.sh
@@ -21,7 +21,7 @@ jobs:
         run: ./docker-build.sh
 
       - name: Upload Plugin Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ifr-1_plugin_Linux_x64
           path: docker-output
