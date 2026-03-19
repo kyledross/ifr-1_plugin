@@ -84,7 +84,7 @@ docker run --rm \
         set -e
         echo "Configuring build with CMake..."
         cd /build
-        cmake /source -DCMAKE_BUILD_TYPE=Release
+        cmake /source -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
         echo ""
         echo "Building plugin..."
         cmake --build . --target ifr1flex -j$(nproc)

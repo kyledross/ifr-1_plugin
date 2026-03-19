@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-#include "ui/QuickReferenceWindow.h"
+#include "QuickReferenceWindow.h"
 #include "XPLMDisplay.h"
 #include "XPLMGraphics.h"
 #include "XPLMProcessing.h"
@@ -136,6 +136,9 @@ namespace ui::quick_ref
                                 line += desc;
                                 g_rawLines.push_back(std::move(line));
                             }
+                        }
+                        if (eventHeaderAdded) {
+                            g_rawLines.emplace_back("");
                         }
                     }
                 }

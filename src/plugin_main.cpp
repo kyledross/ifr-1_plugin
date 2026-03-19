@@ -102,6 +102,20 @@ float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceL
                                        gCurrentConfig.value("name", "unknown"));
                     }
 
+                    if (gDeviceHandler) {
+                        gDeviceHandler->ParseModeDescriptions(gCurrentConfig);
+                    }
+                    if (gOutputProcessor) {
+                        gOutputProcessor->ParseOutputConfig(gCurrentConfig);
+                    }
+
+                    if (gDeviceHandler) {
+                        gDeviceHandler->ParseModeDescriptions(gCurrentConfig);
+                    }
+                    if (gOutputProcessor) {
+                        gOutputProcessor->ParseOutputConfig(gCurrentConfig);
+                    }
+
                     // Update log level based on config
                     if (gCurrentConfig.value("debug", false)) {
                         gSDK->SetLogLevel(LogLevel::Verbose);
@@ -141,7 +155,7 @@ float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceL
     gDeviceHandler->Update(gCurrentConfig, now);
 
     // 3. Update LEDs
-    gDeviceHandler->UpdateLEDs(gCurrentConfig, now);
+    gDeviceHandler->UpdateLEDs(now);
 
     return -1.0f; // Run every frame
 }

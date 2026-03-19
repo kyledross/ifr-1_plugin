@@ -1,13 +1,21 @@
 cmake_minimum_required(VERSION 3.25)
 project(ifr1flex)
 
-# 1. C++23 Configuration
+# 1. Compiler Selection
+if(NOT CMAKE_C_COMPILER)
+    set(CMAKE_C_COMPILER clang)
+endif()
+if(NOT CMAKE_CXX_COMPILER)
+    set(CMAKE_CXX_COMPILER clang++)
+endif()
+
+# 2. C++23 Configuration
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
-# 2. External Libraries (Google Test & JSON)
+# 3. External Libraries (Google Test & JSON)
 include(FetchContent)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 find_package(OpenGL REQUIRED)
@@ -28,7 +36,7 @@ FetchContent_Declare(
   URL https://github.com/libusb/hidapi/archive/refs/tags/hidapi-0.14.0.tar.gz
 )
 
-# 2.1 hidapi configuration
+# 3.1 hidapi configuration
 set(HIDAPI_BUILD_HIDTEST OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(HIDAPI_WITH_LIBUSB OFF CACHE BOOL "" FORCE)
@@ -38,20 +46,20 @@ FetchContent_MakeAvailable(googletest json hidapi)
 
 enable_testing()
 
-# 3. X-Plane SDK Path
+# 4. X-Plane SDK Path
 set(XPLANE_SDK_PATH "${CMAKE_SOURCE_DIR}/SDK" CACHE PATH "Path to X-Plane SDK")
 
-# 4. Include SDK Headers and JSON
+# 5. Include SDK Headers and JSON
 # These will be handled per-target to be more robust
 # include_directories(${XPLANE_SDK_PATH}/CHeaders/XPLM)
 # include_directories(${XPLANE_SDK_PATH}/CHeaders/Widgets)
 # include_directories(src/core)
 
-# 5. Definitions
+# 6. Definitions
 add_definitions(-DAPL=0 -DIBM=0 -DLIN=1)
 add_definitions(-DXPLM200 -DXPLM210 -DXPLM300 -DXPLM301 -DXPLM302 -DXPLM303 -DXPLM400)
 
-# 5.1 Generated embedded resources
+# 6.1 Generated embedded resources
 set(EMBEDDED_PNG_HEADER ${CMAKE_CURRENT_BINARY_DIR}/src/resources_embedded.h)
 set(EMBEDDED_LICENSE_HEADER ${CMAKE_CURRENT_BINARY_DIR}/src/license_embedded.h)
 
@@ -78,7 +86,7 @@ add_custom_command(
 
 add_custom_target(embed_resources DEPENDS ${EMBEDDED_PNG_HEADER} ${EMBEDDED_LICENSE_HEADER})
 
-# 6. Core Logic Library (Testable)
+# 7. Core Logic Library (Testable)
 add_library(ifr1flex_core STATIC
         src/core/ConfigManager.cpp
         src/core/EventProcessor.cpp
@@ -105,7 +113,7 @@ target_link_libraries(ifr1flex_core PUBLIC
     hidapi::hidapi
 )
 
-# 7. Create Library (Plugin Target)
+# 8. Create Library (Plugin Target)
 add_library(ifr1flex SHARED 
     src/plugin_main.cpp
     src/ui/AboutWindow.cpp
@@ -127,14 +135,14 @@ target_link_libraries(ifr1flex PRIVATE
 )
 # ifr1flex needs SDK headers too, which it gets from ifr1flex_core PUBLIC includes
 
-# 8. Static Linking
+# 9. Static Linking
 target_link_options(ifr1flex PRIVATE -static-libgcc -static-libstdc++)
 
-# 9. Output Formatting
+# 10. Output Formatting
 set_target_properties(ifr1flex PROPERTIES PREFIX "")
 set_target_properties(ifr1flex PROPERTIES SUFFIX ".xpl")
 
-# 10. Unit Tests
+# 11. Unit Tests
 add_executable(ifr1flex_tests
         tests/ConfigManager_test.cpp
         tests/EventProcessor_test.cpp
@@ -155,5 +163,4 @@ target_link_libraries(ifr1flex_tests PRIVATE
 )
 add_test(NAME ifr1flex_tests COMMAND ifr1flex_tests)
 
-# 11. (Optional) Deploy to Simulator
-# install(TARGETS ifr1flex LIBRARY DESTINATION "/home/kyle/X-Plane 12/Resources/plugins/ifr1flex/lin_x64")
+# 12. (Optional) Deploy to Simulator

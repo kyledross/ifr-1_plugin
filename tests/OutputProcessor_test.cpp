@@ -56,7 +56,8 @@ TEST(OutputProcessorTest, EvaluateLEDs_ReturnsOffIfNoConfig) {
     OutputProcessor processor(mockSdk);
     nlohmann::json config;
     
-    EXPECT_EQ(processor.EvaluateLEDs(config, 0.0f), IFR1::LEDMask::OFF);
+    processor.ParseOutputConfig(config);
+    EXPECT_EQ(processor.EvaluateLEDs(0.0f), IFR1::LEDMask::OFF);
 }
 
 TEST(OutputProcessorTest, EvaluateLEDs_SetsSolidBit) {
@@ -79,7 +80,8 @@ TEST(OutputProcessorTest, EvaluateLEDs_SetsSolidBit) {
     EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr)).WillOnce(Return(2)); // xplmType_Float = 2
     EXPECT_CALL(mockSdk, GetDataf(dummyDr)).WillOnce(Return(2.0f));
     
-    uint8_t bits = processor.EvaluateLEDs(config, 0.0f);
+    processor.ParseOutputConfig(config);
+    uint8_t bits = processor.EvaluateLEDs(0.0f);
     EXPECT_EQ(bits, IFR1::LEDMask::AP);
 }
 
@@ -99,18 +101,16 @@ TEST(OutputProcessorTest, EvaluateLEDs_Blinks) {
     
     void* dummyDr = reinterpret_cast<void*>(0x1234);
     EXPECT_CALL(mockSdk, FindDataRef(StrEq("sim/cockpit2/autopilot/altitude_mode")))
-        .Times(2)
         .WillRepeatedly(Return(dummyDr));
     EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr))
-        .Times(2)
         .WillRepeatedly(Return(2)); // xplmType_Float = 2
     EXPECT_CALL(mockSdk, GetDataf(dummyDr))
-        .Times(2)
         .WillRepeatedly(Return(5.0f));
     
     // 1 Hz blink -> 0.0s ON, 0.5s OFF
-    EXPECT_EQ(processor.EvaluateLEDs(config, 0.0f), IFR1::LEDMask::ALT);
-    EXPECT_EQ(processor.EvaluateLEDs(config, 0.5f), IFR1::LEDMask::OFF);
+    processor.ParseOutputConfig(config);
+    EXPECT_EQ(processor.EvaluateLEDs(0.0f), IFR1::LEDMask::ALT);
+    EXPECT_EQ(processor.EvaluateLEDs(0.5f), IFR1::LEDMask::OFF);
 }
 
 TEST(OutputProcessorTest, EvaluateLEDs_BitTest) {
@@ -134,7 +134,8 @@ TEST(OutputProcessorTest, EvaluateLEDs_BitTest) {
     // Bit 1 means (1 << 1) = 2
     EXPECT_CALL(mockSdk, GetDatai(dummyDr)).WillOnce(Return(2));
     
-    uint8_t bits = processor.EvaluateLEDs(config, 0.0f);
+    processor.ParseOutputConfig(config);
+    uint8_t bits = processor.EvaluateLEDs(0.0f);
     EXPECT_EQ(bits, IFR1::LEDMask::HDG);
 }
 
@@ -160,6 +161,7 @@ TEST(OutputProcessorTest, EvaluateLEDs_IntDatarefWithMinMax) {
     EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr)).WillOnce(Return(1)); // xplmType_Int = 1
     EXPECT_CALL(mockSdk, GetDatai(dummyDr)).WillOnce(Return(2));
     
-    uint8_t bits = processor.EvaluateLEDs(config, 0.0f);
+    processor.ParseOutputConfig(config);
+    uint8_t bits = processor.EvaluateLEDs(0.0f);
     EXPECT_EQ(bits, IFR1::LEDMask::AP);
 }

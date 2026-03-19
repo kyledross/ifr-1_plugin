@@ -19,55 +19,100 @@
 #include "Logger.h"
 #include <cmath>
 
-uint8_t OutputProcessor::EvaluateLEDs(const nlohmann::json& config, float currentTime) const
-{
-    if (config.empty() || !config.contains("output")) {
-        if (!config.empty() && config.is_object()) {
-            IFR1_LOG_VERBOSE(m_sdk, "Config missing 'output'. Keys: {}", [&] {
-                std::string keys;
-                for (auto it = config.begin(); it != config.end(); ++it) {
-                    keys += it.key() + ", ";
-                }
-                return keys;
-            }());
+namespace {
+    std::pair<std::string, int> ParseDataRefStr(const std::string& rawName) {
+        size_t bracketPos = rawName.find('[');
+        if (bracketPos != std::string::npos) {
+            size_t endBracketPos = rawName.find(']', bracketPos);
+            if (endBracketPos != std::string::npos) {
+                std::string name = rawName.substr(0, bracketPos);
+                std::string indexStr = rawName.substr(bracketPos + 1, endBracketPos - bracketPos - 1);
+                try {
+                    return {name, std::stoi(indexStr)};
+                } catch (...) { }
+            }
         }
+        return {rawName, -1};
+    }
+}
+
+void OutputProcessor::ParseOutputConfig(const nlohmann::json& config) {
+    m_parsedLEDs.clear();
+
+    if (config.empty() || !config.contains("output")) {
+        return;
+    }
+
+    const auto& output = config["output"];
+
+    auto parseLED = [&](const std::string& name, uint8_t mask) {
+        if (output.contains(name) && output[name].contains("conditions")) {
+            ParsedLED ledDef;
+            ledDef.mask = mask;
+
+            for (const auto& condition : output[name]["conditions"]) {
+                if (!condition.contains("dataref")) continue;
+
+                ParsedCondition parsed;
+                parsed.rawName = condition["dataref"];
+                
+                auto info = ParseDataRefStr(parsed.rawName);
+                parsed.drRef = m_sdk.FindDataRef(info.first.c_str());
+                parsed.index = info.second;
+
+                if (condition.contains("bit")) {
+                    parsed.bit = condition["bit"].get<int>();
+                } else if (condition.contains("min") && condition.contains("max")) {
+                    parsed.minVal = condition["min"].get<double>();
+                    parsed.maxVal = condition["max"].get<double>();
+                }
+                
+                parsed.mode = condition.value("mode", "solid");
+                if (parsed.mode == "blink") {
+                    parsed.blinkRate = condition.contains("blink-rate") ? static_cast<float>(condition["blink-rate"].get<double>()) : IFR1::DEFAULT_BLINK_RATE_HZ;
+                }
+
+                ledDef.conditions.push_back(parsed);
+            }
+            m_parsedLEDs.push_back(ledDef);
+        }
+    };
+
+    parseLED("ap", IFR1::LEDMask::AP);
+    parseLED("hdg", IFR1::LEDMask::HDG);
+    parseLED("nav", IFR1::LEDMask::NAV);
+    parseLED("apr", IFR1::LEDMask::APR);
+    parseLED("alt", IFR1::LEDMask::ALT);
+    parseLED("vs", IFR1::LEDMask::VS);
+}
+
+uint8_t OutputProcessor::EvaluateLEDs(float currentTime) const
+{
+    if (m_parsedLEDs.empty()) {
         return IFR1::LEDMask::OFF;
     }
 
     uint8_t ledBits = IFR1::LEDMask::OFF;
-    const auto& output = config["output"];
-    bool verbose = false; // config.value("debug", false); // Hard-coded to false to avoid log spam from high-frequency LED updates
+    bool verbose = false; // Hard-coded to false to avoid log spam from high-frequency LED updates
 
-    auto processLED = [&](const std::string& name, uint8_t mask) {
-        if (output.contains(name) && output[name].contains("conditions")) {
-            for (const auto& condition : output[name]["conditions"]) {
-                if (m_evaluator.EvaluateCondition(condition, verbose)) {
-                    std::string mode = condition.value("mode", "solid");
-                    if (mode == "solid") {
-                        ledBits |= mask;
-                    } else if (mode == "blink") {
-                        float blinkRate = condition.value("blink-rate", IFR1::DEFAULT_BLINK_RATE_HZ);
-                        if (blinkRate > 0) {
-                            float x = 1.0f;
-                            float period = x / blinkRate;
-                            float phase = std::fmod(currentTime, period);
-                            if (phase < period / 2.0f) {
-                                ledBits |= mask;
-                            }
+    for (const auto& ledDef : m_parsedLEDs) {
+        for (const auto& condition : ledDef.conditions) {
+            if (m_evaluator.EvaluateParsedCondition(condition, verbose)) {
+                if (condition.mode == "solid") {
+                    ledBits |= ledDef.mask;
+                } else if (condition.mode == "blink") {
+                    if (condition.blinkRate > 0) {
+                        float period = 1.0f / condition.blinkRate;
+                        float phase = std::fmod(currentTime, period);
+                        if (phase < period / 2.0f) {
+                            ledBits |= ledDef.mask;
                         }
                     }
-                    return; // Precedence: first condition met wins
                 }
+                break; // Precedence: first condition met wins
             }
         }
-    };
-
-    processLED("ap", IFR1::LEDMask::AP);
-    processLED("hdg", IFR1::LEDMask::HDG);
-    processLED("nav", IFR1::LEDMask::NAV);
-    processLED("apr", IFR1::LEDMask::APR);
-    processLED("alt", IFR1::LEDMask::ALT);
-    processLED("vs", IFR1::LEDMask::VS);
+    }
 
     return ledBits;
 }

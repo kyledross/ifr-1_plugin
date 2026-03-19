@@ -17,6 +17,8 @@
 #pragma once
 #include "XPlaneSDK.h"
 #include <nlohmann/json.hpp>
+#include <nlohmann/json.hpp>
+#include "ParsedCondition.h"
 
 class ConditionEvaluator {
 public:
@@ -29,6 +31,14 @@ public:
      * @return true if the condition is met, false otherwise.
      */
     [[nodiscard]] bool EvaluateCondition(const nlohmann::json& condition, bool verbose = false) const;
+
+    /**
+     * @brief Evaluates a single parsed condition.
+     * @param condition The pre-parsed condition struct.
+     * @param verbose If true, logs evaluation details to X-Plane debug.
+     * @return true if the condition is met, false otherwise.
+     */
+    [[nodiscard]] bool EvaluateParsedCondition(const ParsedCondition& condition, bool verbose = false) const;
 
     /**
      * @brief Evaluates a list of conditions. All must be true.

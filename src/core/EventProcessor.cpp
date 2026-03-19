@@ -17,7 +17,7 @@
 #include "EventProcessor.h"
 #include "Logger.h"
 #include <cmath>
-#include <regex>
+#include <nlohmann/json.hpp>
 
 namespace {
     struct DataRefInfo {
@@ -26,10 +26,19 @@ namespace {
     };
 
     DataRefInfo ParseDataRef(const std::string& rawName) {
-        std::regex re("(.+)\\[([0-9]+)\\]");
-        std::smatch match;
-        if (std::regex_match(rawName, match, re)) {
-            return {match[1].str(), std::stoi(match[2].str())};
+        size_t bracketPos = rawName.find('[');
+        if (bracketPos != std::string::npos) {
+            size_t endBracketPos = rawName.find(']', bracketPos);
+            if (endBracketPos != std::string::npos) {
+                std::string name = rawName.substr(0, bracketPos);
+                std::string indexStr = rawName.substr(bracketPos + 1, endBracketPos - bracketPos - 1);
+                
+                try {
+                    return {name, std::stoi(indexStr)};
+                } catch (...) {
+                    // Fall back to treating it as non-array if parsing fails
+                }
+            }
         }
         return {rawName, -1};
     }

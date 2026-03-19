@@ -17,21 +17,35 @@
 #pragma once
 #include "XPlaneSDK.h"
 #include <nlohmann/json.hpp>
+#include <vector>
+#include <map>
 #include "ConditionEvaluator.h"
+#include "ParsedCondition.h"
 
 class OutputProcessor {
 public:
     explicit OutputProcessor(IXPlaneSDK& sdk) : m_sdk(sdk), m_evaluator(sdk) {}
 
     /**
-     * @brief Evaluates LED states based on the current configuration and X-Plane state.
-     * @param config The current aircraft configuration JSON.
+     * @brief Parses the output configuration and resolves datarefs.
+     * @param config The full aircraft configuration JSON.
+     */
+    void ParseOutputConfig(const nlohmann::json& config);
+
+    /**
+     * @brief Evaluates LED states based on parsed conditions.
      * @param currentTime Current time in seconds (for blinking).
      * @return 8-bit mask of LEDs to be lit.
      */
-    [[nodiscard]] uint8_t EvaluateLEDs(const nlohmann::json& config, float currentTime) const;
+    [[nodiscard]] uint8_t EvaluateLEDs(float currentTime) const;
 
 private:
     IXPlaneSDK& m_sdk;
     ConditionEvaluator m_evaluator;
+
+    struct ParsedLED {
+        uint8_t mask;
+        std::vector<ParsedCondition> conditions;
+    };
+    std::vector<ParsedLED> m_parsedLEDs;
 };
