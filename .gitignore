@@ -7,3 +7,6 @@
 /Testing/
 /WARP.md
 /AGENTS.md
+
+.cache
+src/.idea
