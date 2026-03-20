@@ -17,7 +17,6 @@
 #pragma once
 #include "XPlaneSDK.h"
 #include <nlohmann/json.hpp>
-#include <nlohmann/json.hpp>
 #include "ParsedCondition.h"
 
 class ConditionEvaluator {
