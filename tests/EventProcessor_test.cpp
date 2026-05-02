@@ -609,6 +609,33 @@ TEST(EventProcessorTest, CommandQueueLimit_EnforcedAtTen) {
     }
 }
 
+TEST(EventProcessorTest, ProcessEvent_PlaysSound) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"fms1", {
+                {"vnav", {
+                    {"short-press", {
+                        {"actions", {
+                            {
+                                {"type", "sound"},
+                                {"value", "Resources/sounds/systems/click.wav"}
+                            }
+                        }}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    EXPECT_CALL(mockSdk, GetSystemPath()).WillOnce(Return("/xplane/"));
+    EXPECT_CALL(mockSdk, PlaySound("/xplane/Resources/sounds/systems/click.wav")).Times(1);
+
+    processor.ProcessEvent(config, "fms1", "vnav", "short-press");
+}
+
 TEST(EventProcessorTest, ProcessEvent_HandlesObjectWithActionsArray) {
     using ::testing::StrEq;
     using ::testing::Return;

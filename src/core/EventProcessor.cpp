@@ -128,6 +128,9 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
         } else {
             IFR1_LOG_ERROR(m_sdk, "DataRef not found: {}", value);
         }
+    } else if (type == "sound") {
+        std::string fullPath = m_sdk.GetSystemPath() + value;
+        m_sdk.PlaySound(fullPath);
     } else if (type == "dataref-adjust") {
         auto info = ParseDataRef(value);
         if (void* drRef = m_sdk.FindDataRef(info.name.c_str())) {

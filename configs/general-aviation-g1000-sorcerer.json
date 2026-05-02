@@ -619,7 +619,12 @@
           "actions": [
             {
               "type": "command",
-              "value": "sim/autopilot/vnav"
+              "value": "sim/autopilot/vnav",
+              "continue-to-next-action": true
+            },
+            {
+              "type": "sound",
+              "value": "Resources/sounds/systems/click.wav"
             }
           ]
         }
@@ -782,7 +787,12 @@
           "actions": [
             {
               "type": "command",
-              "value": "sim/autopilot/vnav"
+              "value": "sim/autopilot/vnav",
+              "continue-to-next-action": true
+            },
+            {
+              "type": "sound",
+              "value": "Resources/sounds/systems/click.wav"
             }
           ]
         }

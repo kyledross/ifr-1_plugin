@@ -82,7 +82,11 @@ Sets a dataref to a specific value.
 - `value`: The dataref name.
 - `adjustment`: The value to set (e.g., `1` for ON, `0` for OFF).
 
-#### 3. `dataref-adjust`
+#### 3. `sound`
+Plays a sound file.
+- `value`: Path to a `.wav` file relative to the X-Plane system folder (e.g., `"Resources/sounds/systems/click.wav"`).
+
+#### 4. `dataref-adjust`
 Increments or decrements a dataref.
 - `value`: The dataref name.
 - `adjustment`: The amount to add (use negative for subtraction).

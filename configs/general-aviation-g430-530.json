@@ -586,7 +586,12 @@
           "actions": [
             {
               "type": "command",
-              "value": "sim/GPS/g430n1_vnav"
+              "value": "sim/GPS/g430n1_vnav",
+              "continue-to-next-action": true
+            },
+            {
+              "type": "sound",
+              "value": "Resources/sounds/systems/click.wav"
             }
           ]
         }
@@ -743,7 +748,12 @@
           "actions": [
             {
               "type": "command",
-              "value": "sim/GPS/g430n2_vnav"
+              "value": "sim/GPS/g430n2_vnav",
+              "continue-to-next-action": true
+            },
+            {
+              "type": "sound",
+              "value": "Resources/sounds/systems/click.wav"
             }
           ]
         }
