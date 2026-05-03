@@ -71,91 +71,89 @@ static void MenuHandler(void* /*inMenuRef*/, void* inItemRef) {
 }
 
 // ReSharper disable once CppDFAConstantFunctionResult
-float FlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void* inRefcon) {
+static float FlightLoopCallback(float /*inElapsedSinceLastCall*/, float /*inElapsedTimeSinceLastFlightLoop*/, int inCounter, void* /*inRefcon*/) {
     if (!gSDK || !gDeviceHandler) return -1.0f;
 
-    float now = gSDK->GetElapsedTime();
+    try {
+        float now = gSDK->GetElapsedTime();
 
-    // 1. Aircraft detection every 20 frames (or if first time)
-    static int lastDetectionCounter = -1;
-    if (lastDetectionCounter == -1 || inCounter >= lastDetectionCounter + 20 || inCounter < lastDetectionCounter) {
-        lastDetectionCounter = inCounter;
+        // 1. Aircraft detection every 20 frames (or if first time)
+        static int lastDetectionCounter = -1;
+        if (lastDetectionCounter == -1 || inCounter >= lastDetectionCounter + 20 || inCounter < lastDetectionCounter) {
+            lastDetectionCounter = inCounter;
 
-        if (!gAcfPathRef) {
-            gAcfPathRef = gSDK->FindDataRef("sim/aircraft/view/acf_relative_path");
-        }
+            if (!gAcfPathRef) {
+                gAcfPathRef = gSDK->FindDataRef("sim/aircraft/view/acf_relative_path");
+            }
 
-        if (gAcfPathRef) {
-            char path[512];
-            int bytes = gSDK->GetDatab(gAcfPathRef, path, 0, sizeof(path) - 1);
-            if (bytes > 0) {
-                path[bytes] = '\0';
-                std::string currentPath(path);
-                if (currentPath != gCurrentAircraftPath) {
-                    IFR1_LOG_INFO(*gSDK, "Aircraft changed to {}", currentPath);
-                    gCurrentAircraftPath = currentPath;
-                    gDeviceHandler->ClearLEDs();
-                    gCurrentConfig = gConfigManager->GetConfigForAircraft(currentPath, *gSDK);
+            if (gAcfPathRef) {
+                char path[512];
+                int bytes = gSDK->GetDatab(gAcfPathRef, path, 0, sizeof(path) - 1);
+                if (bytes > 0) {
+                    path[bytes] = '\0';
+                    std::string currentPath(path);
+                    if (currentPath != gCurrentAircraftPath) {
+                        IFR1_LOG_INFO(*gSDK, "Aircraft changed to {}", currentPath);
+                        gCurrentAircraftPath = currentPath;
+                        gDeviceHandler->ClearLEDs();
+                        gCurrentConfig = gConfigManager->GetConfigForAircraft(currentPath, *gSDK);
 
-                    if (!gCurrentConfig.empty() && !gCurrentConfig.contains("output")) {
-                        IFR1_LOG_ERROR(*gSDK, "Loaded config '{}' is missing 'output' section!",
-                                       gCurrentConfig.value("name", "unknown"));
-                    }
-
-                    if (gDeviceHandler) {
-                        gDeviceHandler->ParseModeDescriptions(gCurrentConfig);
-                    }
-                    if (gOutputProcessor) {
-                        gOutputProcessor->ParseOutputConfig(gCurrentConfig);
-                    }
-
-                    if (gDeviceHandler) {
-                        gDeviceHandler->ParseModeDescriptions(gCurrentConfig);
-                    }
-                    if (gOutputProcessor) {
-                        gOutputProcessor->ParseOutputConfig(gCurrentConfig);
-                    }
-
-                    // Update log level based on config
-                    if (gCurrentConfig.value("debug", false)) {
-                        gSDK->SetLogLevel(LogLevel::Verbose);
-                    } else {
-                        gSDK->SetLogLevel(LogLevel::Info);
-                    }
-
-                    if (gCurrentConfig.empty()) {
-                        IFR1_LOG_INFO(*gSDK, "No configuration found for this aircraft.");
-                    } else {
-                        std::string configName = gCurrentConfig.value("name", "Unknown");
-                        if (gCurrentConfig.value("fallback", false)) {
-                            IFR1_LOG_INFO(*gSDK, "Using fallback configuration: {}", configName);
-                        } else {
-                            IFR1_LOG_INFO(*gSDK, "Configuration loaded: {}", configName);
+                        if (!gCurrentConfig.empty() && !gCurrentConfig.contains("output")) {
+                            IFR1_LOG_ERROR(*gSDK, "Loaded config '{}' is missing 'output' section!",
+                                           gCurrentConfig.value("name", "unknown"));
                         }
+
+                        gDeviceHandler->ParseModeDescriptions(gCurrentConfig);
+                        gOutputProcessor->ParseOutputConfig(gCurrentConfig);
+                        gEventProcessor->PrepareConfig(gCurrentConfig);
+
+                        // Update log level based on config
+                        if (gCurrentConfig.value("debug", false)) {
+                            gSDK->SetLogLevel(LogLevel::Verbose);
+                        } else {
+                            gSDK->SetLogLevel(LogLevel::Info);
+                        }
+
+                        if (gCurrentConfig.empty()) {
+                            IFR1_LOG_INFO(*gSDK, "No configuration found for this aircraft.");
+                        } else {
+                            std::string configName = gCurrentConfig.value("name", "Unknown");
+                            if (gCurrentConfig.value("fallback", false)) {
+                                IFR1_LOG_INFO(*gSDK, "Using fallback configuration: {}", configName);
+                            } else {
+                                IFR1_LOG_INFO(*gSDK, "Configuration loaded: {}", configName);
+                            }
+                        }
+                    }
+                } else {
+                    if (!gCurrentAircraftPath.empty()) {
+                        IFR1_LOG_INFO(*gSDK, "No aircraft detected.");
+                        gCurrentAircraftPath.clear();
+                        gCurrentConfig = nlohmann::json();
+                        gEventProcessor->PrepareConfig(gCurrentConfig);
+                        gDeviceHandler->ClearLEDs();
                     }
                 }
             } else {
-                if (!gCurrentAircraftPath.empty()) {
-                    IFR1_LOG_INFO(*gSDK, "No aircraft detected.");
-                    gCurrentAircraftPath.clear();
-                    gCurrentConfig = nlohmann::json();
-                    gDeviceHandler->ClearLEDs();
-                }
+                IFR1_LOG_ERROR(*gSDK, "Could not find 'sim/aircraft/view/acf_relative_path' dataref.");
             }
-        } else {
-            IFR1_LOG_ERROR(*gSDK, "Could not find 'sim/aircraft/view/acf_relative_path' dataref.");
         }
+
+        if (gCurrentAircraftPath.empty()) {
+            return -1.0f;
+        }
+
+        // 2. Update hardware input
+        gDeviceHandler->Update(gCurrentConfig, now);
+
+        // 3. Update LEDs
+        gDeviceHandler->UpdateLEDs(now);
+
+    } catch (const std::exception& e) {
+        IFR1_LOG_ERROR(*gSDK, "Unhandled exception in flight loop: {}", e.what());
+    } catch (...) {
+        IFR1_LOG_ERROR(*gSDK, "Unknown exception in flight loop");
     }
-
-    if (gCurrentAircraftPath.empty()) {
-        return -1.0f;
-    }
-
-    // 2. Update hardware input
-    gDeviceHandler->Update(gCurrentConfig, now);
-
-    // 3. Update LEDs
-    gDeviceHandler->UpdateLEDs(now);
 
     return -1.0f; // Run every frame
 }
@@ -282,7 +280,8 @@ PLUGIN_API int XPluginEnable(void) {
     }
 
     gCurrentAircraftPath.clear();
-    
+    gAcfPathRef = nullptr; // Force fresh dataref lookup on re-enable
+
     if (gDeviceHandler) {
         gDeviceHandler->ClearLEDs();
     }

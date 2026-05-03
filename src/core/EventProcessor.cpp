@@ -15,66 +15,80 @@
  */
 
 #include "EventProcessor.h"
+#include "DataRefUtils.h"
 #include "Logger.h"
 #include <cmath>
 #include <nlohmann/json.hpp>
 
-namespace {
-    struct DataRefInfo {
-        std::string name;
-        int index = -1;
-    };
-
-    DataRefInfo ParseDataRef(const std::string& rawName) {
-        size_t bracketPos = rawName.find('[');
-        if (bracketPos != std::string::npos) {
-            size_t endBracketPos = rawName.find(']', bracketPos);
-            if (endBracketPos != std::string::npos) {
-                std::string name = rawName.substr(0, bracketPos);
-                std::string indexStr = rawName.substr(bracketPos + 1, endBracketPos - bracketPos - 1);
-                
-                try {
-                    return {name, std::stoi(indexStr)};
-                } catch (...) {
-                    // Fall back to treating it as non-array if parsing fails
-                }
-            }
-        }
-        return {rawName, -1};
-    }
-}
-
-void EventProcessor::ProcessEvent(const nlohmann::json& config, 
-                                  const std::string& mode, 
-                                  const std::string& control, 
+void EventProcessor::ProcessEvent(const nlohmann::json& config,
+                                  const std::string& mode,
+                                  const std::string& control,
                                   const std::string& action)
 {
     if (config.empty()) return;
 
-    if (config.contains("modes") && 
-        config["modes"].contains(mode) && 
-        config["modes"][mode].contains(control) && 
-        config["modes"][mode][control].contains(action)) {
-        
-        IFR1_LOG_VERBOSE(m_sdk, "Event - mode: {}, control: {}, action: {}", mode, control, action);
+    // Fast path: use pre-computed action map when available
+    const nlohmann::json* eventConfig = nullptr;
+    if (!m_actionMap.empty()) {
+        std::string key = mode;
+        key += '\x1F';
+        key += control;
+        key += '\x1F';
+        key += action;
+        auto it = m_actionMap.find(key);
+        if (it != m_actionMap.end()) {
+            eventConfig = &it->second;
+        }
+    } else {
+        // Fallback: traverse the JSON hierarchy (used when PrepareConfig has not been called)
+        if (config.contains("modes") &&
+            config["modes"].contains(mode) &&
+            config["modes"][mode].contains(control) &&
+            config["modes"][mode][control].contains(action)) {
+            eventConfig = &config["modes"][mode][control][action];
+        }
+    }
 
-        const auto& eventConfig = config["modes"][mode][control][action];
-        
-        auto processActions = [&](const nlohmann::json& actions) {
-            for (const auto& actionConfig : actions) {
-                if (m_evaluator.EvaluateConditions(actionConfig, m_sdk.GetLogLevel() >= LogLevel::Verbose)) {
-                    ExecuteAction(actionConfig);
-                    if (!ShouldEvaluateNext(actionConfig)) {
-                        break; // First one that matches wins (unless requested to continue)
-                    }
+    if (!eventConfig) return;
+
+    IFR1_LOG_VERBOSE(m_sdk, "Event - mode: {}, control: {}, action: {}", mode, control, action);
+
+    auto processActions = [&](const nlohmann::json& actions) {
+        for (const auto& actionConfig : actions) {
+            if (m_evaluator.EvaluateConditions(actionConfig, m_sdk.GetLogLevel() >= LogLevel::Verbose)) {
+                ExecuteAction(actionConfig);
+                if (!ShouldEvaluateNext(actionConfig)) {
+                    break;
                 }
             }
-        };
+        }
+    };
 
-        if (eventConfig.is_object() && eventConfig.contains("actions") && eventConfig["actions"].is_array()) {
-            processActions(eventConfig["actions"]);
-        } else {
-            IFR1_LOG_ERROR(m_sdk, "Event {}/{} in mode {} missing required 'actions' array", control, action, mode);
+    if (eventConfig->is_object() && eventConfig->contains("actions") && (*eventConfig)["actions"].is_array()) {
+        processActions((*eventConfig)["actions"]);
+    } else {
+        IFR1_LOG_ERROR(m_sdk, "Event {}/{} in mode {} missing required 'actions' array", control, action, mode);
+    }
+}
+
+void EventProcessor::PrepareConfig(const nlohmann::json& config)
+{
+    m_actionMap.clear();
+    if (config.empty() || !config.contains("modes") || !config["modes"].is_object()) return;
+
+    for (auto& [modeName, modeJson] : config["modes"].items()) {
+        if (!modeJson.is_object()) continue;
+        for (auto& [controlName, controlJson] : modeJson.items()) {
+            if (!controlJson.is_object()) continue;
+            for (auto& [actionName, actionJson] : controlJson.items()) {
+                if (!actionJson.is_object()) continue;
+                std::string key = modeName;
+                key += '\x1F';
+                key += controlName;
+                key += '\x1F';
+                key += actionName;
+                m_actionMap.emplace(std::move(key), actionJson);
+            }
         }
     }
 }
@@ -88,7 +102,7 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
         if (void* cmdRef = m_sdk.FindCommand(value.c_str())) {
             int times = actionConfig.value("send-count", 1);
             if (times < 0) times = -times;
-            
+
             if (times > 0) {
                 IFR1_LOG_VERBOSE(m_sdk, "Queueing command: {} ({} times)", value, times);
                 for (int i = 0; i < times; ++i) {
@@ -105,9 +119,11 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
             IFR1_LOG_ERROR(m_sdk, "Command not found: {}", value);
         }
     } else if (type == "dataref-set") {
-        auto info = ParseDataRef(value);
+        auto info = ::ParseDataRef(value);
         if (void* drRef = m_sdk.FindDataRef(info.name.c_str())) {
-            if (actionConfig.contains("adjustment")) {
+            if (!actionConfig.contains("adjustment")) {
+                IFR1_LOG_ERROR(m_sdk, "dataref-set action for '{}' is missing required 'adjustment' key", value);
+            } else {
                 float adj = actionConfig["adjustment"].get<float>();
                 IFR1_LOG_VERBOSE(m_sdk, "Setting dataref: {} to {}", value, adj);
                 int types = m_sdk.GetDataRefTypes(drRef);
@@ -132,12 +148,12 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
         std::string fullPath = m_sdk.GetSystemPath() + value;
         m_sdk.PlaySound(fullPath);
     } else if (type == "dataref-adjust") {
-        auto info = ParseDataRef(value);
+        auto info = ::ParseDataRef(value);
         if (void* drRef = m_sdk.FindDataRef(info.name.c_str())) {
             int types = m_sdk.GetDataRefTypes(drRef);
             float current = 0.0f;
             bool isInt = false;
-            
+
             if (info.index != -1) {
                 isInt = (types & static_cast<int>(DataRefType::IntArray));
                 if (isInt) {
@@ -163,15 +179,16 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
                 std::string limitType = actionConfig.value("limit-type", "clamp");
 
                 if (limitType == "wrap") {
+                    // +1.0f accounts for discrete-step ranges (e.g. heading 0–359
+                    // has 360 steps, so the wrap range is 360, not 359).
                     float range = maxVal - minVal + 1.0f;
                     while (next < minVal) next += range;
                     while (next > maxVal) next -= range;
                 } else {
-                    if (next < minVal) next = minVal;
-                    if (next > maxVal) next = maxVal;
+                    next = std::clamp(next, minVal, maxVal);
                 }
             }
-            
+
             IFR1_LOG_VERBOSE(m_sdk, "Adjusting dataref: {} (current: {}, adj: {}) -> {}", value, current, adj, next);
 
             if (info.index != -1) {

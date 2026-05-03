@@ -16,7 +16,6 @@
 
 #include "DeviceHandler.h"
 #include "Logger.h"
-#include <iostream>
 #include <cctype>
 
 DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, OutputProcessor& outputProc, SettingsManager& settings, IXPlaneSDK& sdk, bool startThread) 
@@ -31,7 +30,7 @@ DeviceHandler::DeviceHandler(IHardwareManager& hw, EventProcessor& eventProc, Ou
 
     m_running = true;
     if (startThread) {
-        m_thread = std::thread(&DeviceHandler::WorkerThread, this);
+        m_thread = std::thread([this] { WorkerThread(); });
     }
 }
 
@@ -160,14 +159,23 @@ void DeviceHandler::ProcessReport(const IFR1::HardwareEvent& event, const nlohma
 
 IFR1::HardwareEvent DeviceHandler::ParseReport(const uint8_t* data) {
     // data[1..3] buttons, data[5] outer knob, data[6] inner knob, data[7] mode
-    
+
     IFR1::HardwareEvent event;
     event.outerKnobRotation = static_cast<int8_t>(data[5]);
     event.innerKnobRotation = static_cast<int8_t>(data[6]);
-    event.mode = static_cast<IFR1::Mode>(data[7]);
-    
+
+    // Validate the mode byte before casting; fall back to COM1 on unknown values
+    const auto rawMode = data[7];
+    if (rawMode <= static_cast<uint8_t>(IFR1::Mode::XPDR)) {
+        event.mode = static_cast<IFR1::Mode>(rawMode);
+    } else {
+        IFR1_LOG_ERROR(m_sdk, "HID report contained unknown mode byte 0x{:02X}; defaulting to COM1", rawMode);
+        event.mode = IFR1::Mode::COM1;
+    }
+
     auto checkBit = [](uint8_t val, uint8_t bit) {
-        return (val & (1 << (bit - 1))) != 0;
+        if (bit == 0) return false;
+        return (val & (1u << (bit - 1))) != 0;
     };
 
     event.buttonStates[static_cast<int>(IFR1::Button::DIRECT)] = checkBit(data[1], IFR1::BitPosition::DIRECT);
@@ -312,9 +320,15 @@ void DeviceHandler::ProcessHardware() {
     int bytesRead = m_hw.Read(readBuffer, IFR1::HID_REPORT_SIZE, 10); // 10ms timeout
     int reportsRead = 0;
     while (bytesRead > 0) {
-        m_inputQueue.Push(ParseReport(readBuffer));
-        
+        // Require at least 8 bytes so all fields accessed by ParseReport are valid
+        if (bytesRead >= 8) {
+            m_inputQueue.Push(ParseReport(readBuffer));
+        } else {
+            IFR1_LOG_ERROR(m_sdk, "Partial HID read ({} bytes); expected at least 8 — report discarded", bytesRead);
+        }
         if (++reportsRead >= 10) break;
+        // Clear the buffer before the next read to avoid stale bytes from a previous partial read
+        std::fill(std::begin(readBuffer), std::end(readBuffer), uint8_t{0});
         bytesRead = m_hw.Read(readBuffer, IFR1::HID_REPORT_SIZE, 0); // No timeout for subsequent reads
     }
 

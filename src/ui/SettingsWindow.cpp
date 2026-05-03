@@ -170,9 +170,8 @@ namespace ui::settings {
                 
                 // If dropdown is open, draw options
                 if (g_dropdownOpenIndex == settingIndex) {
-                    int option_h = 20;
+                int option_h = 20;
                     int options_t = dropdown_b;
-                    int option_idx = 0;
                     for (const auto& option : g_osdPositions) {
                         int option_b = options_t - option_h;
                         
@@ -202,7 +201,6 @@ namespace ui::settings {
                         XPLMDrawString(col_white, dropdown_l + 5, option_b + 6, const_cast<char*>(option.c_str()), nullptr, xplmFont_Basic);
                         
                         options_t = option_b;
-                        option_idx++;
                     }
                 }
             }

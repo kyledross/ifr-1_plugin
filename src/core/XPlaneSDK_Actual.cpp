@@ -26,7 +26,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <cstring>
 #include <filesystem>
 #include <format>
@@ -265,7 +265,7 @@ public:
 
 private:
     LogLevel m_logLevel = LogLevel::Info;
-    std::map<std::string, SoundBuffer> m_sounds;
+    std::unordered_map<std::string, SoundBuffer> m_sounds;
 
     static bool LoadWav(const std::string& path, SoundBuffer& buffer) {
         std::ifstream file(path, std::ios::binary);
@@ -303,8 +303,12 @@ private:
                 if (chunkSize > 16) file.seekg(chunkSize - 16, std::ios::cur);
                 fmtFound = true;
             } else if (std::memcmp(id, "data", 4) == 0) {
+                // Guard against malformed files with absurdly large chunk sizes
+                constexpr uint32_t kMaxWavBytes = 10u * 1024u * 1024u; // 10 MB
+                if (chunkSize > kMaxWavBytes) return false;
                 buffer.data.resize(chunkSize);
                 file.read(buffer.data.data(), chunkSize);
+                if (static_cast<uint32_t>(file.gcount()) != chunkSize) return false;
                 dataFound = true;
                 break; // Found data, we can stop
             } else {

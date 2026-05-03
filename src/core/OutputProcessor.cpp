@@ -15,26 +15,10 @@
  */
 
 #include "OutputProcessor.h"
+#include "DataRefUtils.h"
 #include "IFR1Protocol.h"
 #include "Logger.h"
 #include <cmath>
-
-namespace {
-    std::pair<std::string, int> ParseDataRefStr(const std::string& rawName) {
-        size_t bracketPos = rawName.find('[');
-        if (bracketPos != std::string::npos) {
-            size_t endBracketPos = rawName.find(']', bracketPos);
-            if (endBracketPos != std::string::npos) {
-                std::string name = rawName.substr(0, bracketPos);
-                std::string indexStr = rawName.substr(bracketPos + 1, endBracketPos - bracketPos - 1);
-                try {
-                    return {name, std::stoi(indexStr)};
-                } catch (...) { }
-            }
-        }
-        return {rawName, -1};
-    }
-}
 
 void OutputProcessor::ParseOutputConfig(const nlohmann::json& config) {
     m_parsedLEDs.clear();
@@ -56,9 +40,9 @@ void OutputProcessor::ParseOutputConfig(const nlohmann::json& config) {
                 ParsedCondition parsed;
                 parsed.rawName = condition["dataref"];
                 
-                auto info = ParseDataRefStr(parsed.rawName);
-                parsed.drRef = m_sdk.FindDataRef(info.first.c_str());
-                parsed.index = info.second;
+                auto info = ::ParseDataRef(parsed.rawName);
+                parsed.drRef = m_sdk.FindDataRef(info.name.c_str());
+                parsed.index = info.index;
 
                 if (condition.contains("bit")) {
                     parsed.bit = condition["bit"].get<int>();

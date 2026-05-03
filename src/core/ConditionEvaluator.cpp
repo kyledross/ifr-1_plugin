@@ -15,42 +15,18 @@
  */
 
 #include "ConditionEvaluator.h"
+#include "DataRefUtils.h"
 #include "Logger.h"
 #include "ParsedCondition.h"
 #include <string>
 #include <nlohmann/json.hpp>
 #include <algorithm>
 
-namespace {
-    struct DataRefInfo {
-        std::string name;
-        int index = -1;
-    };
-
-    DataRefInfo ParseDataRef(const std::string& rawName) {
-        size_t bracketPos = rawName.find('[');
-        if (bracketPos != std::string::npos) {
-            size_t endBracketPos = rawName.find(']', bracketPos);
-            if (endBracketPos != std::string::npos) {
-                std::string name = rawName.substr(0, bracketPos);
-                std::string indexStr = rawName.substr(bracketPos + 1, endBracketPos - bracketPos - 1);
-                
-                try {
-                    return {name, std::stoi(indexStr)};
-                } catch (...) {
-                    // Fall back to treating it as non-array if parsing fails
-                }
-            }
-        }
-        return {rawName, -1};
-    }
-}
-
 bool ConditionEvaluator::EvaluateCondition(const nlohmann::json& condition, bool verbose) const {
     if (!condition.contains("dataref")) return false;
 
     std::string rawDrName = condition["dataref"];
-    auto info = ParseDataRef(rawDrName);
+    auto info = ::ParseDataRef(rawDrName);
     void* drRef = m_sdk.FindDataRef(info.name.c_str());
     if (!drRef) {
         IFR1_LOG_VERBOSE(m_sdk, "Condition failed - DataRef not found: {}", info.name);
@@ -77,7 +53,7 @@ bool ConditionEvaluator::EvaluateCondition(const nlohmann::json& condition, bool
 
     if (condition.contains("bit")) {
         int bit = condition["bit"].get<int>();
-        result = (static_cast<int>(val) & (1 << bit)) != 0;
+        result = bit >= 0 && (static_cast<unsigned int>(val) & (1u << bit)) != 0;
     } else if (condition.contains("min") && condition.contains("max")) {
         double minVal = condition["min"].get<double>();
         double maxVal = condition["max"].get<double>();
@@ -126,7 +102,7 @@ bool ConditionEvaluator::EvaluateParsedCondition(const ParsedCondition& conditio
     bool result = false;
 
     if (condition.bit) {
-        result = (static_cast<int>(val) & (1 << *condition.bit)) != 0;
+        result = *condition.bit >= 0 && (static_cast<unsigned int>(val) & (1u << *condition.bit)) != 0;
     } else if (condition.minVal && condition.maxVal) {
         result = (val >= *condition.minVal && val <= *condition.maxVal);
     }

@@ -33,6 +33,8 @@
 #include "resources_embedded.h"
 #include "license_embedded.h"
 
+#include "ScrollbarHelper.h"
+#include <sys/wait.h>
 #include <unistd.h>
 
 namespace ui::about
@@ -130,8 +132,8 @@ namespace ui::about
     if (g_qrTextureLoaded) return;
     // Use embedded RGBA bytes generated at build time (from tools/embed_png.py)
     // Refer to globals defined by the embed script; do NOT redeclare inside namespace
-    constexpr int w = (int)::g_qr_w;
-    constexpr int h = (int)::g_qr_h;
+    constexpr int w = static_cast<int>(::g_qr_w);
+    constexpr int h = static_cast<int>(::g_qr_h);
 
     g_qrTexture.Gen();
     glBindTexture(GL_TEXTURE_2D, g_qrTexture);
@@ -153,10 +155,17 @@ namespace ui::about
   }
 
   static void OpenURL(const char* url) {
+    // Double-fork to orphan the grandchild, avoiding a zombie process.
     pid_t pid = fork();
     if (pid == 0) {
-      execlp("xdg-open", "xdg-open", url, static_cast<char*>(nullptr));
-      _exit(0);
+      if (fork() == 0) {
+        execlp("xdg-open", "xdg-open", url, static_cast<char*>(nullptr));
+        _exit(0);
+      }
+      _exit(0); // Short-lived intermediate child exits immediately
+    }
+    if (pid > 0) {
+      waitpid(pid, nullptr, 0); // Reap the intermediate child
     }
   }
 
@@ -200,7 +209,6 @@ namespace ui::about
     params.bottom = bottom;
     params.decorateAsFloatingWindow = xplm_WindowDecorationRoundRectangle;
     params.layer = xplm_WindowLayerFloatingWindows;
-    params.handleKeyFunc = nullptr;
 
     g_aboutWindow = XPLMCreateWindowEx(&params);
     XPLMSetWindowResizingLimits(g_aboutWindow, width, height, width, height);
@@ -375,28 +383,19 @@ namespace ui::about
     glEnd();
 
     // Scrollbar thumb
-    if (total_lines > lines_fit && max_scroll_px > 0) {
-      const float visible_ratio = static_cast<float>(lines_fit) / static_cast<float>(total_lines);
-      const int track_h = sb_track_t - sb_track_b;
-      int thumb_h = static_cast<int>(static_cast<float>(track_h) * visible_ratio);
-      if (thumb_h < 10) thumb_h = 10; // Minimum thumb height
-      if (thumb_h >= track_h) thumb_h = track_h - 1;
-
-      const float scroll_ratio = static_cast<float>(g_licenseScrollPx) / static_cast<float>(max_scroll_px);
-      const int thumb_top = sb_track_t - static_cast<int>(static_cast<float>(track_h - thumb_h) * scroll_ratio);
-      const int thumb_bottom = thumb_top - thumb_h;
-
-      // Draw thumb
+    const auto thumb = ComputeScrollbarThumb(sb_track_t, sb_track_b, total_lines, lines_fit,
+                                              g_licenseScrollPx, max_scroll_px, 10);
+    if (thumb.thumbH > 0) {
       if (g_isDraggingScrollbar)
         glColor3f(0.7f, 0.7f, 0.7f);
       else
         glColor3f(0.5f, 0.5f, 0.5f);
 
       glBegin(GL_QUADS);
-      glVertex2i(sb_track_l + 1, thumb_top);
-      glVertex2i(sb_track_r - 1, thumb_top);
-      glVertex2i(sb_track_r - 1, thumb_bottom);
-      glVertex2i(sb_track_l + 1, thumb_bottom);
+      glVertex2i(sb_track_l + 1, thumb.thumbTop);
+      glVertex2i(sb_track_r - 1, thumb.thumbTop);
+      glVertex2i(sb_track_r - 1, thumb.thumbBot);
+      glVertex2i(sb_track_l + 1, thumb.thumbBot);
       glEnd();
     }
 
@@ -444,40 +443,28 @@ namespace ui::about
 
       // Scrollbar interaction
       if (x >= sb_track_l && x <= sb_track_r && y >= sb_track_b && y <= sb_track_t) {
-        if (total_lines > lines_fit && max_scroll_px > 0) {
-          const float visible_ratio = static_cast<float>(lines_fit) / static_cast<float>(total_lines);
-          int thumb_h = static_cast<int>(static_cast<float>(track_h) * visible_ratio);
-          if (thumb_h < 10) thumb_h = 10;
-          if (thumb_h >= track_h) thumb_h = track_h - 1; // Ensure thumb is smaller than track
-
-          const float scroll_ratio = static_cast<float>(g_licenseScrollPx) / static_cast<float>(max_scroll_px);
-          const int thumb_top = sb_track_t - static_cast<int>(static_cast<float>(track_h - thumb_h) * scroll_ratio);
-          const int thumb_bottom = thumb_top - thumb_h;
-
-          if (y >= thumb_bottom && y <= thumb_top) {
-            // Clicked on thumb, start dragging
-            g_isDraggingScrollbar = true;
-            g_scrollbarDragClickOffset = static_cast<float>(thumb_top - y);
-          } else {
-            // Clicked on track, jump to position
-            float new_scroll_ratio = static_cast<float>(sb_track_t - y - thumb_h / 2) / static_cast<float>(track_h - thumb_h);
-            g_licenseScrollPx = static_cast<int>(new_scroll_ratio * static_cast<float>(max_scroll_px));
-            g_licenseScrollPx = std::clamp(g_licenseScrollPx, 0, max_scroll_px);
-            g_isDraggingScrollbar = true;
-            g_scrollbarDragClickOffset = static_cast<float>(thumb_h) / 2.0f;
+      const auto thumb = ComputeScrollbarThumb(sb_track_t, sb_track_b, total_lines, lines_fit,
+                                                g_licenseScrollPx, max_scroll_px, 10);
+          if (thumb.thumbH > 0) {
+            if (y >= thumb.thumbBot && y <= thumb.thumbTop) {
+              g_isDraggingScrollbar = true;
+              g_scrollbarDragClickOffset = static_cast<float>(thumb.thumbTop - y);
+            } else {
+              float new_scroll_ratio = static_cast<float>(sb_track_t - y - thumb.thumbH / 2) / static_cast<float>(track_h - thumb.thumbH);
+              g_licenseScrollPx = static_cast<int>(new_scroll_ratio * static_cast<float>(max_scroll_px));
+              g_licenseScrollPx = std::clamp(g_licenseScrollPx, 0, max_scroll_px);
+              g_isDraggingScrollbar = true;
+              g_scrollbarDragClickOffset = static_cast<float>(thumb.thumbH) / 2.0f;
+            }
+            return 1;
           }
-          return 1;
-        }
       }
     } else if (inMouse == xplm_MouseDrag) {
       if (g_isDraggingScrollbar) {
-        const float visible_ratio = static_cast<float>(lines_fit) / static_cast<float>(total_lines);
-        int thumb_h = static_cast<int>(static_cast<float>(track_h) * visible_ratio);
-        if (thumb_h < 10) thumb_h = 10;
-        if (thumb_h >= track_h) thumb_h = track_h - 1;
-
+        const auto drag_thumb = ComputeScrollbarThumb(sb_track_t, sb_track_b, total_lines, lines_fit,
+                                                      g_licenseScrollPx, max_scroll_px, 10);
         float target_thumb_top = static_cast<float>(y) + g_scrollbarDragClickOffset;
-        float new_scroll_ratio = (static_cast<float>(sb_track_t) - target_thumb_top) / static_cast<float>(track_h - thumb_h);
+        float new_scroll_ratio = (static_cast<float>(sb_track_t) - target_thumb_top) / static_cast<float>(track_h - drag_thumb.thumbH);
 
         g_licenseScrollPx = static_cast<int>(new_scroll_ratio * static_cast<float>(max_scroll_px));
         g_licenseScrollPx = std::clamp(g_licenseScrollPx, 0, max_scroll_px);

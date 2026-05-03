@@ -19,6 +19,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <queue>
+#include <unordered_map>
 #include "ConditionEvaluator.h"
 
 class EventProcessor {
@@ -38,6 +39,14 @@ public:
                       const std::string& action);
 
     /**
+     * @brief Pre-computes a flat lookup map from the aircraft configuration.
+     * Call this whenever the aircraft configuration changes.  ProcessEvent will
+     * use the map for O(1) dispatch instead of traversing the JSON hierarchy.
+     * @param config The full aircraft configuration JSON.
+     */
+    void PrepareConfig(const nlohmann::json& config);
+
+    /**
      * @brief Processes one command from the FIFO queue.
      * Should be called once per frame.
      */
@@ -47,6 +56,8 @@ private:
     IXPlaneSDK& m_sdk;
     ConditionEvaluator m_evaluator;
     std::queue<void*> m_commandQueue;
+    // Keyed by "mode\x1Fcontrol\x1Faction"; populated by PrepareConfig
+    std::unordered_map<std::string, nlohmann::json> m_actionMap;
 
     void ExecuteAction(const nlohmann::json& actionConfig);
     static bool ShouldEvaluateNext(const nlohmann::json& actionConfig);

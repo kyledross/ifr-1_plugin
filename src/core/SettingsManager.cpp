@@ -47,13 +47,16 @@ void SettingsManager::Load(IXPlaneSDK& sdk) {
                 std::string name = item.value("option-name", "");
                 if (name.empty()) continue;
 
-                auto it = std::find_if(m_settings.begin(), m_settings.end(), [&](const Setting& s) {
-                    return s.name == name;
-                });
-
-                if (it != m_settings.end()) {
-                    it->description = item.value("option-description", it->description);
-                    it->value = item.value("value", it->value);
+                auto idxIt = m_index.find(name);
+                if (idxIt != m_index.end()) {
+                    // Update the existing setting in place
+                    auto vecIt = std::find_if(m_settings.begin(), m_settings.end(), [&](const Setting& s) {
+                        return s.name == name;
+                    });
+                    if (vecIt != m_settings.end()) {
+                        vecIt->description = item.value("option-description", vecIt->description);
+                        vecIt->value = item.value("value", vecIt->value);
+                    }
                 } else {
                     m_settings.push_back({
                         name,
@@ -62,6 +65,7 @@ void SettingsManager::Load(IXPlaneSDK& sdk) {
                     });
                 }
             }
+            RebuildIndex();
         }
         IFR1_LOG_INFO(sdk, "Settings loaded from: {}", m_path.string());
     } catch (const std::exception& e) {
@@ -94,50 +98,38 @@ void SettingsManager::Save(IXPlaneSDK& sdk) {
 }
 
 bool SettingsManager::GetBool(const std::string& name, bool defaultValue) const {
-    auto it = std::find_if(m_settings.begin(), m_settings.end(), [&](const Setting& s) {
-        return s.name == name;
-    });
-
-    if (it != m_settings.end()) {
-        return it->value == "true";
+    auto it = m_index.find(name);
+    if (it != m_index.end()) {
+        return *it->second == "true";
     }
     return defaultValue;
 }
 
 void SettingsManager::SetBool(const std::string& name, bool value) {
-    auto it = std::find_if(m_settings.begin(), m_settings.end(), [&](const Setting& s) {
-        return s.name == name;
-    });
-
-    if (it != m_settings.end()) {
-        it->value = value ? "true" : "false";
+    auto it = m_index.find(name);
+    if (it != m_index.end()) {
+        *it->second = value ? "true" : "false";
     } else {
-        // Should we allow adding new ones here? Requirement says "Populate... with descriptions in the json"
-        // so they should probably exist.
         m_settings.push_back({name, "", value ? "true" : "false"});
+        RebuildIndex(); // push_back may reallocate; rebuild all pointers
     }
 }
 
 std::string SettingsManager::GetString(const std::string& name, const std::string& defaultValue) const {
-    auto it = std::find_if(m_settings.begin(), m_settings.end(), [&](const Setting& s) {
-        return s.name == name;
-    });
-
-    if (it != m_settings.end()) {
-        return it->value;
+    auto it = m_index.find(name);
+    if (it != m_index.end()) {
+        return *it->second;
     }
     return defaultValue;
 }
 
 void SettingsManager::SetString(const std::string& name, const std::string& value) {
-    auto it = std::find_if(m_settings.begin(), m_settings.end(), [&](const Setting& s) {
-        return s.name == name;
-    });
-
-    if (it != m_settings.end()) {
-        it->value = value;
+    auto it = m_index.find(name);
+    if (it != m_index.end()) {
+        *it->second = value;
     } else {
         m_settings.push_back({name, "", value});
+        RebuildIndex(); // push_back may reallocate; rebuild all pointers
     }
 }
 
@@ -148,4 +140,12 @@ void SettingsManager::SetDefaultSettings() {
         "On-screen mode indication",
         "disabled"
     });
+    RebuildIndex();
+}
+
+void SettingsManager::RebuildIndex() {
+    m_index.clear();
+    for (auto& s : m_settings) {
+        m_index[s.name] = &s.value;
+    }
 }

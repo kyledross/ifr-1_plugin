@@ -17,6 +17,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <filesystem>
 #include "XPlaneSDK.h"
 
@@ -43,6 +44,9 @@ public:
 private:
     std::filesystem::path m_path;
     std::vector<Setting> m_settings;
-    
+    // Index for O(1) name->value lookups; kept in sync with m_settings.
+    std::unordered_map<std::string, std::string*> m_index;
+
     void SetDefaultSettings();
+    void RebuildIndex();
 };

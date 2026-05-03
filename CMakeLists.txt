@@ -100,6 +100,7 @@ add_library(ifr1flex_core STATIC
         src/core/SettingsManager.h
         src/core/ConditionEvaluator.cpp
         src/core/ThreadSafeQueue.h
+        src/core/DataRefUtils.h
         src/core/IHardwareManager.h
         src/core/IFR1Protocol.h
 )
@@ -124,6 +125,7 @@ add_library(ifr1flex SHARED
     src/ui/QuickReferenceWindow.cpp
     src/ui/QuickReferenceWindow.h
     src/ui/GLTextureHandle.h
+    src/ui/ScrollbarHelper.h
 )
 add_dependencies(ifr1flex embed_resources)
 target_include_directories(ifr1flex PRIVATE 

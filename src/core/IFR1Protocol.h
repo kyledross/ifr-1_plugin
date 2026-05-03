@@ -56,10 +56,6 @@ struct HardwareEvent {
     int8_t innerKnobRotation = 0;
     Mode mode = Mode::COM1;
     bool buttonStates[12]{};
-    
-    // One-shot press indicators (helper for EventProcessor)
-    bool shortPress[12]{};
-    bool longPress[12]{};
 };
 
 namespace LEDMask {

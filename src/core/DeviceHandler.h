@@ -71,7 +71,7 @@ private:
     void HandleButtons(const IFR1::HardwareEvent& event, const nlohmann::json& config, float currentTime);
     
     void WorkerThread();
-    static IFR1::HardwareEvent ParseReport(const uint8_t* data);
+    IFR1::HardwareEvent ParseReport(const uint8_t* data);
 
     IHardwareManager& m_hw;
     EventProcessor& m_eventProc;

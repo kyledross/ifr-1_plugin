@@ -15,9 +15,15 @@
  */
 
 #include "HIDManager.h"
+#include <cstdio>
 
 HIDManager::HIDManager() : m_device(nullptr) {
-    hid_init();
+    if (hid_init() != 0) {
+        // hid_init failing typically means HIDAPI could not initialize the
+        // platform HID backend.  Subsequent hid_open calls will fail and the
+        // plugin will report the device as not connected.
+        fprintf(stderr, "IFR-1 Flex: hid_init() failed\n");
+    }
 }
 
 HIDManager::~HIDManager() {
