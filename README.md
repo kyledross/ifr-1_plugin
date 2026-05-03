@@ -10,13 +10,13 @@ This software is not affiliated with, endorsed by, or supported by Octavi GmbH o
 
 **IFR-1 Flight Controller Plugin** is a native X-Plane plugin that integrates the Octavi IFR-1 hardware controller with X-Plane 12 on Linux. 
 
-Unlike other plugins, IFR-1 Flight Controller Plugin is designed for maximum flexibility. It uses a JSON-based configuration system that allows you to map hardware events (knob rotations, button presses) to any X-Plane command or dataref. This means you can easily customize the controller for any aircraft, even those with complex custom systems, without writing any code.
+The IFR-1 Flight Controller Plugin is designed for maximum flexibility. It uses a JSON-based configuration system that allows you to map hardware events (knob rotations, button presses) to any X-Plane command or dataref. This means you can easily customize the controller for any aircraft, even those with complex custom systems.
 
 ### Why not Windows or Mac?
 There are already well-established plugins for Windows that provide similar functionality. See the IFR-1's webpage at https://www.octavi.net/ for more information.  As for Mac, I simply don't have the hardware to test it on.  It _may_ work, but I can't guarantee it.
 
 ## Your support is appreciated
-Writing good quality software takes time and tools.  If you find this plugin helpful, please consider supporting the project at https://buymeacoffee.com/kyledross. Any contribution to help defray costs is greatly appreciated.
+Creating software takes time and tools.  If you find this plugin helpful, please consider supporting the project at https://buymeacoffee.com/kyledross. Any contribution to help defray costs is greatly appreciated.
 
 ## Features
 
@@ -30,7 +30,7 @@ Writing good quality software takes time and tools.  If you find this plugin hel
 ## Requirements
 
 ### Software
-- X-Plane 12.x on Linux (tested on X-Plane 12.3 running on Fedora 13, Ubuntu 24.04 LTS, and Debian 13)
+- X-Plane 12.x on Linux (tested on X-Plane 12.4 running on Ubuntu 24.04 LTS)
 
 ### Hardware
 - Octavi IFR-1 USB controller
@@ -88,7 +88,7 @@ A quick-reference guide for the aircraft you are using can be found in the Plugi
 While the specific behavior of each button and knob is defined by the JSON configuration, most default configs follow a standard layout:
 
 - **Mode Selection**: Press mode buttons to choose the mode that you will be working with (COM1, NAV1, FMS1, etc.).
-- **Shifted Modes**: Long-press the **inner knob** (for ~0.5s) to toggle the shifted state. For example, in COM1 mode, shifting will take you to HDG mode.
+- **Shifted Modes**: Long-press the **inner knob** (for ~0.5s) to toggle the shifted state. For example, in COM1 mode, shifting will take you to HDG mode.  Shifted states are printed in blue lettering above the mode buttons on the IFR-1 hardware.
 - **Autopilot Controls**: The buttons across the bottom and right are generally mapped to autopilot and FMS functions.
 - **LEDs**: The LEDs at the bottom show the status of the corresponding autopilot modes (e.g., AP engaged, ALT hold, etc.).
 
@@ -121,7 +121,7 @@ Settings are saved automatically to a `settings.json` file located in the plugin
 ## Support
 This plugin is a hobby project. If you encounter an issue or have a feature request, please open an issue on the [GitHub Issues](https://github.com/kyledross/ifr-1_plugin/issues) page.
 
-Contributions are welcome! If you create a great configuration for a new aircraft, please consider submitting a Pull Request.
+Contributions are welcome! If you create a configuration for a new aircraft, please consider submitting a Pull Request.
 
 ## License
 See the accompanying `LICENSE` file for details.
