@@ -228,6 +228,8 @@ PLUGIN_API int XPluginStart(char * outName, char * outSig, char * outDesc) {
 }
 
 PLUGIN_API void XPluginStop(void) {
+    gDeviceHandler.reset();
+    gHIDManager.reset();
     if (gFlightLoop) {
         XPLMDestroyFlightLoop(gFlightLoop);
         gFlightLoop = nullptr;
@@ -243,8 +245,6 @@ PLUGIN_API void XPluginStop(void) {
         gSubMenuIndex = -1;
     }
 
-    gDeviceHandler.reset();
-    gHIDManager.reset();
     gOutputProcessor.reset();
     gEventProcessor.reset();
     gConfigManager.reset();
