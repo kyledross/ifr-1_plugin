@@ -4,7 +4,7 @@
     "N844X",
     "RV-10"
   ],
-  "debug": true,
+  "debug": false,
   "modes": {
     "com1": {
       "inner-knob-button": {

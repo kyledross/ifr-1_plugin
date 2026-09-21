@@ -1,6 +1,6 @@
 {
   "name": "Beechcraft Baron/King Air",
-  "debug": true,
+  "debug": false,
   "aircraft": [
     "C90B",
     "Baron_58"

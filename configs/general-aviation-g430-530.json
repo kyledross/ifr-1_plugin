@@ -4,7 +4,7 @@
     "Cessna_172SP",
     "Cessna_172SP_seaplane"
   ],
-  "debug": true,
+  "debug": false,
   "modes": {
     "com1": {
       "outer-knob": {
