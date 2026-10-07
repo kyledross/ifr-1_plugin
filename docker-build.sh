@@ -68,17 +68,30 @@ fi
 echo "Running build in Docker container..."
 echo ""
 
+# Ownership strategy:
+# - Rootful Docker: run as the host user so bind-mounted outputs are owned by you.
+# - Rootless Docker: run as container root (UID 0), which maps to the host user.
+#   Do not chown to the host UID inside the container; that UID is remapped through
+#   the subordinate range (e.g. host 1000 -> container 1000 -> host 100999).
+DOCKER_USER_ARGS=()
+if docker info 2>/dev/null | grep -q 'rootless: true'; then
+    echo "Detected rootless Docker; running container as root (maps to host user)"
+else
+    DOCKER_USER_ARGS=(--user "$(id -u):$(id -g)")
+    echo "Detected rootful Docker; running container as host UID $(id -u)"
+fi
+echo ""
+
 # Run the build in Docker
 # - Mount source directory as read-only
 # - Mount build directory for CMake artifacts
 # - Mount output directory for final plugin
 docker run --rm \
     --name "$CONTAINER_NAME" \
+    "${DOCKER_USER_ARGS[@]}" \
     -v "$SCRIPT_DIR:/source:ro,Z" \
     -v "$SCRIPT_DIR/docker-build:/build:Z" \
     -v "$SCRIPT_DIR/docker-output:/output:Z" \
-    -e HOST_UID=$(id -u) \
-    -e HOST_GID=$(id -g) \
     "$IMAGE_NAME" \
     bash -c '
         set -e
@@ -101,9 +114,6 @@ docker run --rm \
         cp -v /source/LICENSE /output/LICENSE
         cp -v /source/NOTICE /output/NOTICE
         cp -rv /source/configs /output/configs
-        echo ""
-        echo "Fixing ownership of output files..."
-        chown -R $HOST_UID:$HOST_GID /output
         echo ""
         echo "Build complete!"
         echo ""
