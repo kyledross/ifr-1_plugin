@@ -113,6 +113,9 @@ docker run --rm \
         cp -v /source/install.sh /output/install.sh
         cp -v /source/LICENSE /output/LICENSE
         cp -v /source/NOTICE /output/NOTICE
+        # Replace configs entirely. cp into an existing destination directory nests
+        # as /output/configs/configs and leaves stale top-level JSON files behind.
+        rm -rf /output/configs
         cp -rv /source/configs /output/configs
         echo ""
         echo "Build complete!"

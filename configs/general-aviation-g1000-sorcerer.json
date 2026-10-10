@@ -45,7 +45,7 @@
           "actions": [
             {
               "type": "command",
-              "value": "sim/radios/stby_com1_coarse_up"
+              "value": "sim/radios/stby_com1_coarse_up_833"
             }
           ]
         },
@@ -54,7 +54,7 @@
           "actions": [
             {
               "type": "command",
-              "value": "sim/radios/stby_com1_coarse_down"
+              "value": "sim/radios/stby_com1_coarse_down_833"
             }
           ]
         }
@@ -65,7 +65,7 @@
           "actions": [
             {
               "type": "command",
-              "value": "sim/radios/stby_com1_fine_up"
+              "value": "sim/radios/stby_com1_fine_up_833"
             }
           ]
         },
@@ -74,7 +74,7 @@
           "actions": [
             {
               "type": "command",
-              "value": "sim/radios/stby_com1_fine_down"
+              "value": "sim/radios/stby_com1_fine_down_833"
             }
           ]
         }
@@ -119,7 +119,7 @@
           "actions": [
             {
               "type": "command",
-              "value": "sim/radios/stby_com2_coarse_up"
+              "value": "sim/radios/stby_com2_coarse_up_833"
             }
           ]
         },
@@ -128,7 +128,7 @@
           "actions": [
             {
               "type": "command",
-              "value": "sim/radios/stby_com2_coarse_down"
+              "value": "sim/radios/stby_com2_coarse_down_833"
             }
           ]
         }
@@ -139,7 +139,7 @@
           "actions": [
             {
               "type": "command",
-              "value": "sim/radios/stby_com2_fine_up"
+              "value": "sim/radios/stby_com2_fine_up_833"
             }
           ]
         },
@@ -148,7 +148,7 @@
           "actions": [
             {
               "type": "command",
-              "value": "sim/radios/stby_com2_fine_down"
+              "value": "sim/radios/stby_com2_fine_down_833"
             }
           ]
         }
