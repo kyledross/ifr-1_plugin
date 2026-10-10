@@ -368,9 +368,8 @@
           "description": "Increases the altimeter barometer setting by 0.01 inHg.",
           "actions": [
             {
-              "type": "dataref-adjust",
-              "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
-              "adjustment": 0.01
+              "type": "command",
+              "value": "sim/GPS/g1000n1_baro_up"
             }
           ]
         },
@@ -378,9 +377,8 @@
           "description": "Decreases the altimeter barometer setting by 0.01 inHg.",
           "actions": [
             {
-              "type": "dataref-adjust",
-              "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
-              "adjustment": -0.01
+              "type": "command",
+              "value": "sim/GPS/g1000n1_baro_down"
             }
           ]
         }
@@ -390,9 +388,8 @@
           "description": "Increases the altimeter barometer setting by 0.01 inHg.",
           "actions": [
             {
-              "type": "dataref-adjust",
-              "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
-              "adjustment": 0.01
+              "type": "command",
+              "value": "sim/GPS/g1000n1_baro_up"
             }
           ]
         },
@@ -400,9 +397,8 @@
           "description": "Decreases the altimeter barometer setting by 0.01 inHg.",
           "actions": [
             {
-              "type": "dataref-adjust",
-              "value": "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
-              "adjustment": -0.01
+              "type": "command",
+              "value": "sim/GPS/g1000n1_baro_down"
             }
           ]
         }
