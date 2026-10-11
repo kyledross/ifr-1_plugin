@@ -412,6 +412,101 @@ TEST(EventProcessorTest, DataRefAdjust_ArrayInt) {
     processor.ProcessEvent(config, "com1", "knob_inner", "rotate_cw");
 }
 
+TEST(EventProcessorTest, ProcessEvent_DatarefToggle_IntOffToOn) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"baro", {
+                {"swap", {
+                    {"short-press", {
+                        {"actions", {
+                            {
+                                {"type", "dataref-toggle"},
+                                {"value", "sim/physics/metric_press"}
+                            }
+                        }}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* dummyDr = reinterpret_cast<void*>(0xBEEF);
+    EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/physics/metric_press")))
+        .WillOnce(Return(dummyDr));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr)).WillOnce(Return(1)); // xplmType_Int = 1
+    EXPECT_CALL(mockSdk, GetDatai(dummyDr)).WillOnce(Return(0));
+    EXPECT_CALL(mockSdk, SetDatai(dummyDr, 1));
+
+    processor.ProcessEvent(config, "baro", "swap", "short-press");
+}
+
+TEST(EventProcessorTest, ProcessEvent_DatarefToggle_IntOnToOff) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"baro", {
+                {"swap", {
+                    {"short-press", {
+                        {"actions", {
+                            {
+                                {"type", "dataref-toggle"},
+                                {"value", "sim/physics/metric_press"}
+                            }
+                        }}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* dummyDr = reinterpret_cast<void*>(0xBEEF);
+    EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/physics/metric_press")))
+        .WillOnce(Return(dummyDr));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr)).WillOnce(Return(1)); // xplmType_Int = 1
+    EXPECT_CALL(mockSdk, GetDatai(dummyDr)).WillOnce(Return(1));
+    EXPECT_CALL(mockSdk, SetDatai(dummyDr, 0));
+
+    processor.ProcessEvent(config, "baro", "swap", "short-press");
+}
+
+TEST(EventProcessorTest, ProcessEvent_DatarefToggle_CustomOnOff) {
+    MockXPlaneSDK mockSdk;
+    EventProcessor processor(mockSdk);
+
+    nlohmann::json config = {
+        {"modes", {
+            {"baro", {
+                {"swap", {
+                    {"short-press", {
+                        {"actions", {
+                            {
+                                {"type", "dataref-toggle"},
+                                {"value", "sim/test/two_state"},
+                                {"on-value", 2},
+                                {"off-value", 1}
+                            }
+                        }}
+                    }}
+                }}
+            }}
+        }}
+    };
+
+    void* dummyDr = reinterpret_cast<void*>(0xCAFE);
+    EXPECT_CALL(mockSdk, FindDataRef(::testing::StrEq("sim/test/two_state")))
+        .WillOnce(Return(dummyDr));
+    EXPECT_CALL(mockSdk, GetDataRefTypes(dummyDr)).WillOnce(Return(1)); // xplmType_Int = 1
+    EXPECT_CALL(mockSdk, GetDatai(dummyDr)).WillOnce(Return(1));
+    EXPECT_CALL(mockSdk, SetDatai(dummyDr, 2));
+
+    processor.ProcessEvent(config, "baro", "swap", "short-press");
+}
+
 TEST(EventProcessorTest, DataRefSet_ArrayFloat) {
     MockXPlaneSDK mockSdk;
     EventProcessor processor(mockSdk);

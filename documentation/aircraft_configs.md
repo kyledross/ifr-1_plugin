@@ -70,7 +70,7 @@ Within each mode, you map **Controls** to **Actions** based on **Event Types**. 
 - **For Buttons**: `short-press`, `long-press`
 
 ### Action Types
-There are three types of actions you can trigger within the `actions` array:
+There are five types of actions you can trigger within the `actions` array:
 
 #### 1. `command`
 Executes a standard X-Plane command.
@@ -93,6 +93,12 @@ Increments or decrements a dataref.
 - `min`: (Optional) Minimum allowed value.
 - `max`: (Optional) Maximum allowed value.
 - `limit-type`: (Optional) `"clamp"` (default) or `"wrap"`.
+
+#### 5. `dataref-toggle`
+Toggles a dataref between two values. If the current value equals `on-value`, the dataref is set to `off-value`; otherwise it is set to `on-value`.
+- `value`: The dataref name.
+- `on-value`: (Optional) Value treated as the "on" state. Defaults to `1`.
+- `off-value`: (Optional) Value treated as the "off" state. Defaults to `0`.
 
 ### Example of Single-Action Event
 Even for a single action, the `actions` array is required.

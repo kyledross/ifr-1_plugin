@@ -301,7 +301,7 @@
       },
       "outer-knob": {
         "rotate-clockwise": {
-          "description": "Increases the altimeter barometer setting by 0.01 inHg.",
+          "description": "Increases the altimeter barometer setting.",
           "actions": [
             {
               "type": "command",
@@ -310,7 +310,7 @@
           ]
         },
         "rotate-counterclockwise": {
-          "description": "Decreases the altimeter barometer setting by 0.01 inHg.",
+          "description": "Decreases the altimeter barometer setting.",
           "actions": [
             {
               "type": "command",
@@ -321,7 +321,7 @@
       },
       "inner-knob": {
         "rotate-clockwise": {
-          "description": "Increases the altimeter barometer setting by 0.01 inHg.",
+          "description": "Increases the altimeter barometer setting.",
           "actions": [
             {
               "type": "command",
@@ -330,7 +330,7 @@
           ]
         },
         "rotate-counterclockwise": {
-          "description": "Decreases the altimeter barometer setting by 0.01 inHg.",
+          "description": "Decreases the altimeter barometer setting.",
           "actions": [
             {
               "type": "command",

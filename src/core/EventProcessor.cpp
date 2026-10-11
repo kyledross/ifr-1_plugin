@@ -144,6 +144,55 @@ void EventProcessor::ExecuteAction(const nlohmann::json& actionConfig)
         } else {
             IFR1_LOG_ERROR(m_sdk, "DataRef not found: {}", value);
         }
+    } else if (type == "dataref-toggle") {
+        auto info = ::ParseDataRef(value);
+        if (void* drRef = m_sdk.FindDataRef(info.name.c_str())) {
+            int types = m_sdk.GetDataRefTypes(drRef);
+            float current = 0.0f;
+            bool isInt = false;
+
+            if (info.index != -1) {
+                isInt = (types & static_cast<int>(DataRefType::IntArray));
+                if (isInt) {
+                    current = static_cast<float>(m_sdk.GetDataiArray(drRef, info.index));
+                } else {
+                    current = m_sdk.GetDatafArray(drRef, info.index);
+                }
+            } else {
+                isInt = (types & static_cast<int>(DataRefType::Int));
+                if (isInt) {
+                    current = static_cast<float>(m_sdk.GetDatai(drRef));
+                } else {
+                    current = m_sdk.GetDataf(drRef);
+                }
+            }
+
+            float onValue = actionConfig.value("on-value", 1.0f);
+            float offValue = actionConfig.value("off-value", 0.0f);
+            constexpr float kEpsilon = 1e-5f;
+            bool isOn = isInt
+                ? (static_cast<int>(std::round(current)) == static_cast<int>(std::round(onValue)))
+                : (std::fabs(current - onValue) <= kEpsilon);
+            float next = isOn ? offValue : onValue;
+
+            IFR1_LOG_VERBOSE(m_sdk, "Toggling dataref: {} (current: {}) -> {}", value, current, next);
+
+            if (info.index != -1) {
+                if (isInt) {
+                    m_sdk.SetDataiArray(drRef, static_cast<int>(std::round(next)), info.index);
+                } else {
+                    m_sdk.SetDatafArray(drRef, next, info.index);
+                }
+            } else {
+                if (isInt) {
+                    m_sdk.SetDatai(drRef, static_cast<int>(std::round(next)));
+                } else {
+                    m_sdk.SetDataf(drRef, next);
+                }
+            }
+        } else {
+            IFR1_LOG_ERROR(m_sdk, "DataRef not found: {}", value);
+        }
     } else if (type == "sound") {
         std::string fullPath = m_sdk.GetSystemPath() + value;
         m_sdk.PlaySound(fullPath);
