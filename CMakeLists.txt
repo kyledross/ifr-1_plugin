@@ -13,7 +13,6 @@ endif()
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # 3. External Libraries (Google Test & JSON)
@@ -34,7 +33,7 @@ FetchContent_Declare(
 
 FetchContent_Declare(
   hidapi
-  URL https://github.com/libusb/hidapi/archive/refs/tags/hidapi-0.14.0.tar.gz
+  URL https://github.com/libusb/hidapi/archive/refs/tags/hidapi-0.15.0.tar.gz
 )
 
 # 3.1 hidapi configuration
