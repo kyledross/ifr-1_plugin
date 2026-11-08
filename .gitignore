@@ -22,3 +22,5 @@
 /deploy.sh
 /.output.txt
 /CMakeUserPresets.json
+/.agents/
+/.gemini/
